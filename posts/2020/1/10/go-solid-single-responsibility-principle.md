@@ -16,8 +16,8 @@ publish_date:  2020-01-10
 ## สารบัญ
 
 - Go SOLID - Single Responsibility Principle
-- [Go SOLID - Open-Closed](/2020/1/2/go-solid-open-closed)
-- [Go SOLID - Interface Segregation](/2019/12/20/go-solid-interface-segregation)
+- [Go SOLID - Open-closed Principle](/2020/1/2/go-solid-open-closed-principle)
+- [Go SOLID - Interface Segregation Principle](/2019/12/20/go-solid-interface-segregation-principle)
 
 ---
 
