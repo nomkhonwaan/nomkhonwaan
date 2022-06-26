@@ -13,7 +13,7 @@ Open-closed เป็นหลักการที่พบเห็นได�
 
 - [Go SOLID - Single Responsibility Principle](/2020/1/10/go-solid-single-responsibility-principle)
 - Go SOLID - Open-closed Principle
-- [Go SOLID - Interface Segregation Principle](/2019/12/20/go-solid-interface-segregation-principle)
+- [Go SOLID - Interface Segregation Principle](/2022/5/7/go-solid-interface-segregation-principle)
 
 ---
 
