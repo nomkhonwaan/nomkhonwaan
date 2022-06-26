@@ -17,7 +17,7 @@ publish_date:  2020-01-10
 
 - Go SOLID - Single Responsibility Principle
 - [Go SOLID - Open-closed Principle](/2020/1/2/go-solid-open-closed-principle)
-- [Go SOLID - Interface Segregation Principle](/2019/12/20/go-solid-interface-segregation-principle)
+- [Go SOLID - Interface Segregation Principle](/2022/5/7/go-solid-interface-segregation-principle)
 
 ---
 

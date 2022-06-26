@@ -13,7 +13,7 @@ Open-closed เป็นหลักการที่พบเห็นได�
 
 - [Go SOLID - Single Responsibility Principle](/2020/1/10/go-solid-single-responsibility-principle)
 - Go SOLID - Open-closed Principle
-- [Go SOLID - Interface Segregation Principle](/2019/12/20/go-solid-interface-segregation-principle)
+- [Go SOLID - Interface Segregation Principle](/2022/5/7/go-solid-interface-segregation-principle)
 
 ---
 
@@ -75,3 +75,6 @@ func (s rectangle) area() float64 {
 ---
 
 หลักการ open-closed เดิมที่ถูกออกแบบเพื่อใช้งานระหว่างคลาสและซูเปอร์คลาสในภาษาตระกูล OOP เป็นหลัก แต่ภายหลังได้เปลี่ยนมาเป็นการใช้งานอินเตอร์เฟสแทนเพื่อความยืดหยุ่นที่มากขึ้น
+
+---
+#go #solid
