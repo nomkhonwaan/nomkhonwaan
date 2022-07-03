@@ -614,3 +614,6 @@ func TestAdd(t *testing.T) {
 ---
 
 ตัวอย่างโค้ดฉบับเต็มสามารถดูได้ที่ [Go Playground](https://go.dev/play/p/HwEj2buPvM2)
+
+---
+#tdd #kata #go
