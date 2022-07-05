@@ -83,3 +83,35 @@ fn read_lines<P: AsRef<path::Path>>(path: P) -> io::Result<io::Lines<io::BufRead
 }
 ```
 
+เมื่อได้ฟังก์ชัน `read_lines` แล้วมาเติมส่วนของการแปลงค่าสตริงเป็นตัวเลขที่ `main` แบบนี้
+
+```rust
+use std::{env, fs, io, io::BufRead, path};
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let input = &args[1];
+
+    println!("process input file: {}", input);
+
+    let mut sum: isize = 0;
+
+    if let Ok(lines) = read_lines(input) {
+        for line in lines {
+            if let Ok(line) = line {
+                let freq: isize = line.parse().expect("invalid number");
+                // accumulate the frequency to sum variable
+                sum += freq;
+            }
+        }
+    }
+
+    println!("the answer is: {}", sum);
+}
+```
+
+เท่านี้ก็ได้คำตอบของพาร์ทแรกในวันที่หนึ่งแล้ว
+
+---
+
+ถ้าอ่านแล้วยังไม่ค่อยเข้าใจสามารถเข้าไปดูหรือดาวน์โหลดตัวอย่าง [โค้ดพาร์ทแรก](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=c8d1896914f6c4d82a5f84d133af3395) และ [โค้ดพาร์ทสอง]() มาลองเล่นจะช่วยให้เข้าใจได้ง่ายขึ้น
