@@ -53,4 +53,33 @@ _"Error: Device must be calibrated before first use. Frequency drift detected. C
 1 directory, 2 files
 ```
 
-จัดการเปิดไฟล์ main.rs แล้วเพิ่มฟังก์ชันสำหรับอ่านไฟล์แบบนี้
+จัดการเปิดไฟล์ main.rs แล้วเพิ่มส่วนของการรับอาร์กิวเมนต์แบบนี้
+
+```rust
+use std:: {env};
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let input: &String = &args[1];
+
+    println!("processing input file: {}", input);
+}
+```
+
+ลองสั่งรันด้วย `cargo run -- input.txt` จะได้ผลลัพธ์แบบนี้
+
+```
+process input file: input.txt
+```
+
+จากนั้นมาเขียนฟังก์ชันสำหรับเปิดไฟล์เพื่ออ่านทีละบรรทัดตามตัวอย่าง [`read_lines`](https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html) แบบนี้
+
+```rust
+use std::{env, fs, io, io::BufRead, path};
+
+fn read_lines<P: AsRef<path::Path>>(path: P) -> io::Result<io::Lines<io::BufReader<fs::File>>> {
+    let file = fs::File::open(path)?;
+    Ok(io::BufReader::new(file).lines())
+}
+```
+
