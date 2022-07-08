@@ -339,7 +339,7 @@ func TestGame(t *testing.T) {
 }
 ```
 
-จากนั้นแก้ไข `Frame` เพื่อบันทึกคะแนนพิเศษสำหรับเฟรมสุดท้ายโดยเพิ่ม `lastFrameKnockedPins` แบบนี้
+จากนั้นแก้ไข `Frame` โดยเพิ่ม `lastFrameKnockedPins` เข้าไปเพื่อบันทึกคะแนนพิเศษสำหรับเฟรมสุดท้าย
 
 ```go
 # game.go
@@ -349,3 +349,65 @@ type Frame struct {
         lastFrameKnockedPins              int
 }
 ```
+
+จากนั้นแก้ไขฟังก์ชัน `roll` เพื่อเช็คว่าถ้าเป็นเฟรมสุดท้ายคะแนนพิเศษที่ได้จะนับรวมเข้าไปที่ `lastFrameKnockedPins` แทน
+
+```go
+# game.go
+
+func (g *Game) roll(pins int) {
+        g.times++
+        // this is the first attempt,
+        // create a new frame instance and
+        // put the number of knocked down pin in it.
+        if g.times%2 != 0 {
+                // strike!
+                // let's skip the second roll of this frame
+                if pins == 10 {
+                        g.times++
+                }
+                // either spare or strike at the last frame,
+                // then the knocked down pins will assign to the special score
+                // of the last frame.
+                if float64(g.times)/2 > 10 {
+                        g.frames[9].lastFrameKnockedPins += pins
+                        return
+                }
+
+                g.frames = append(g.frames, Frame{firstKnockedPins: pins})
+                return
+        }
+        // get the latest frame from the list of frames
+        // and update its roll.
+        g.frames[len(g.frames)-1].lastKnockedPins = pins
+}
+```
+
+สุดท้ายที่ฟังก์ชัน `score` แก้ไขนิดหน่อยโดยให้รวมคะแนนของเฟรมสุดท้ายเข้าไปด้วย
+
+```go
+# game.go
+
+// score calculates and returns a total score of the game.
+func (g Game) score() int {
+        var totalScore int
+
+        for i, f := range g.frames {
+                totalScore += f.firstKnockedPins + f.lastKnockedPins + f.lastFrameKnockedPins // include the last frame special score
+
+                ...
+        }
+
+        return totalScore
+}
+```
+
+เท่านี้โปรแกรมนับคะแนนโบวลิ่งก็ทำงานได้อย่างถูกต้องหมดแล้ว
+
+---
+
+ตัวอย่างโค้ดฉบับเต็มสามารถดูได้ที่ [Go Playground](https://go.dev/play/p/RCgsb1xbBOw)
+
+---
+
+#tdd #kata #go
