@@ -13,7 +13,7 @@ blog({
   ],
   style:
     `
-      @import url('https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap');
 
       h1, h2, h3, h4, h5, h6 {
         font-family: 'Prompt', sans-serif;
@@ -21,6 +21,10 @@ blog({
       
       p {
         font-family: 'Maitree', sans-serif;
+      }
+
+      code {
+        font-family: 'Source Code Pro', monospace;
       }
     `,
   background: "#f9f9f9",
