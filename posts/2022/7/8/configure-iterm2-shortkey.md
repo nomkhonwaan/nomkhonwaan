@@ -40,5 +40,4 @@ $ cat /etc/passwd | grep root | awk -F ':' '{print $5}'
 ทีนี้เวลาจะลบคำสามารถกด Option + Back เพื่อลบทั้งคำได้
 
 ---
-
 #iterm2
