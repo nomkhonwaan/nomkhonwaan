@@ -161,5 +161,4 @@ func (pmt EmployeePayment) CalculatePay(emp Employee) Monay {
 > Gather together the things that change for the same reasons. Separate those things that change for different reasons.
 
 ---
-
 #go #solid
