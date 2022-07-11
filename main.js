@@ -11,7 +11,8 @@ blog({
     { title: "GitHub", url: "https://github.com/nomkhonwaan" },
     { title: "LinkedIn", url: "https://linkedin.com/in/nomkhonwaan" },
   ],
-  lang: "th",
+  lang: "en",
+  dateStyle: "long",
   style:
     `
       @import url('https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap');
