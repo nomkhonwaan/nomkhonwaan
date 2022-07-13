@@ -42,11 +42,167 @@ type Post struct {
 }
 ```
 
-ทีนี้ถ้าต้องการแสดงผลข้อมูลโพสต์ทั้งหมดในรูปแบบ JSON กรณีที่ไม่ใช้งาน Repository กระบวนการคิวรี่ข้อมูลก็จะเขียนไว้ที่ฟังก์ชันนั้น ๆ แทนแบบนี้
+ทีนี้ถ้าต้องการแสดงผลข้อมูลโพสต์ทั้งหมดในรูปแบบ JSON กรณีที่ไม่ใช้งาน Repository กระบวนการคิวรี่ข้อมูลก็จะเขียนไว้ที่ฟังก์ชันตรง ๆ แบบฟังก์ชัน `listAllPosts`
 
 ```go
+import (
+        "database/sql"
+        "encoding/json"
+        "fmt"
+        "net/http"
+        "time"
 
+        _ "github.com/go-sql-driver/mysql"
+)
+
+func main() {
+        db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", "root", "my-secret-pw", "localhost", "go_repository_pattern"))
+        if err != nil {
+                panic(err)
+        }
+        defer db.Close()
+
+        http.HandleFunc("/posts", listAllPosts(db))
+        http.ListenAndServe(":8080", nil)
+}
+
+// listAllPosts shows all posts in the database.
+func listAllPosts(db *sql.DB) http.HandlerFunc {
+        return func(w http.ResponseWriter, r *http.Request) {
+                rows, err := db.Query(`SELECT id, title, body, created_at, updated_at FROM posts`)
+                if err != nil {
+                        http.Error(w, err.Error(), http.StatusInternalServerError)
+                        return
+                }
+                defer rows.Close()
+
+                var posts []Post
+                for rows.Next() {
+                        var p Post
+                        err = rows.Scan(&p.ID, &p.Title, &p.Body, &p.CreatedAt, &p.UpdatedAt)
+                        if err != nil {
+                                http.Error(w, err.Error(), http.StatusInternalServerError)
+                                return
+                        }
+                        posts = append(posts, p)
+                }
+
+                err = json.NewEncoder(w).Encode(posts)
+                if err != nil {
+                        http.Error(w, err.Error(), http.StatusInternalServerError)
+                        return
+                }
+        }
+}
 ```
 
+ลองปรับมาใช้ Repository Pattern ด้วยการรับอินเตอร์เฟส `Repository` แล้วเรียกใช้ฟังก์ชัน `FindAll` แทนแบบนี้
+
+```go
+// Repository provides `posts` handling function
+type Repository interface {
+        FindAll() ([]Post, error)
+}
+
+// listAllPosts shows all posts in the database.
+func listAllPosts(repo Repository) http.HandlerFunc {
+        return func(w http.ResponseWriter, r *http.Request) {
+                posts, err := repo.FindAll()
+                if err != nil {
+                        http.Error(w, err.Error(), http.StatusInternalServerError)
+                        return
+                }
+
+                err = json.NewEncoder(w).Encode(posts)
+                if err != nil {
+                        http.Error(w, err.Error(), http.StatusInternalServerError)
+                        return
+                }
+        }
+}
+```
+
+จากนั้นย้ายส่วนของการคิวรี่ข้อมูลไปอยู่ที่ `MariaDBRepository` ที่อิมพลิเมนต์ `Repository` แทน
+
+```go
+// MariaDBRepository implements Repository for using with MariaDB.
+type MariaDBRepository struct {
+        db *sql.DB
+}
+
+func (repo MariaDBRepository) FindAll() ([]Post, error) {
+        rows, err := repo.db.Query(`SELECT id, title, body, created_at, updated_at FROM posts`)
+        if err != nil {
+                return nil, err
+        }
+        defer rows.Close()
+
+        var posts []Post
+        for rows.Next() {
+                var p Post
+                err = rows.Scan(&p.ID, &p.Title, &p.Body, &p.CreatedAt, &p.UpdatedAt)
+                if err != nil {
+                        return nil, err
+                }
+                posts = append(posts, p)
+        }
+
+        return posts, nil
+}
+```
+
+ทำการแก้ไขฟังก์ชันที่ `main` เพื่อให้ส่ง `Repository` เข้ามาแทนที่จะเป็น `*sql.DB` 
+
+```go
+func main() {
+        db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", "root", "my-secret-pw", "localhost", "go_repository_pattern"))
+        if err != nil {
+                panic(err)
+        }
+        defer db.Close()
+
+        repo := MariaDBRepository{db: db}
+
+        http.HandleFunc("/posts", listAllPosts(repo))
+        http.ListenAndServe(":8080", nil)
+}
+```
+
+ในอนาคตหากโปรแกรมต้องการเปลี่ยนจาก MariaDB เป็นฐานข้อมูลชนิดอื่น การทำงานของฟังก์ชัน `listAllPosts` ก็จะยังคงเหมือนเดิม เพราะส่วนของการติดต่อกับข้อมูลได้แยกออกจากการประมวลอยู่แล้ว
+
 ---
-#go #repository-pattern #design-pattern
+
+ข้อดีอีกอย่างคือการเขียนเทสสามารถทำได้ง่ายขึ้นโดยการจำลอง `Repository` แบบนี้
+
+```go
+type mockRepository struct{}
+
+func (repo mockRepository) FindAll() ([]Post, error) {
+        return []Post{
+                {
+                        ID:    1,
+                        Title: "title",
+                        Body:  "body",
+                },
+        }, nil
+}
+
+func TestSuccessfulListAllPosts(t *testing.T) {
+        // Given
+        w := httptest.NewRecorder()
+        expected := `[{"ID":1,"Title":"title","Body":"body","CreatedAt":null,"UpdatedAt":null}]` + "\n"
+
+        // When
+        listAllPosts(mockRepository{}).ServeHTTP(w, nil)
+
+        // Then
+        if w.Body.String() != expected {
+                t.Error("invalid body")
+        }
+}
+```
+
+[Go Playground](https://go.dev/play/p/9e9JKD1Svfx)
+
+---
+#go
