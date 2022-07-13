@@ -1,4 +1,4 @@
-import blog, { ga, redirects } from "https://deno.land/x/blog@0.3.3/blog.tsx";
+import blog, { ga } from "https://deno.land/x/blog@0.4.0/blog.tsx";
 
 blog({
   title: "Nomkhonwaan",
@@ -27,8 +27,10 @@ blog({
         font-family: 'Source Code Pro', monospace;
       }
     `,
-  background: "#f9f9f9",
   middlewares: [
     ga("UA-33411047-1"),
-  ]
+  ],
+  lang: "en",
+  dateStyle: "long",
+  theme: "auto",
 });

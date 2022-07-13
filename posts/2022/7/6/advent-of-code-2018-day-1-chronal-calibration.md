@@ -1,6 +1,6 @@
 ---
 title: Advent of Code 2018 Day 1 - Chronal Calibration
-publish_date: 2022-7-6
+publish_date: 2022-07-06
 ---
 
 เห็นบล็อก Advent of Code 2018 ณ ตอนปี 2022 อาจจะเผลอคิดในใจกันว่าช้าไปหรือเปล่า (ฮา) บังเอิญได้มีโอกาสอ่านบล็อก [Learning Rust in 2020](https://github.com/pretzelhammer/rust-blog/blob/master/posts/learning-rust-in-2020.md#tldr) และมีการพูดถึง Advent of Code 2018 ว่าเป็นจุดเริ่มต้นที่ดีสำหรับใช้เรียนรู้ภาษา Rust
