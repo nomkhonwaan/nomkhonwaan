@@ -10,6 +10,7 @@ publish_date: 2022-07-06
 ## สารบัญ
 
 - Advent of Code 2018 Day 1 - Chronal Calibration
+- [Advent of Code 2018 Day 2 - Inventory Management System](/2022/7/22/advent-of-code-2018-day-2-inventory-management-system)
 
 ---
 
@@ -97,6 +98,8 @@ fn main() {
 }
 ```
 
+[Rust Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=e4ca8ec8e34e16ee3de3dbda57191ddc)
+
 เท่านี้ก็สามารถหาคำตอบของพาร์ทแรกได้แล้ว
 
 ---
@@ -175,11 +178,9 @@ fn main() {
 }
 ```
 
-ใช้เวลารันสักพักใหญ่ ๆ ก็จะได้ผลลัพธ์ออกมา แน่นอนว่านี่ไม่ใช่วิธีที่เร็วที่สุดแต่เป็นวิธีที่น่าจะเข้าใจได้ง่ายตรงตามความต้องการของโจทย์
+[Rust Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=9c3390ca362c9af216822ca9c72320d0)
+
+ใช้เวลารันสักพักใหญ่ ๆ ก็จะได้คำตอบของพาร์ทสอง
 
 ---
-
-ถ้าอ่านแล้วยังไม่ค่อยเข้าใจสามารถเข้าไปดูหรือดาวน์โหลดตัวอย่าง [โค้ดพาร์ทแรก](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=e4ca8ec8e34e16ee3de3dbda57191ddc) และ [โค้ดพาร์ทสอง](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=9c3390ca362c9af216822ca9c72320d0) มาลองเล่นจะช่วยให้เข้าใจได้ง่ายขึ้น
-
----
-#rust #advent-of-code
+#advent-of-code #rust
