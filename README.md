@@ -1,3 +1,7 @@
-# Blog
+# Hello, World!
 
-A simple blog web built on [Deno Blog](https://github.com/denoland/deno_blog) and run on the [Deno Deploy](https://deno.com/deploy).
+I am a Full Stack Develop from Thailand.
+
+## Stats
+
+<img src="https://wakatime.com/share/@nomkhonwaan/778f0d74-b3e9-492f-8517-58363cd02f49.svg" width="50%" />
