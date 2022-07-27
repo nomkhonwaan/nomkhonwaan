@@ -12,6 +12,10 @@ publish_date: 2022-07-06
 - Advent of Code 2018 Day 1 - Chronal Calibration
 - [Advent of Code 2018 Day 2 - Inventory Management System](/2022/7/22/advent-of-code-2018-day-2-inventory-management-system)
 
+## TL;DR
+
+[GitHub](https://github.com/nomkhonwaan/nomkhonwaan/blob/main/advent-of-code/2018/day_1_chronal_calibration.rs)
+
 ---
 
 เรื่องราวเริ่มต้นเมื่อมีคนพยายามจะแก้ไขประวัติศาสตร์ของซานต้าเมื่อ 500 ปีก่อน เอลฟ์สาวประจำสถานีวิจัยและตรวจสอบความผิดปกติเป็นคนเล่า เธอต้องการให้เราย้อนเวลากลับไปแก้ไขเรื่องราวเหล่านี้
@@ -82,25 +86,23 @@ use std::{env, fs, io, io::BufRead, path};
 fn main() {
     let args: Vec<String> = env::args().collect();
     let input = &args[1];
-    let mut resulting_frequency = 0isize;
+    let mut first_part_answer = 0isize;
 
     if let Ok(lines) = read_lines(input) {
         for line in lines {
             if let Ok(line) = line {
                 // convert string to signed integer
                 let current_frequency: isize = line.parse().expect("invalid number");
-                resulting_frequency += current_frequency;
+                first_part_answer += current_frequency;
             }
         }
     }
 
-    println!("{}", resulting_frequency);
+    println!("first part answer is: {}", first_part_answer);
 }
 ```
 
-[Rust Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=e4ca8ec8e34e16ee3de3dbda57191ddc)
-
-เท่านี้ก็สามารถหาคำตอบของพาร์ทแรกได้แล้ว
+เท่านี้ก็ได้คำตอบของพาร์ทแรกแล้ว
 
 ---
 
@@ -174,11 +176,10 @@ fn main() {
         }
     }
 
-    println!("{}", find_first_reaches_twice(&frequency))
+    let second_part_answer = find_first_reaches_twice(&frequency);
+    println!("second part answer is: {}", second_part_answer);
 }
 ```
-
-[Rust Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=9c3390ca362c9af216822ca9c72320d0)
 
 ใช้เวลารันสักพักใหญ่ ๆ ก็จะได้คำตอบของพาร์ทสอง
 
