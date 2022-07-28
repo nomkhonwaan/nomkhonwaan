@@ -10,6 +10,11 @@ publish_date: 2022-07-06
 ## สารบัญ
 
 - Advent of Code 2018 Day 1 - Chronal Calibration
+- [Advent of Code 2018 Day 2 - Inventory Management System](/2022/7/22/advent-of-code-2018-day-2-inventory-management-system)
+
+## TL;DR
+
+[GitHub](https://github.com/nomkhonwaan/nomkhonwaan/blob/main/advent-of-code/2018/day_1_chronal_calibration.rs)
 
 ---
 
@@ -81,23 +86,23 @@ use std::{env, fs, io, io::BufRead, path};
 fn main() {
     let args: Vec<String> = env::args().collect();
     let input = &args[1];
-    let mut resulting_frequency = 0isize;
+    let mut first_part_answer = 0isize;
 
     if let Ok(lines) = read_lines(input) {
         for line in lines {
             if let Ok(line) = line {
                 // convert string to signed integer
                 let current_frequency: isize = line.parse().expect("invalid number");
-                resulting_frequency += current_frequency;
+                first_part_answer += current_frequency;
             }
         }
     }
 
-    println!("{}", resulting_frequency);
+    println!("first part answer is: {}", first_part_answer);
 }
 ```
 
-เท่านี้ก็สามารถหาคำตอบของพาร์ทแรกได้แล้ว
+เท่านี้ก็ได้คำตอบของพาร์ทแรกแล้ว
 
 ---
 
@@ -171,15 +176,12 @@ fn main() {
         }
     }
 
-    println!("{}", find_first_reaches_twice(&frequency))
+    let second_part_answer = find_first_reaches_twice(&frequency);
+    println!("second part answer is: {}", second_part_answer);
 }
 ```
 
-ใช้เวลารันสักพักใหญ่ ๆ ก็จะได้ผลลัพธ์ออกมา แน่นอนว่านี่ไม่ใช่วิธีที่เร็วที่สุดแต่เป็นวิธีที่น่าจะเข้าใจได้ง่ายตรงตามความต้องการของโจทย์
+ใช้เวลารันสักพักใหญ่ ๆ ก็จะได้คำตอบของพาร์ทสอง
 
 ---
-
-ถ้าอ่านแล้วยังไม่ค่อยเข้าใจสามารถเข้าไปดูหรือดาวน์โหลดตัวอย่าง [โค้ดพาร์ทแรก](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=e4ca8ec8e34e16ee3de3dbda57191ddc) และ [โค้ดพาร์ทสอง](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=9c3390ca362c9af216822ca9c72320d0) มาลองเล่นจะช่วยให้เข้าใจได้ง่ายขึ้น
-
----
-#rust #advent-of-code
+#advent-of-code #rust
