@@ -10,7 +10,7 @@ publish_date: 2022-07-06
 ## สารบัญ
 
 - Advent of Code 2018 Day 1 - Chronal Calibration
-- [Advent of Code 2018 Day 2 - Inventory Management System](/2022/7/22/advent-of-code-2018-day-2-inventory-management-system)
+- [Advent of Code 2018 Day 2 - Inventory Management System](/2022/7/28/advent-of-code-2018-day-2-inventory-management-system)
 
 ## TL;DR
 
