@@ -172,4 +172,89 @@ fn main() {
 ```
 
 ---
+
+ต่อกันที่พาร์ทสองโจทย์ต้องการให้หาว่าหมายเลขกล่องใดบ้างที่ใกล้เคียงกันโดยยกตัวอย่างตามนี้
+
+```
+abcde
+fghij
+klmno
+pqrst
+fguij
+axcye
+wvxyz
+```
+
+ซึ่งหมายเลข `fghij` และ `fguij` มีความใกล้เคียงกันมากที่สุดโดยต่างกันแค่หนึ่งตำแหน่งคือ `h` และ `u` ซึ่งถ้าเอาตำแหน่งที่ต่างกันออกจะได้หมายเลขกล่องที่เป็นคำตอบคือ `fgij`
+
+เนื่องจากพาร์ทแรกหมายเลขกล่องที่ได้มาจะถูกเรียงลำดับ ดังนั้นจึงต้องเพิ่มอีกตัวฟิลด์เข้าไปที่ `BoxId` เพื่อเก็บหมายเลขกล่องก่อนที่จะถูกเรียงลำดับ
+
+```rust
+#[derive(Debug, Default)]
+struct BoxId {
+    // for comparing with each other BoxId
+    chars: Vec<char>,
+    sorted_chars: Vec<char>,
+
+}
+```
+
+จากนั้นสร้างฟังก์ชันสำหรับหาว่ามีตัวอักษรที่แตกต่างกันกี่ตำแหน่ง
+
+```rust
+/// Return number of different characters between box id `a` and `b`.
+fn differ(a: &BoxId, b: &BoxId) -> usize {
+    let mut diff: usize = 0;
+    for (i, c) in a.chars.iter().enumerate() {
+        if *c != b.chars[i] {
+            diff += 1;
+        }
+    }
+    diff
+}
+```
+
+ต่อมาก็เอารายการกล่องทั้งหมดมาวนลูปโดยเริ่มตรวจสอบไปทีละกล่องเป็นคู่ ๆ ซึ่งจะเป็นการวนลูปแบบ n^2 และในลูปจะเรียกใช้ฟังก์ชัน `differ` เพื่อหาว่าหมายเลขกล่องใดบ้างที่มีความแตกต่างที่น้อยที่สุด
+
+```rust
+fn find_two_correct_box_ids(list_of_box_ids: &Vec<BoxId>) -> Option<(&BoxId, &BoxId)> {
+    for (i, a) in list_of_box_ids.iter().enumerate() {
+        for b in list_of_box_ids.iter().skip(i + 1) {
+            if differ(a, b) == 1 {
+                return Some((a, b));
+            }
+        }
+    }
+    None
+}
+```
+
+พอได้หมายเลขกล่องที่เป็นคำตอบออกมาสองกล่องแล้วก็เอามาอินเตอร์เซกชันเพื่อเอาเฉพาะตัวอักษรที่เหมือนกัน
+
+```rust
+/// Return a set of characters are in both of box id `a` and `b`.
+fn intersect(a: &BoxId, b: &BoxId) -> Vec<char> {
+    let mut chars: Vec<char> = vec![];
+    for (i, c) in a.chars.iter().enumerate() {
+        if *c == b.chars[i] {
+            chars.push(*c);
+        }
+    }
+    chars
+}
+```
+
+เอาโค้ดทั้งหมดมาประกอบกันก็จะได้คำตอบของพาร์ทที่สองแล้ว
+
+```rust
+fn main() {
+    ...
+    
+    if let Some((a, b)) = find_two_correct_box_ids(&list_of_box_ids) {
+        println!("second part answer is: {}", String::from_iter(intersect(&a, &b)));
+    }
+}
+```
+
+---
 #advent-of-code #rust
