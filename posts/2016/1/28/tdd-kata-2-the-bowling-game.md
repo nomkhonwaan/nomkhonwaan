@@ -9,7 +9,7 @@ publish_date: 2016-01-28
 ## สารบัญ 
 
 - [TDD Kata 1 - String Calculator](/2015/6/1/tdd-kata-1-string-calculator)
-- TDD Kata 2 - Bowling Game
+- [TDD Kata 2 - Bowling Game](/2016/1/28/tdd-kata-2-the-bowling-game)
 
 ---
 
