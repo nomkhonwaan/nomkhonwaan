@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 fn main() {
     assert_eq!(2, Solution::min_domino_rotations(vec![2, 1, 2, 4, 2, 2], vec![5, 2, 6, 2, 3, 2]));
     assert_eq!(-1, Solution::min_domino_rotations(vec![3, 5, 1, 2, 3], vec![3, 6, 3, 3, 4]));
@@ -52,28 +54,22 @@ impl Solution {
             return -1;
         }
 
-        let mut minimum_rotate = -1i32;
+        let mut minimum_rotation = -1i32;
         for target_value in target_values {
-            let n = rotate_top(target_value, &dominoes);
-
-            if n > - 1 && (minimum_rotate == -1 || n < minimum_rotate) {
-                minimum_rotate = n;
-            }
-
-            let m = rotate_bottom(target_value, &dominoes);
+            let rotation = rotate(target_value, &dominoes);
 
             // both top and bottom rotation still unable to rotate to this target value,
             // try another target value instead.
-            if n == -1 && m == -1 {
-                continue
+            if rotation == -1 {
+                continue;
             }
 
-            if m > - 1 && (minimum_rotate == -1 || m < minimum_rotate) {
-                minimum_rotate = m;
+            if minimum_rotation == -1 || rotation < minimum_rotation {
+                minimum_rotation = rotation;
             }
         }
 
-        minimum_rotate
+        minimum_rotation
     }
 }
 
@@ -122,34 +118,20 @@ fn find_target_values_from_pair(first_domino: &Domino, second_domino: &Domino) -
     target_values
 }
 
-fn rotate_top(target_value: i32, dominoes: &Dominoes) -> i32 {
+fn rotate(target_value: i32, dominoes: &Dominoes) -> i32 {
+    let mut m = 0i32;
     let mut n = 0i32;
     for domino in dominoes {
+        // either top or bottom are not rotate to the target value.
+        if domino.top != target_value && domino.bottom != target_value {
+            return -1;
+        }
         if domino.top != target_value {
-            // the bottom also not equal to the target value,
-            // this domino can not rotate either way.
-            if domino.bottom != target_value {
-                return -1;
-            }
-
+            m += 1;
+        }
+        if domino.bottom != target_value {
             n += 1;
         }
     }
-    n
-}
-
-fn rotate_bottom(target_value: i32, dominoes: &Dominoes) -> i32 {
-    let mut m = 0i32;
-    for domino in dominoes {
-        if domino.bottom != target_value {
-            // the top also not equal to the target value,
-            // this domino can not rotate either way.
-            if domino.top != target_value {
-                return -1;
-            }
-
-            m += 1;
-        }
-    }
-    m
+    min(m, n)
 }
