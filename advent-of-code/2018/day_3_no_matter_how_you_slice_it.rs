@@ -20,7 +20,18 @@ fn main() {
 
     let collided_points: HashMap<(i32, i32), i32> = list_of_rectangles
         .iter()
+        // at this point, the rectangle will become vector of points
+        //
+        // [(x0,y0), (x1,y1), ..., (xn, yn)]
         .flat_map(|rectangle| rectangle.to_points())
+        // at this point, the vector of points will become a hashmap like this
+        //
+        // [
+        //   (x0,y0): 1,
+        //   (x1,y1): 2,
+        //   ...
+        //  (xn,yn): 1,
+        // ]
         .fold(HashMap::new(), |mut result, pair| {
             // insert pair to the hash map and increase count by 1
             result.insert(pair, match result.get(&pair) {
@@ -37,9 +48,7 @@ fn main() {
 }
 
 /// Contain each rectangle data.
-#[derive(Default)]
 struct Rectangle {
-    // id: String,
     left_edge: i32,
     top_edge: i32,
     wide: i32,
@@ -52,12 +61,10 @@ impl Rectangle {
         let captures = re.captures(&s).unwrap();
 
         Rectangle {
-            // id: captures.get(1).map(|m| m.as_str()).unwrap().to_string(),
             left_edge: captures.get(2).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),
             top_edge: captures.get(3).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),
             wide: captures.get(4).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),
             tall: captures.get(5).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),
-            ..Default::default()
         }
     }
 
