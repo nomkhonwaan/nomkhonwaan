@@ -49,6 +49,7 @@ fn main() {
 
 /// Contain each rectangle data.
 struct Rectangle {
+    id: String,
     left_edge: i32,
     top_edge: i32,
     wide: i32,
@@ -61,6 +62,7 @@ impl Rectangle {
         let captures = re.captures(&s).unwrap();
 
         Rectangle {
+            id: captures.get(1).map(|m| m.as_str().to_string()).unwrap(),
             left_edge: captures.get(2).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),
             top_edge: captures.get(3).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),
             wide: captures.get(4).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),

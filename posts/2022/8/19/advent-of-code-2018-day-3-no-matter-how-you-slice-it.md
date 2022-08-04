@@ -73,6 +73,7 @@ publish_date: 2022-08-19
 /// Contain each rectangle data.
 #[derive(Default)]
 struct Rectangle {
+    id: String,
     left_edge: i32,
     top_edge: i32,
     wide: i32,
@@ -85,6 +86,7 @@ impl Rectangle {
         let captures = re.captures(&s).unwrap();
 
         Rectangle {
+            id: captures.get(1).map(|m| m.as_str().to_string()).unwrap(),
             left_edge: captures.get(2).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),
             top_edge: captures.get(3).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),
             wide: captures.get(4).map(|m| m.as_str().parse::<i32>().unwrap()).unwrap(),
@@ -189,6 +191,10 @@ let collided_points: HashMap<(i32, i32), i32> = list_of_rectangles
 
 println!("first part answer is: {}", collided_points.len());
 ```
+
+---
+
+พาร์ทที่สองโจทย์ต้องการให้หาว่าสี่เหลี่ยมใดที่ไม่ถูกอ้างอิงเลย (เช่นสี่เหลี่ยมหมายเลข 3 จากตัวอย่างข้างบน)
 
 ---
 #advent-of-code #rust
