@@ -1,6 +1,6 @@
 ---
 title: Advent of Code 2018 Day 3 - No Matter How You Slice it
-publish_date: 2022-08-19
+publish_date: 2022-08-05
 ---
 
 ในที่สุดบรรดาเอลฟ์ก็สามารถสร้างตัวอย่างชุดซานต้าต่อได้ (ต้องขอบคุณใครบางคนที่เขียนหมายเลขกล่องที่ถูกต้องไว้บนกำแพงเมื่อคืน) แต่เรื่องราวยังคงไม่จบพวกเขาเถียงกันว่าจะตัดผ้าอย่างไรดี
@@ -9,7 +9,7 @@ publish_date: 2022-08-19
 
 - [Advent of Code 2018 Day 1 - Chronal Calibration](/2022/7/6/advent-of-code-2018-day-1-chronal-calibration)
 - [Advent of Code 2018 Day 2 - Inventory Management System](/2022/7/28/advent-of-code-2018-day-2-inventory-management-system)
-- [Advent of Code 2018 Day 3 - No Matter How You Slice it](/2022/8/19/advent-of-code-2018-day-3-no-matter-how-you-slice-it)
+- [Advent of Code 2018 Day 3 - No Matter How You Slice it](/2022/8/5/advent-of-code-2018-day-3-no-matter-how-you-slice-it)
 
 ## TL;DR
 
