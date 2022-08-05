@@ -18,7 +18,8 @@ fn main() {
         }
     }
 
-    let collided_points: HashMap<(i32, i32), i32> = list_of_rectangles
+    let counted_points: HashMap<(i32, i32), i32> = list_of_rectangles
+        .clone()
         .iter()
         // at this point, the rectangle will become vector of points
         //
@@ -30,7 +31,7 @@ fn main() {
         //   (x0,y0): 1,
         //   (x1,y1): 2,
         //   ...
-        //  (xn,yn): 1,
+        //   (xn,yn): 1,
         // ]
         .fold(HashMap::new(), |mut result, pair| {
             // insert pair to the hash map and increase count by 1
@@ -39,15 +40,40 @@ fn main() {
                 _ => 1,
             });
             result
-        })
+        });
+
+    let collided_points: HashMap<(i32, i32), i32> = counted_points
+        .clone()
         .into_iter()
         .filter(|(_, v)| *v > 1) // to filter only points are collided more than 1
         .collect();
+    let non_collided_points: Vec<(i32, i32)> = counted_points
+        .clone()
+        .into_iter()
+        .filter(|(_, v)| *v == 1) // to filter only points are not counted more than 1
+        // at this point, the hashmap will become a vector of points
+        //
+        // [(x0,y0), (x1,y1), ..., (xn,yx)]
+        .map(|(k, _)| k)
+        .collect();
 
     println!("first part answer is: {}", collided_points.len());
+
+    for rectangle in list_of_rectangles.into_iter() {
+        let yes = rectangle.to_points()
+            .iter()
+            .all(|point| {
+                non_collided_points.contains(point)
+            });
+        if yes {
+            println!("second part answer is: {}", &rectangle.id);
+            break;
+        }
+    }
 }
 
 /// Contain each rectangle data.
+#[derive(Clone)]
 struct Rectangle {
     id: String,
     left_edge: i32,

@@ -163,12 +163,13 @@ impl Rectangle {
 กลับมาที่ `main` ทำการวนลูปและแปลงค่าเป็น `Vec<(i32, i32)>` จากนั้นเอาไปใส่ `HashMap<(i32, i32), i32>` เพื่อที่จะนับว่าตำแหน่งนี้โดนอ้างถึงกี่ครั้ง และสุดท้ายทำการนับตำแหน่งที่ถูกอ้างถึงมากกว่าหนึ่งครั้งก็จะได้คำตอบของพาร์ทแรกแล้ว
 
 ```rust
-let collided_points: HashMap<(i32, i32), i32> = list_of_rectangles
+let counted_points: HashMap<(i32, i32), i32> = list_of_rectangles
+    .clone()
     .iter()
     // at this point, the rectangle will become vector of points
     //
     // [(x0,y0), (x1,y1), ..., (xn, yn)]
-    .flat_map(|rectangle| rectangle.to_points()) 
+    .flat_map(|rectangle| rectangle.to_points())
     // at this point, the vector of points will become a hashmap like this
     //
     // [
@@ -184,7 +185,10 @@ let collided_points: HashMap<(i32, i32), i32> = list_of_rectangles
             _ => 1,
         });
         result
-    })
+    });
+
+let collided_points: HashMap<(i32, i32), i32> = counted_points
+    .clone()
     .into_iter()
     .filter(|(_, v)| *v > 1) // to filter only points are collided more than 1
     .collect();
@@ -195,6 +199,36 @@ println!("first part answer is: {}", collided_points.len());
 ---
 
 พาร์ทที่สองโจทย์ต้องการให้หาว่าสี่เหลี่ยมใดที่ไม่ถูกอ้างอิงเลย (เช่นสี่เหลี่ยมหมายเลข 3 จากตัวอย่างข้างบน)
+
+ทำคล้าย ๆ กันโดยแทนที่จะกรองเอาจุดที่ถูกอ้างอิงมากกว่าหนึ่งครั้งเปลี่ยนเป็นเอาเฉพาะจุดที่ถูกอ้างอิงเพียงครั้งเดียวเท่านั้น
+
+```rust
+let non_collided_points: Vec<(i32, i32)> = counted_points
+    .clone()
+    .into_iter()
+    .filter(|(_, v)| *v == 1) // to filter only points are not counted more than 1
+    // at this point, the hashmap will become a vector of points
+    //
+    // [(x0,y0), (x1,y1), ..., (xn,yx)]
+    .map(|(k, _)| k)
+    .collect();
+```
+
+จากนั้นก็สั่งวนลูปสี่เหลี่ยมทั้งหมดเพื่อเอาจุดมาเช็คว่าสี่เหลี่ยมไหนที่จุดทั้งหมดอยู่ในรายการของ `non_collided_points` และเมื่อเจอก็สั่งให้หยุดการทำงานจากลูปและพิมพ์หมายเลขสี่เหลี่ยมเพื่อแสดงคำตอบของพาร์ทที่สอง
+
+```rust
+for rectangle in list_of_rectangles.into_iter() {
+    let yes = rectangle.to_points()
+        .iter()
+        .all(|point| {
+            non_collided_points.contains(point)
+        });
+    if yes {
+        println!("second part answer is: {}", &rectangle.id);
+        break;
+    }
+}
+```
 
 ---
 #advent-of-code #rust
