@@ -46,7 +46,7 @@ publish_date: 2022-08-27
 [1518-11-05 00:55] wakes up
 ```
 
-จากตัวอย่าง; ข้อมูลที่ได้มาสามารถแสดงในรูปแผนผังโดยเรียงจากวันที่และรหัสของยามที่เฝ้า ซึ่งนาทีที่ยามหลับจะแทนที่ด้วยสัญลักษณ์​ `#`
+จากตัวอย่างข้อมูลที่ได้มาสามารถแสดงในรูปแผนภาพโดยเรียงจากวันที่และรหัสของยามที่เฝ้า ซึ่งนาทีที่ยามหลับจะแทนที่ด้วยสัญลักษณ์​ `#`
 
 ```
 Date   ID   Minute
@@ -61,4 +61,174 @@ Date   ID   Minute
 
 โจทย์ต้องการให้หาว่ายามคนไหนที่ใช้เวลานอนหลับมากที่สุด จากนั้นให้เอาหมายเลขไอดีของยามคูณกับนาทีที่ชอบหลับบ่อยที่สุดจะได้ผลลัพธ์ของคำตอบในพาร์ทแรก
 
-เริ่มต้นเหมือนทุกครั้งด้วยการดาวน์โหลดอินพุตไฟล์เข้ามาในโปรแกรมและแปลงให้เป็น `Record` แบบนี้
+เริ่มต้นเหมือนทุกครั้งด้วยการดาวน์โหลดอินพุตไฟล์เข้ามาในโปรแกรมและแปลงให้เป็น `Record` ซึ่งจะเก็บข้อมูลอยู่สองอย่างคือ `date_time` จะถูกแปลงเป็น [`NaiveDateTime`](https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDateTime.html) ซึ่งจะเอามาใช้เพื่อเรียงลำดับรายการตามเวลา `info` จะเป็นส่วนของข้อมูลที่เหลือหลังจากตัดเอาเวลาออกไปใช้สำหรับระบุประเภทของรายการ
+
+```rust
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let input = &args[1];
+    let mut records: Vec<Record> = vec![];
+
+    if let Ok(lines) = read_lines(input) {
+        for line in lines {
+            if let Ok(line) = line {
+                let record = Record::from_string(line);
+                records.push(record);
+            }
+        }
+    }
+}
+
+/// Contain each line of the record.
+#[derive(Debug, Default)]
+struct Record {
+    date_time: NaiveDateTime,
+    info: String,
+}
+
+impl Record {
+    fn from_string(s: String) -> Self {
+        let re = Regex::new(r"\[(.+)]\s(.+)$").unwrap();
+        let captures = re.captures(&s).unwrap();
+        let date_time = captures.get(1).map(|m| m.as_str().to_string()).unwrap();
+
+        Record {
+            date_time: NaiveDateTime::parse_from_str(&date_time, "%Y-%m-%d %H:%M").unwrap(),
+            info: captures.get(2).map(|m| m.as_str().to_string()).unwrap(),
+        }
+    }
+}
+
+fn read_lines<P: AsRef<path::Path>>(path: P) -> io::Result<io::Lines<io::BufReader<fs::File>>> {
+    let file = fs::File::open(path)?;
+    Ok(io::BufReader::new(file).lines())
+}
+```
+
+หลังจากอ่านข้อมูลจนครบทั้งไฟล์แล้วนำมาจัดเรียงใหม่ตามเวลา `date_time` จากน้อยไปมากด้วยฟังก์ชัน `sort_by` แบบนี้
+
+```rust
+fn main() {
+    ...
+
+    if let Ok(lines) = read_lines(input) {
+        for line in lines {
+            if let Ok(line) = line {
+                let record = Record::from_string(line);
+                records.push(record);
+            }
+        }
+    }
+
+    records.sort_by(|a, b| a.date_time.cmp(&b.date_time));
+
+    ...
+}
+```
+ 
+มาถึงส่วนสำคัญของโจทย์วันนี้นั่นก็คือการแปลงข้อมูลที่ได้มาให้อยู่ในรูปของที่สามารถนำมาคำนวณได้ จากตัวอย่างแผนภาพด้านบนแสดงให้เห็นว่ายามหนึ่งคนจะมีวันที่เฝ้ายามมากกว่าหนึ่งวันได้ดังนั้นข้อมูลของยามจะเก็บอยู่ในรูปแบบ tuple ประกอบไปด้วยหมายเลขไอดีของยามและตารางการทำงาน
+
+```rust
+let guard: (String, HashMap<String, Vec<u32>>);
+//          |- contain guard id
+//                  |- contain guard's duties
+//                          |- contain date-time of the duty
+//                                  |- list of asleep/awake time
+
+let list_of_guards: Vec<(String, HashMap<String, Vec<u32>>)>;
+```
+
+ก่อนอื่นเพิ่มฟังก์ชันสำหรับใช้ตรวจสอบว่าเป็น `begin_record`, `falls_asleep` และ `wakes_up` ที่ `Record` สำหรับใช้เช็คค่าแต่ละบรรทัด
+
+```rust
+impl Record {
+    ...
+
+    fn begin_record(&self) -> bool {
+        self.info.contains("begins")
+    }
+
+    fn falls_asleep(&self) -> bool {
+        self.info.contains("falls asleep")
+    }
+
+    fn wakes_up(&self) -> bool {
+        self.info.contains("wakes up")
+    }
+}
+
+```
+
+จากนั้นวนลูป `records` เพื่ออ่านค่าทีละบรรทัดแล้วเอามาเก็บที่ `list_of_guards` แบบนี้
+
+```rust
+let mut duties: HashMap<String, Vec<u32>> = HashMap::new();
+let mut guard_id = records.get(0).unwrap().get_guard_id();
+let mut begin_sleep_time: Option<NaiveDateTime> = None;
+let mut midnight_hour = vec![0; 60];
+
+// skip the first record since it has been recorded at the init step
+for record in records.iter().skip(1) {
+    if record.begin_record() {
+        // store previous record
+        if let Some(t) = begin_sleep_time {
+            duties.insert(t.format("%Y-%m-%d").to_string(), midnight_hour);
+            list_of_guards.insert(guard_id.clone(), duties);
+        }
+
+        // init a new record
+        guard_id = record.get_guard_id();
+        // try to get the previous duties data,
+        // will create a new one if not exists
+        duties = match list_of_guards.get(&guard_id) {
+            Some(duties) => duties.clone(),
+            _ => HashMap::new(),
+        };
+        begin_sleep_time = None;
+        midnight_hour = vec![0; 60];
+    }
+
+    if record.falls_asleep() {
+        begin_sleep_time = Some(record.date_time);
+    }
+
+    if record.wakes_up() {
+        let end_sleep_time = record.date_time;
+        if let Some(mut time) = begin_sleep_time {
+            while time < end_sleep_time {
+                let i = time.format("%M").to_string().parse::<usize>().unwrap();
+                midnight_hour[i] = 1;
+                time = time + Duration::minutes(1);
+            }
+        }
+    }
+}
+
+// store the latest record if not empty
+if let Some(t) = begin_sleep_time {
+    duties.insert(t.format("%Y-%m-%d").to_string(), midnight_hour);
+    list_of_guards.insert(guard_id.clone(), duties);
+}
+```
+
+เนื่องจากบรรทัดแรกจะขึ้นต้นด้วย `Guard #XX begins shift` เสมอ ดังนั้นจะเอาค่าของบรรทัดแรกสุดมาเป็นค่าเริ่มต้นและข้ามบรรทัดแรกสุดตอนวนลูปด้วย 
+
+```rust
+records.iter().skip(1)
+```
+
+(TBC) Explain the accumulate all duties function
+
+```rust
+fn accumulate_all_duties(duties: &HashMap<String, Vec<u32>>) -> Vec<u32> {
+    let mut accumulated: Vec<u32> = vec![0; 60];
+    for duty in duties.iter() {
+        for (i, &v) in duty.1.iter().enumerate() {
+            if v > 0 {
+                accumulated[i] += 1;
+            }
+        }
+    }
+    accumulated
+}
+```
