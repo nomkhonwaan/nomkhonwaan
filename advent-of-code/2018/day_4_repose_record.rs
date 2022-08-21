@@ -122,6 +122,7 @@ fn main() {
     println!("second part answer is: {}", guard_id.parse::<usize>().unwrap() * i);
 }
 
+/// Contain each line of the record.
 #[derive(Debug, Default)]
 struct Record {
     date_time: NaiveDateTime,
