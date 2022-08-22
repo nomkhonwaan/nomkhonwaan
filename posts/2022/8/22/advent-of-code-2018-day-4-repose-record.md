@@ -1,6 +1,6 @@
 ---
 title: Advent of Code 2018 Day 4 - Repose Record
-publish_date: 2022-08-27
+publish_date: 2022-08-22
 ---
 
 คุณย่องเข้าไปในตู้เสื้อผ้าอีกอันที่อยู่ตรงข้ามกับห้องแล็บผลิตชุดต้นแบบ คุณสามารถแอบเข้าไปข้างในได้และพบว่ามีปัญหาเกิดขึ้นกับชุดสูท คุณต้องการแก้ไขมันแต่จะทำอย่างไรในเมื่อมียามเฝ้าอยู่ด้านนอกห้องเล็บ
@@ -10,7 +10,7 @@ publish_date: 2022-08-27
 - [Advent of Code 2018 Day 1 - Chronal Calibration](/2022/7/6/advent-of-code-2018-day-1-chronal-calibration)
 - [Advent of Code 2018 Day 2 - Inventory Management System](/2022/7/28/advent-of-code-2018-day-2-inventory-management-system)
 - [Advent of Code 2018 Day 3 - No Matter How You Slice it](/2022/8/5/advent-of-code-2018-day-3-no-matter-how-you-slice-it)
-- [Advent of Code 2018 Day 4 - Repose Record](/2022/8/27/advent-of-code-2018-day-4-repose-record)
+- [Advent of Code 2018 Day 4 - Repose Record](/2022/8/22/advent-of-code-2018-day-4-repose-record)
 
 ## TL;DR
 
@@ -128,6 +128,8 @@ fn main() {
  
 มาถึงส่วนสำคัญของโจทย์วันนี้นั่นก็คือการแปลงข้อมูลที่ได้มาให้อยู่ในรูปของที่สามารถนำมาคำนวณได้ จากตัวอย่างแผนภาพด้านบนแสดงให้เห็นว่ายามหนึ่งคนจะมีวันที่เฝ้ายามมากกว่าหนึ่งวันได้ดังนั้นข้อมูลของยามจะเก็บอยู่ในรูปแบบ tuple ประกอบไปด้วยหมายเลขไอดีของยามและตารางการทำงาน
 
+ตารางการทำงานจะเก็บเป็น `Vec<32>` ขนาด 60 แทนที่แต่ละอินเด็กซ์ด้วยเลขนาทีเริ่มจาก 0 จนถึง 59 นาทีที่ยามตื่นจะแทนที่ด้วย "0" และถ้านาทีที่หลับจะแทนที่ด้วย "1"
+
 ```rust
 let guard: (String, HashMap<String, Vec<u32>>);
 //          |- contain guard id
@@ -211,24 +213,89 @@ if let Some(t) = begin_sleep_time {
 }
 ```
 
-เนื่องจากบรรทัดแรกจะขึ้นต้นด้วย `Guard #XX begins shift` เสมอ ดังนั้นจะเอาค่าของบรรทัดแรกสุดมาเป็นค่าเริ่มต้นและข้ามบรรทัดแรกสุดตอนวนลูปด้วย 
+เนื่องจากบรรทัดแรกจะขึ้นต้นด้วย `Guard #XX begins shift` เสมอเลยใช้บรรทัดแรกเป็นค่าเริ่มต้นในการวนลูป 
 
-```rust
-records.iter().skip(1)
-```
-
-(TBC) Explain the accumulate all duties function
+เมื่อแปลงค่าทั้งหมดเสร็จแล้วต่อมาสร้างฟังก์ชัน `accumulate_all_duties` สำหรับนับรวมเวลาที่หลับให้เป็น `Vec<u32>` อันเดียว
 
 ```rust
 fn accumulate_all_duties(duties: &HashMap<String, Vec<u32>>) -> Vec<u32> {
-    let mut accumulated: Vec<u32> = vec![0; 60];
+  let mut accumulated: Vec<u32> = vec![0; 60];
     for duty in duties.iter() {
-        for (i, &v) in duty.1.iter().enumerate() {
-            if v > 0 {
-                accumulated[i] += 1;
+      for (i, &v) in duty.1.iter().enumerate() {
+        if v > 0 {
+          accumulated[i] += 1;
             }
         }
     }
     accumulated
 }
 ```
+
+ซึ่งจะเปลี่ยนจาก `HashMap<String, Vec<u32>>` 
+
+```
+[
+  ...
+  "2022-08-18" => [0, 0, 0, 1, 1, 1, 1, ...],
+  "2022-08-19" => [0, 0, 1, 1, 1, 0, 0, ...],
+  "2022-08-20" => [0, 0, 0, 1, 1, 1, 0, ...],
+  ...
+]
+```
+
+ให้เป็น `Vec<u32>` แบบนี้
+
+```
+[ 0, 0, 1, 3, 3, 2, 1, ... ]
+```
+
+จากนั้นก็วนลูปยามทั้งหมดแล้วหาว่ายามคนไหนที่หลับเยอะที่สุดด้วยการใช้ฟังก์ชัน `fold` ซึ่งจะคล้ายกับ [`reduce`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce) ใน JavaScript นั่นเอง
+
+หลังจากวนลูปจบจะได้คำตอบเป็นหมายเลขไอดียามและตารางงานออกมาเสร็จแล้วใช้ฟังก์ชัน `max` เพื่อหาว่านาทีไหนที่ยามหลับบ่อยที่สุดและใช้ฟังก์ชัน `position` เพื่อหาอินเด็กซ์ของนาทีนั้น 
+
+เมื่อได้ผลลัพธ์แล้วนำเอาหมายเลขไอดีของยามมาคูณกับอินเด็กซ์ของนาทีที่หลับบ่อยที่สุดจะได้เป็นคำตอบของพาร์ทแรก
+
+```rust
+
+fn main() {
+    ...
+
+    let accumulated_list_of_guards: Vec<(&String, Vec<u32>)> = list_of_guards
+        .iter()
+        // at this point, the list of duties will aggregated into a single vector
+        //
+        // from:
+        // [
+        //   "2022-08-18" => [0, 0, 1, 1, ...],
+        //   "2022-08-19" => [1, 1, 1, 0, ...],
+        // ]
+        //
+        // to:
+        // [1, 1, 2, 1, ...]
+        .map(|(guard_id, duties)| -> (&String, Vec<u32>) {
+            (guard_id, accumulate_all_duties(&duties))
+        })
+        .collect();
+
+    let (guard_id, accumulated, _): (&str, Vec<u32>, _) = accumulated_list_of_guards
+        .clone()
+        .into_iter()
+        // find the most spending time on sleep guard
+        .fold(("", vec![], 0u32), |result, (guard_id, accumulated)| {
+            let total_sleep_time = accumulated.iter().sum::<u32>();
+            if total_sleep_time > result.2 {
+                return (guard_id, accumulated, total_sleep_time);
+            }
+            result
+        });
+
+    // find the most fall asleep time of the guard
+    let max = accumulated.iter().max().unwrap();
+    let i = accumulated.iter().position(|v| v == max).unwrap();
+
+    println!("first part answer is: {}", guard_id.parse::<usize>().unwrap() * i);
+}
+```
+
+---
+
