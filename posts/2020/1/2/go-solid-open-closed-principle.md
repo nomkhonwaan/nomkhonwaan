@@ -1,6 +1,7 @@
 ---
 title: Go SOLID - Open-closed Principle
 publish_date: 2020-01-02
+tags: ['go', 'solid']
 ---
 
 บล็อกนี้เล่าถึงหลักการ Open-closed หนึ่งในหลักการของ SOLID ที่กล่าวไว้โดย Bertrand Meyer ในหนังสือเรื่อง [Object Oriented Sofrware Construction](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle#cite_note-1) แปลได้ใจความว่า "เอนทิตี้ใด ๆ ในซอฟต์แวร์เช่นคลาส, โมดูล, ฟังก์ชัน ควรเปิดเพื่อให้ต่อยอดได้ (extension) แต่ปิดเพื่อป้องกันไม่ให้แก้ไข (modification)"
@@ -75,6 +76,3 @@ func (s rectangle) area() float64 {
 ---
 
 หลักการ open-closed เดิมที่ถูกออกแบบเพื่อใช้งานระหว่างคลาสและซูเปอร์คลาสในภาษาตระกูล OOP เป็นหลัก แต่ภายหลังได้เปลี่ยนมาเป็นการใช้งานอินเตอร์เฟสแทนเพื่อความยืดหยุ่นที่มากขึ้น
-
----
-#go #solid

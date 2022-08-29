@@ -1,6 +1,7 @@
 ---
 title: Coin Change และ Dynamic Programming
 publish_date: 2022-08-07
+tags: ['leetcode', 'dynamic-programming']
 ---
 
 เรื่องมีอยู่ว่าได้ลองทำโจทย์ [Coin Change](https://leetcode.com/problems/coin-change/) ทีแรกคิดว่าไม่น่ายากแต่พอส่งคำตอบกลับติดอยู่ที่ `[186, 419, 83, 408]` จะทำอย่างไรให้ใช้เหรียญที่น้อยที่สุดเพื่อแทนค่า `6249`?
@@ -200,6 +201,3 @@ fn coin_change(coins: Vec<i32>, amount: i32) -> i32 {
     res
 }
 ```
-
----
-#leetcode #dynamic-programming

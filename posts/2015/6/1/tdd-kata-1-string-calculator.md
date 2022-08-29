@@ -1,6 +1,7 @@
 ---
 title: TDD Kata 1 - String Calculator
 publish_date: 2015-06-01
+tags: ['tdd', 'kata', 'go']
 ---
 
 ในการเขียนโปรแกรมมีแนวคิดนึงที่ยึดหลักการเขียนเทสก่อนลงมืออิมพลิเมนต์ฟังก์ชันจริงหรือที่เรียกว่า Test-driven development (TDD) หลักการคือเริ่มต้นด้วยการเขียนเทส, รันแล้วพัง, แก้ไขโปรแกรม, รันแล้วผ่าน วนอยู่แบบนี้
@@ -614,6 +615,3 @@ func TestAdd(t *testing.T) {
 ---
 
 ตัวอย่างโค้ดฉบับเต็มสามารถดูได้ที่ [Go Playground](https://go.dev/play/p/HwEj2buPvM2)
-
----
-#tdd #kata #go

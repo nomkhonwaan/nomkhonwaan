@@ -1,6 +1,7 @@
 ---
 title: Channel กับการสื่อสารระหว่าง Goroutines
 publish_date: 2019-11-24
+tags: ['go', 'goroutines']
 ---
 
 Go มี built-in concurrency ที่เรียกว่า Goroutines การทำงานคล้ายกับ Thread ที่อยู่ใน Java แต่มีขนาดเล็กและเบากว่า ซึ่ง Go เคลมว่า[สามารถรันได้ถึงหนึ่งแสน Goroutines](https://go.dev/doc/faq#goroutines) 
@@ -302,6 +303,3 @@ func request(method string, url string, body io.Reader) (<-chan data, error) {
 
 1. [The Go Blog - Go Concurrency Patterns: Pipelines and cancellation](https://go.dev/blog/pipelines)
 2. [Thejas Babu - Concurrency Patterns: Golang](https://medium.com/@thejasbabu/concurrency-patterns-golang-5c5e1bcd0833)
-
----
-#go #goroutines

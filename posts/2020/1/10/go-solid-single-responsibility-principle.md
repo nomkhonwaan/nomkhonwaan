@@ -1,6 +1,7 @@
 ---
 title: Go SOLID - Single Responsiblity Principle
 publish_date:  2020-01-10
+tags: ['go', 'solid']
 ---
 
 บล็อกนี้เล่าถึงหลักการ Single Responsibility Principle (SRP) หนึ่งในหลักการของ SOLID ที่กล่าวไว้โดย Robert C. Martin หรือ Uncle Bob ในหนังสือเรื่อง [Agile Software Development, Principles, Patterns, and Practices](https://en.wikipedia.org/wiki/Single_responsibility_principle#cite_note-cleancode-1) สรุปใจความสั้น ๆ ได้ว่า "คลาสควรจะมีเพียงเหตุผลเดียวที่ทำให้ต้องแก้ไข"
@@ -159,6 +160,3 @@ func (pmt EmployeePayment) CalculatePay(emp Employee) Monay {
 ท้ายนี้ขอยกคำพูดของ Uncle Bob ที่กล่าวไว้ว่า
 
 > Gather together the things that change for the same reasons. Separate those things that change for different reasons.
-
----
-#go #solid
