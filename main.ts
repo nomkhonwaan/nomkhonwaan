@@ -26,6 +26,12 @@ blog({
       code {
         font-family: 'Source Code Pro', monospace;
       }
+
+      .text-2xl + .flex > .text-bluegray-500 {
+        font-style: italic;
+        font-family: 'Maitree', sans-serif;
+        font-weight: normal;
+      }
     `,
   middlewares: [
     ga("UA-33411047-1"),
