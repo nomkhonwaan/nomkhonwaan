@@ -1,6 +1,7 @@
 ---
 title: Generics ใน Go
 publish_date: 2022-08-18
+tags: ['go']
 ---
 
 Generics เป็นหนึ่งในฟีเจอร์ที่นักพัฒนาเรียกร้องกันมา [ตั้งแต่เปิดตัวภาษา](https://groups.google.com/g/golang-nuts/c/70-pdwUUrbI/m/onMsQspcljcJ?pli=1) และ [เริ่มพัฒนาจริง ๆ ตอนปี 2019](https://go.dev/blog/why-generics) ในที่สุดก็ปล่อยออกมาให้ใช้งานกันแล้วที่เวอร์ชัน 1.18 มาลองดูกันว่าสามารถทำอะไรได้บ้าง
@@ -148,6 +149,3 @@ type node[T constraints.Ordered] struct {
 
 1. [Tutorial: Getting started with generics](https://go.dev/doc/tutorial/generics)
 2. [When To Use Generics](https://go.dev/blog/when-generics)
-
----
-#go

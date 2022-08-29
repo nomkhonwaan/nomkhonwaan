@@ -1,6 +1,7 @@
 ---
 title: Advent of Code 2018 Day 3 - No Matter How You Slice it
 publish_date: 2022-08-05
+tags: ['advent-of-code', 'rust']
 ---
 
 ในที่สุดบรรดาเอลฟ์ก็สามารถสร้างตัวอย่างชุดซานต้าต่อได้ (ต้องขอบคุณใครบางคนที่เขียนหมายเลขกล่องที่ถูกต้องไว้บนกำแพงเมื่อคืน) แต่เรื่องราวยังคงไม่จบพวกเขาเถียงกันว่าจะตัดผ้าอย่างไรดี
@@ -230,6 +231,3 @@ for rectangle in list_of_rectangles.into_iter() {
     }
 }
 ```
-
----
-#advent-of-code #rust

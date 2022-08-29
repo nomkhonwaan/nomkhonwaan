@@ -1,6 +1,7 @@
 ---
 title: TDD Kata 2 - The Bowling Game
 publish_date: 2016-01-28
+tags: ['tdd', 'kata', 'go']
 ---
 
 กลับมาพบกันอีกครั้งกับ TDD Kata โจทย์ในวันนี้คือ [The Bowling Game Kata](http://butunclebob.com/ArticleS.UncleBob.TheBowlingGameKata) รายละเอียดของโจทย์จะอยู่ในสไลด์ที่อยู่ในบทความอีกที ถ้าพร้อมแล้วไปลุยกันดีกว่า
@@ -407,7 +408,3 @@ func (g Game) score() int {
 ---
 
 ตัวอย่างโค้ดฉบับเต็มสามารถดูได้ที่ [Go Playground](https://go.dev/play/p/RCgsb1xbBOw)
-
----
-
-#tdd #kata #go

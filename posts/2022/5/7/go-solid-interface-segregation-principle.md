@@ -1,6 +1,7 @@
 ---
 title: Go SOLID - Interface Segregation Principle
 publish_date: 2022-05-07
+tags: ['go', 'solid']
 ---
 
 บล็อกนี้เล่าถึงหลักการ Interface Segreagation Principle (ISP) หนึ่งในหลักการของ SOLID ที่กล่าวไว้โดย Robert C. Martin หรือ Uncle Bob ในบทความที่ตอบ[จดหมาย](https://blog.cleancoder.com/uncle-bob/2020/10/18/Solid-Relevance.html)เอาไว้ดังนี้
@@ -76,6 +77,3 @@ func writeLog(f io.Writer, args ...any) error {
         return err
 }
 ```
-
----
-#go #solid
