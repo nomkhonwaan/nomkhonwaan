@@ -27,7 +27,8 @@ blog({
         font-family: 'Source Code Pro', monospace;
       }
 
-      .text-2xl + .flex > .text-bluegray-500 {
+      .text-2xl + .flex > .text-bluegray-500,
+      .text-4xl + .flex > .text-bluegray-500 {
         font-style: italic;
         font-family: 'Maitree', sans-serif;
         font-weight: normal;
@@ -36,7 +37,8 @@ blog({
   middlewares: [
     ga("UA-33411047-1"),
   ],
-  lang: "en",
-  dateStyle: "long",
+  lang: "th",
+  dateFormat: (date: Date) =>
+    date.toLocaleString("default", { month: "short", day: "2-digit", year: "numeric" }),
   theme: "auto",
 });
