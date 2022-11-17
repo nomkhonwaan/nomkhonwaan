@@ -4,7 +4,7 @@ I am a Full Stack Developer from Thailand. I mainly code in Go, Rust, and TypeSc
 
 [Blog](https://nomkhonwaan.com) | [Email](mailto:me@nomkhonwaan.com) | [LinkedIn](https://www.linkedin.com/in/nomkhonwaan/)
 
-<img src="https://i.imgur.com/vaVFm5C.gif" width="15%"/>
+![Pani Poni Dash! Dance](https://user-images.githubusercontent.com/303589/202332691-f71320b1-3f1d-4a51-8ad2-277dfa24d64d.gif)
 
 ## Skills
 
