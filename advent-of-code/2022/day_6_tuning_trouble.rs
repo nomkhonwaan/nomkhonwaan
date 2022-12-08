@@ -36,8 +36,8 @@ fn find_start_of_packet_marker_position(s: &str) -> usize {
 
 fn find_start_of_message_marker_position(s: &str) -> usize {
     for i in 0..=s.len() - 14 {
-        let four_characters = s.chars().skip(i).take(14).collect::<String>();
-        if !is_duplicated(&four_characters) {
+        let fourteenth_characters = s.chars().skip(i).take(14).collect::<String>();
+        if !is_duplicated(&fourteenth_characters) {
             return i + 14;
         }
     }
