@@ -10,7 +10,6 @@ fn main() {
     let mut node = root.clone();
 
     if let Ok(lines) = read_lines(input) {
-        // skip / since we already there
         for line in lines {
             if let Ok(line) = line {
                 if line.starts_with("$") {
