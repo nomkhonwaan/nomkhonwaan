@@ -1,4 +1,4 @@
-import blog, { ga } from "https://deno.land/x/blog@0.5.0/blog.tsx";
+import blog, { ga } from "https://deno.land/x/blog@0.6.1/blog.tsx";
 
 blog({
   title: "Nomkhonwaan",
@@ -35,7 +35,7 @@ blog({
       }
     `,
   middlewares: [
-    ga("UA-33411047-1"),
+    ga("G-ER347CPNY4"),
   ],
   lang: "th",
   dateFormat: (date: Date) =>
