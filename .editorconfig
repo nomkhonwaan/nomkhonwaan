@@ -23,4 +23,3 @@ max_line_length = 0
 
 [{Makefile,**.mk}]
 indent_style = tab
-indent_size = 8
