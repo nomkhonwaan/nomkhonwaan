@@ -60,7 +60,7 @@ fn read_file<P: AsRef<path::Path>>(path: P) -> io::Result<String> {
 จากนั้นเขียนฟังก์ชัน `reduce` สำหรับวนลูปสายพอลิเมอร์เพื่อทำการตัดยูนิตที่เกิดปฏิกิริยาออก โดยเงื่อนไขของฟังก์ชันคือจะวนลูปเรื่อย ๆ จนกว่าจะไม่เกิดปฏิกิริยาแล้วถึงจะหยุดและส่งยูนิตที่เหลืองทั้งหมดกลับ
 
 ```rust
-fn reduce(polymer: String) -> String {
+fn reduce(&polymer: String) -> String {
     let mut units: Vec<char> = polymer.chars().collect();
 
     loop {
@@ -112,7 +112,7 @@ fn main() {
     let input = &args[1];
     let polymer = read_file(input).unwrap();
 
-    println!("first part answer is: {}", reduce(polymer).len());
+    println!("first part answer is: {}", reduce(&polymer).len());
 }
 ```
 
@@ -129,3 +129,29 @@ fn main() {
 
 จากตัวอย่างข้างต้นหมายความว่าถ้าลบ `C/c` ออกจากจะทำให้ได้สายพอลิเมอร์ที่มีขนาดสั้นที่สุด
 
+ด้วยเงื่อนไขนี้ทำให้จำเป็นต้องมีการเพิ่มโค้ดส่วนของการตัดยูนิตออกก่อนที่จะส่งเข้าฟังก์ชัน `reduce` โดยเพิ่มโค้ดเข้าไปที่ `main` แบบนี้
+
+```rust
+
+fn main() {
+    ...
+
+    let instances = "abcdefghijklmnopqrstuvwxyz";
+    let mut shortest_polymer_len = polymer.len();
+
+    for instance in instances.chars().collect::<Vec<char>>() {
+        let mut produced_polymer = polymer.clone();
+        produced_polymer = produced_polymer.replace(instance, "");
+        produced_polymer = produced_polymer.replace(instance.to_ascii_uppercase(), "");
+
+        let polymer_len = reduce(&produced_polymer).len();
+        if polymer_len < shortest_polymer_len {
+            shortest_polymer_len = polymer_len;
+        }
+    }
+
+    println!("second part answer is: {}", shortest_polymer_len);
+}
+```
+
+จากโค้ดคือจะทำการวนลูปทั้งหมด 26 ครั้งตามจำนวนตัวอักษร เพื่อทดลองดูว่าหลังจากลบยูนิตดังกล่าวออกจากสายพอลิเมอร์แล้วจะได้ขนาดเท่าไรหลังจากเกิดปฏิกิริยา เท่านี้ก็จะได้คำตอบของพาร์ทที่สองแล้ว
