@@ -1,7 +1,9 @@
-use std::io::Read;
-use std::{env, fs, io, path};
+use futures::future::join_all;
+use std::{env, fs, io, io::Read, path};
+use tokio::task::spawn;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args: Vec<String> = env::args().collect();
     let input = &args[1];
     let polymer = read_file(input).unwrap();
@@ -9,20 +11,32 @@ fn main() {
     println!("first part answer is: {}", reduce(&polymer).len());
 
     let instances = "abcdefghijklmnopqrstuvwxyz";
-    let mut shortest_polymer_len = polymer.len();
+    let mut tasks = vec![];
 
     for instance in instances.chars().collect::<Vec<char>>() {
-        let mut produced_polymer = polymer.clone();
-        produced_polymer = produced_polymer.replace(instance, "");
-        produced_polymer = produced_polymer.replace(instance.to_ascii_uppercase(), "");
-
-        let polymer_len = reduce(&produced_polymer).len();
-        if polymer_len < shortest_polymer_len {
-            shortest_polymer_len = polymer_len;
-        }
+        let task = spawn(produce(polymer.clone(), instance));
+        tasks.push(task);
     }
 
-    println!("second part answer is: {}", shortest_polymer_len);
+    let shortest_polymer_len = join_all(tasks)
+        .await
+        .into_iter()
+        .filter_map(Result::ok)
+        .collect::<Vec<usize>>()
+        .into_iter()
+        .min();
+
+    println!(
+        "second part answer is: {}",
+        shortest_polymer_len.unwrap_or(polymer.len())
+    );
+}
+
+async fn produce(mut polymer: String, instance: char) -> usize {
+    polymer = polymer.replace(instance, "");
+    polymer = polymer.replace(instance.to_ascii_uppercase(), "");
+
+    reduce(&polymer).len()
 }
 
 fn reduce(polymer: &String) -> String {
