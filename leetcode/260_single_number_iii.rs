@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-struct Solution;
-
 /// Given an integer array `nums`, in which exactly two elements appear only once and all the other elements appear exactly twice.
 /// Find the two elements that appear only once. You can return the answer in any order.
 ///
@@ -27,6 +25,8 @@ struct Solution;
 /// Input: nums = [0,1]
 /// Output: [1,0]
 /// ```
+struct Solution;
+
 impl Solution {
     pub fn single_number(nums: Vec<i32>) -> Vec<i32> {
         let mut result = HashMap::<i32, u32>::new();
