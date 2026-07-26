@@ -1,5 +1,5 @@
-import { App, staticFiles } from "https://deno.land/x/fresh@1.6.0/mod.ts";
-import { fsRoutes } from "https://deno.land/x/fresh@1.6.0/fs_routes.ts";
+import { App, staticFiles } from "fresh/";
+import { fsRoutes } from "fresh/fs_routes.ts";
 
 const app = new App()
   .use(staticFiles())

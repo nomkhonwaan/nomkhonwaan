@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { Handlers } from "https://deno.land/x/fresh@1.6.0/server.ts";
+import { Handlers } from "fresh/server.ts";
 import { getPostByUrl } from "../../../../utils/posts.ts";
 import { renderMarkdown } from "../../../../utils/markdown.ts";
 
