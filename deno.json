@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "fresh/": "https://deno.land/x/fresh@1.6.0/",
+    "gfm": "https://deno.land/x/gfm@0.1.22/"
+  },
+  "tasks": {
+    "dev": "deno run -A --watch=routes/,static/,utils/,main.ts main.ts",
+    "start": "deno run -A main.ts"
+  }
+}

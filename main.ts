@@ -1,3 +1,12 @@
+import { App, staticFiles } from "https://deno.land/x/fresh@1.6.0/mod.ts";
+import { fsRoutes } from "https://deno.land/x/fresh@1.6.0/fs_routes.ts";
+
+const app = new App()
+  .use(staticFiles())
+  .fsRoutes();
+
+console.log("Starting Fresh app on http://localhost:8000");
+app.listen({ port: 8000 });
 import blog, { ga } from "https://deno.land/x/blog@0.7.0/blog.tsx";
 
 blog({
