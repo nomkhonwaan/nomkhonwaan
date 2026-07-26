@@ -1,6 +1,6 @@
 {
   "imports": {
-    "fresh/": "https://deno.land/x/fresh@1.6.0/",
+    "fresh/": "jsr:@fresh/fresh",
     "gfm": "jsr:@deno/gfm"
   },
   "tasks": {

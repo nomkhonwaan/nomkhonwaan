@@ -175,7 +175,8 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@deno/gfm@*"
+      "jsr:@deno/gfm@*",
+      "jsr:@fresh/fresh@*"
     ]
   }
 }
