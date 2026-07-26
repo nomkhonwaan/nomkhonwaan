@@ -1,5 +1,5 @@
-import { App, staticFiles } from "fresh/";
-import { fsRoutes } from "fresh/fs_routes.ts";
+import { App, staticFiles } from "jsr:@fresh/fresh/server.ts";
+import { fsRoutes } from "jsr:@fresh/fresh/fs_routes.ts";
 
 const app = new App()
   .use(staticFiles())

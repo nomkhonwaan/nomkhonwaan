@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { Handlers } from "fresh/server.ts";
+import { Handlers } from "jsr:@fresh/fresh/server.ts";
 import { getPosts } from "../utils/posts.ts";
 import { renderMarkdown } from "../utils/markdown.ts";
 
