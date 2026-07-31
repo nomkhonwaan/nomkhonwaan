@@ -15,14 +15,14 @@ export const CSS = `
   .markdown-body {
     font-family: 'Maitree', sans-serif;
     line-height: 1.8;
-    color: #333;
+    color: var(--text, #333);
   }
 
   .markdown-body h1, .markdown-body h2, .markdown-body h3,
   .markdown-body h4, .markdown-body h5, .markdown-body h6 {
     font-family: 'Prompt', sans-serif;
     line-height: 1.3;
-    color: #111;
+    color: var(--heading, #111);
     margin-top: 1.5em;
     margin-bottom: 0.5em;
   }
@@ -33,13 +33,13 @@ export const CSS = `
 
   .markdown-body p { margin-bottom: 1rem; }
 
-  .markdown-body a { color: #2563eb; }
+  .markdown-body a { color: var(--link, #2563eb); }
   .markdown-body a:hover { text-decoration: underline; }
 
   .markdown-body code {
     font-family: 'Source Code Pro', monospace;
     font-size: 0.9em;
-    background: #f1f5f9;
+    background: var(--code-bg, #f1f5f9);
     padding: 0.15em 0.4em;
     border-radius: 4px;
   }
@@ -67,10 +67,10 @@ export const CSS = `
   .markdown-body li { margin-bottom: 0.25rem; }
 
   .markdown-body blockquote {
-    border-left: 4px solid #2563eb;
+    border-left: 4px solid var(--blockquote-border, #2563eb);
     padding-left: 1rem;
     margin: 1rem 0;
-    color: #475569;
+    color: var(--blockquote-text, #475569);
     font-style: italic;
   }
 
@@ -81,13 +81,13 @@ export const CSS = `
   }
 
   .markdown-body th, .markdown-body td {
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--table-border, #e2e8f0);
     padding: 0.5rem 0.75rem;
     text-align: left;
   }
 
   .markdown-body th {
-    background: #f8fafc;
+    background: var(--table-header-bg, #f8fafc);
     font-weight: 700;
   }
 
@@ -95,7 +95,7 @@ export const CSS = `
 
   .markdown-body hr {
     border: none;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border, #e2e8f0);
     margin: 2rem 0;
   }
 `;
