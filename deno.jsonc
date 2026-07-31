@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno task dev --allow-net --allow-read",
-    "serve": "deno task start --allow-net --allow-read"
+    "dev": "deno task start",
+    "serve": "deno task preview"
   }
 }
