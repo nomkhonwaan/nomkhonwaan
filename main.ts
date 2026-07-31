@@ -1,44 +1,11 @@
-import blog, { ga } from "https://deno.land/x/blog@0.7.0/blog.tsx";
+/// <reference no-default-lib="true" />
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+/// <reference lib="dom.asynciterable" />
+/// <reference lib="deno.ns" />
 
-blog({
-  title: "Nomkhonwaan",
-  description: "Trust me I'm Petdo",
-  avatar: "avatar.png",
-  avatarClass: "rounded-full",
-  author: "Natcha Luangaroonchai",
-  links: [
-    { title: "Email", url: "mailto:me@nomkhonwaan.com" },
-    { title: "GitHub", url: "https://github.com/nomkhonwaan" },
-    { title: "LinkedIn", url: "https://linkedin.com/in/nomkhonwaan" },
-  ],
-  style:
-    `
-      @import url('https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap');
+import { start } from "$fresh/server.ts";
+import manifest from "./fresh.gen.ts";
+import config from "./fresh.config.ts";
 
-      h1, h2, h3, h4, h5, h6 {
-        font-family: 'Prompt', sans-serif;
-      }
-      
-      p {
-        font-family: 'Maitree', sans-serif;
-      }
-
-      code {
-        font-family: 'Source Code Pro', monospace;
-      }
-
-      .text-2xl + .flex > .text-bluegray-500,
-      .text-4xl + .flex > .text-bluegray-500 {
-        font-style: italic;
-        font-family: 'Maitree', sans-serif;
-        font-weight: normal;
-      }
-    `,
-  middlewares: [
-    ga("G-ER347CPNY4"),
-  ],
-  lang: "th",
-  dateFormat: (date: Date) =>
-    date.toLocaleString("default", { month: "short", day: "2-digit", year: "numeric" }),
-  theme: "auto",
-});
+await start(manifest, config);
