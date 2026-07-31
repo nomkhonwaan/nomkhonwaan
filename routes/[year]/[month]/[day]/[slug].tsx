@@ -33,12 +33,11 @@ export default function PostPage({ data }: PageProps<{ post: Post }>) {
           <div class="post-meta">
             <time>{post.publish_date}</time>
             {post.tags && post.tags.length > 0 && (
-              <span>
-                {" "}&middot;{" "}
+              <div class="post-tags">
                 {post.tags.map((tag) => (
                   <span class="post-tag">{tag}</span>
                 ))}
-              </span>
+              </div>
             )}
           </div>
         </header>
