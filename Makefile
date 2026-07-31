@@ -1,4 +1,4 @@
-.PHONY: build dev run
+.PHONY: build dev run test
 
 build:
 	deno task build
@@ -8,3 +8,6 @@ dev:
 
 run:
 	deno task preview
+
+test:
+	deno test --no-check utils/*_test.ts

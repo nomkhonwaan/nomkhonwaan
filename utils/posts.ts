@@ -11,7 +11,7 @@ export interface Post {
   url: string;
 }
 
-function extractFirstParagraph(body: string): string {
+export function extractFirstParagraph(body: string): string {
   // Get the first paragraph: text before the first heading, blank line, or horizontal rule
   const text = body.trim();
   const match = text.match(/^(.+?)(?:\n\n|\n#{1,6}\s|\n---|\n*$)/s);
@@ -26,11 +26,16 @@ function extractFirstParagraph(body: string): string {
   return para;
 }
 
+function toDateString(value: unknown): string {
+  if (value instanceof Date) return value.toISOString().split("T")[0];
+  return (value as string) ?? "1970-01-01";
+}
+
 async function readFileText(path: string) {
   return await Deno.readTextFile(path);
 }
 
-function extractFrontMatter(text: string) {
+export function extractFrontMatter(text: string) {
   if (!text.startsWith("---")) return { attrs: {}, body: text };
   const end = text.indexOf("---", 3);
   if (end === -1) return { attrs: {}, body: text };
@@ -58,7 +63,7 @@ export async function getPosts(postsDir = "posts") {
       const raw = await readFileText(path);
       const { attrs, body } = extractFrontMatter(raw);
       const title = (attrs?.title as string) ?? "Untitled";
-      const publish_date = (attrs?.publish_date as string) ?? "1970-01-01";
+      const publish_date = toDateString(attrs?.publish_date);
       const tags = (attrs?.tags as string[]) ?? [];
       // Build URL from path: posts/2022/8/18/slug.md -> /2022/8/18/slug
       const rel = path.replace(/^posts[\/]/, "").replace(/\\/g, "/");
@@ -81,7 +86,7 @@ export async function getPostByUrl(url: string) {
     const raw = await readFileText(mdPath);
     const { attrs, body } = extractFrontMatter(raw);
     const title = (attrs?.title as string) ?? "Untitled";
-    const publish_date = (attrs?.publish_date as string) ?? "1970-01-01";
+    const publish_date = toDateString(attrs?.publish_date);
     const tags = (attrs?.tags as string[]) ?? [];
     const slug = mdPath.split("/").pop()!.replace(/\.md$/, "");
     return { slug, title, publish_date, tags, description: extractFirstParagraph(body), content: body, url } as Post;
