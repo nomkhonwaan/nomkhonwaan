@@ -1,5 +1,5 @@
-import { extname, join } from "https://deno.land/std@0.200.0/path/mod.ts";
-import { parse } from "https://deno.land/std@0.200.0/encoding/yaml.ts";
+import { extname, join } from "std/path/mod.ts";
+import { parse } from "std/yaml/parse.ts";
 
 export interface Post {
   slug: string;
@@ -44,9 +44,9 @@ export async function getPosts(postsDir = "posts") {
       const title = (attrs?.title as string) ?? "Untitled";
       const publish_date = (attrs?.publish_date as string) ?? "1970-01-01";
       const tags = (attrs?.tags as string[]) ?? [];
-      // Build URL from path: posts/2022/8/18/slug.md -> /posts/2022/8/18/slug
+      // Build URL from path: posts/2022/8/18/slug.md -> /2022/8/18/slug
       const rel = path.replace(/^posts[\/]/, "").replace(/\\/g, "/");
-      const url = "/posts/" + rel.replace(/\.md$/, "");
+      const url = "/" + rel.replace(/\.md$/, "");
       const slug = url.split("/").pop() || "";
       posts.push({ slug, title, publish_date, tags, content: body, url });
     }
@@ -58,9 +58,9 @@ export async function getPosts(postsDir = "posts") {
 }
 
 export async function getPostByUrl(url: string) {
-  // url expected like /posts/2022/8/18/go-generics
+  // url expected like /2022/8/18/go-generics
   const path = url.replace(/^\//, "");
-  const mdPath = `${path}.md`;
+  const mdPath = `posts/${path}.md`;
   try {
     const raw = await readFileText(mdPath);
     const { attrs, body } = extractFrontMatter(raw);
