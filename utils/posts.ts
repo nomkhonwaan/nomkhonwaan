@@ -6,8 +6,24 @@ export interface Post {
   title: string;
   publish_date: string;
   tags?: string[];
+  description: string;
   content: string;
   url: string;
+}
+
+function extractFirstParagraph(body: string): string {
+  // Get the first paragraph: text before the first heading, blank line, or horizontal rule
+  const text = body.trim();
+  const match = text.match(/^(.+?)(?:\n\n|\n#{1,6}\s|\n---|\n*$)/s);
+  if (!match) return "";
+  let para = match[1].trim();
+  // Strip markdown links: [text](url) -> text
+  para = para.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1");
+  // Strip inline code backticks
+  para = para.replace(/`([^`]+)`/g, "$1");
+  // Strip bold/italic markers
+  para = para.replace(/(\*{1,3}|_{1,3})(.+?)\1/g, "$2");
+  return para;
 }
 
 async function readFileText(path: string) {
@@ -48,7 +64,7 @@ export async function getPosts(postsDir = "posts") {
       const rel = path.replace(/^posts[\/]/, "").replace(/\\/g, "/");
       const url = "/" + rel.replace(/\.md$/, "");
       const slug = url.split("/").pop() || "";
-      posts.push({ slug, title, publish_date, tags, content: body, url });
+      posts.push({ slug, title, publish_date, tags, description: extractFirstParagraph(body), content: body, url });
     }
   } catch (e) {
     console.error("getPosts error:", e);
@@ -68,7 +84,7 @@ export async function getPostByUrl(url: string) {
     const publish_date = (attrs?.publish_date as string) ?? "1970-01-01";
     const tags = (attrs?.tags as string[]) ?? [];
     const slug = mdPath.split("/").pop()!.replace(/\.md$/, "");
-    return { slug, title, publish_date, tags, content: body, url } as Post;
+    return { slug, title, publish_date, tags, description: extractFirstParagraph(body), content: body, url } as Post;
   } catch (e) {
     return null;
   }

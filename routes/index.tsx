@@ -31,6 +31,9 @@ export default function Home({ data }: { data: { posts: Post[] } }) {
                 <a href={p.url}>{p.title}</a>
               </div>
               <div class="post-date">{p.publish_date}</div>
+              {p.description && (
+                <div class="post-desc">{p.description}</div>
+              )}
               {p.tags && p.tags.length > 0 && (
                 <div class="post-tags">
                   {p.tags.map((tag) => (

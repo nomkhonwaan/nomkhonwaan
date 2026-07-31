@@ -193,6 +193,17 @@ hr {
   color: var(--muted-light);
 }
 
+.post-desc {
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-top: 0.35rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .post-tags {
   display: flex;
   gap: 0.5rem;
