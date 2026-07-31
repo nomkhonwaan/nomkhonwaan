@@ -331,3 +331,5 @@ Cargo.lock
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,node,deno,rust,go,intellij+all
+
+_fresh
