@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Advent of Code 2018 Day 2 - Inventory Management System — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+  
+  <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Advent of Code 2018 Day 2 - Inventory Management System</h1>
+        <div class="post-meta">
+          <time>2022-07-28</time>
+          <div class="post-tags"><span class="post-tag">advent-of-code</span><span class="post-tag">rust</span></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>ในวันที่สองตัวเราหยุดการเดินทางผ่านกาลเวลาแล้ว หลังจากพักหายใจสักครู่ก็ก้มมองดูเจ้าอุปกรณ์ที่อยู่บนข้อมือที่ได้รับมา ที่หน้าจอแสดงข้อความว่าถึงที่หมายปลายทางแล้วพร้อมกับแจ้งปี ค.ศ. 1518 และสถานที่ปัจจุบันคือ​ <em>ตู้เอนกประสงค์แห่งสำนักงานขั้วโลกเหนือหมายเลข 83N10</em></p>
+<h2>สารบัญ</h2>
+<ul>
+<li><a href="/2022/7/6/advent-of-code-2018-day-1-chronal-calibration">Advent of Code 2018 Day 1 - Chronal Calibration</a></li>
+<li><a href="/2022/7/28/advent-of-code-2018-day-2-inventory-management-system">Advent of Code 2018 Day 2 - Inventory Management System</a></li>
+<li><a href="/2022/8/5/advent-of-code-2018-day-3-no-matter-how-you-slice-it">Advent of Code 2018 Day 3 - No Matter How You Slice it</a></li>
+<li><a href="/2022/8/22/advent-of-code-2018-day-4-repose-record">Advent of Code 2018 Day 4 - Repose Record</a></li>
+<li><a href="/2023/6/24/advent-of-code-2018-day-5-alchemical-reduction">Advent of Code 2018 Day 5 - Alchemical Reduction</a></li>
+</ul>
+<h2>TL;DR</h2>
+<p><a href="https://github.com/nomkhonwaan/nomkhonwaan/blob/main/advent-of-code/2018/day_2_inventory_management_system.rs">GitHub</a></p>
+<hr>
+<p>คุณได้ยินเสียงฝีเท้าและเสียงพูดคุยอยู่ด้านนอก</p>
+<p>&quot;...ฉันเองก็ไม่มั่นใจเหมือนกัน แต่คนส่วนมากมีปล่องไฟอยู่ที่บ้าน ไม่แน่เขาอาจจะอาศัยช่องนั่นมุดตัวผ่านเข้าไปได้?&quot; — <em>เสียงลึกลับ</em></p>
+<p>&quot;อันที่จริงแล้วเรากำลังสร้างชุดแบบใหม่ที่ช่วยให้เขาสามารถผ่านที่แคบแบบนั้นได้ แต่เมื่อไม่กี่วันก่อนฉันได้ยินว่าตัวอย่างผ้า, แบบแปลน, และทุกสิ่ง! อยู่ดี ๆ ทุกคนในทีมก็ลืมมันไปหมดเหมือนไม่เคยเกิดขึ้นมาก่อน!&quot; — <em>เสียงลึกลับอีกเสียง</em></p>
+<p>&quot;อันที่จริงแล้วพวกเขาน่าจะยังมีผ้าเหลืออยู่ที่โกดังไม่ใช่หรือ? มันน่าจะถูกเก็บรวมกันอยู่ในกล่องที่มีรหัสใกล้เคียงกันแต่น่าเสียดายมันคงจะเป็นเรื่องยากที่ต้องค้นหากล่องสองใบที่มีรหัสใกล้เคียงกันจากกล่องจำนวนมหาศาลขนาดนั้น...&quot; เสียงลึกลับทั้งสองเสียงเดินห่างออกไปไกลเกินกว่าที่จะได้ยินประโยคที่เหลือทั้งหมด</p>
+<p>ในคืนนั้นเอง, คุณแอบย่องเข้าไปที่โกดังเพื่อที่จะค้นหากล่องสอบใบที่ว่านั่นอย่างระมัดระวัง ใครจะรู้ถ้าเกิดคุณถูกเจอตัวเข้ามันอาจจะเปลี่ยนแปลงเหตุการณ์อะไรในอนาคตเข้าก็ได้ คุณใช้อุปกรณ์ที่ข้อมือสแกนหากล่องที่_น่าจะใช่_ทั้งหมดได้ออกมาจำนวนหนึ่ง</p>
+<hr>
+<p>มาถึงส่วนของโจทย์ในวันนี้แล้ว</p>
+<p>โจทย์ต้องการให้หาว่าในหมายเลขกล่องที่ได้มามีตัวอักษรใดบ้างที่ซ้ำกันสองหรือสามครั้งเช่น</p>
+<ul>
+<li><code>abcdef</code> ไม่มีตัวอักษรใดที่ซ้ำสองหรือสามครั้งเลย</li>
+<li><code>bababc</code> มี <code>a</code> สองครั้งและ <code>b</code> สามครั้ง</li>
+<li><code>abbcde</code> มี <code>a</code> สองครั้งแต่ไม่มีตัวอักษรใดที่ซ้ำสามครั้ง</li>
+<li><code>abcccd</code> มี <code>c</code> สามครั้งแต่ไม่มีตัวอักษรใดที่ซ้ำสองครั้ง</li>
+<li><code>aabcdd</code> มี <code>a</code> และ <code>d</code> ที่ซ้ำสองครั้ง</li>
+<li><code>abcdee</code> มี <code>e</code> สองครั้ง</li>
+<li><code>ababab</code> มี <code>a</code> และ <code>b</code> ที่ซ้ำสามครั้ง</li>
+</ul>
+<p>จากรายการข้างต้นมีสี่รหัสที่มีตัวอักษรซ้ำสองครั้งคือ <code>bababc</code>,​ <code>abbcde</code>, <code>aabcdd</code> และ <code>abcdee</code> กับรหัสที่มีตัวอักษกซ้ำสามครั้งคือ <code>bababc</code> (นับอีกรอบเพราะมีทั้งสองและสาม), <code>abcccd</code> และ <code>ababab</code> จากนั้นเอาจำนวนของรหัสที่ซ้ำสองและสามครั้งมาคูณกัน จากตัวอย่างจะได้เป็น <code>4 * 3 = 12</code> </p>
+<hr>
+<p>เหมือนกันกับวันแรกเริ่มจากดาวน์โหลดอินพุต &quot;input.txt&quot; จากนั้นใช้ฟังก์ชันเดิมเพื่ออ่านไฟล์ทีละบรรทัด</p>
+<pre><code class="language-rust">use std::{env, fs, io, io::BufRead, path};
+
+fn main() {
+    let args: Vec&lt;String&gt; = env::args().collect();
+    let input = &amp;args[1];
+    let mut list_of_box_ids: Vec&lt;BoxId&gt; = vec![];
+
+    if let Ok(lines) = read_lines(input) {
+        for line in lines {
+            if let Ok(line) = line {
+                // TODO: Parse each line into `BoxId` here...
+            }
+        }
+    }
+}
+
+fn read_lines&lt;P: AsRef&lt;path::Path&gt;&gt;(path: P) -&gt; io::Result&lt;io::Lines&lt;io::BufReader&lt;fs::File&gt;&gt;&gt; {
+    let file = fs::File::open(path)?;
+    Ok(io::BufReader::new(file).lines())
+}
+</code></pre>
+<p>ถัดมาสร้าง <code>BoxId</code> เพื่อใช้สำหรับเก็บข้อมูลหมายเลขกล่อง ถ้าสังเกตจะเห็นว่าหมายเลขกล่องจะถูกเรียงลำดับอันนี้เพื่อใช้เวลาหาตัวอักษรที่ซ้ำกันสองและสามครั้งจะทำให้ง่ายกว่าการนับด้วยการวนลูปซ้อนกันสองลูป</p>
+<pre><code class="language-rust">/// Represent each line of the ID
+#[derive(Debug, Default)]
+struct BoxId {
+    sorted_chars: Vec&lt;char&gt;,
+}
+
+impl BoxId {
+    fn from_string(s: String) -&gt; Self {
+        let mut c: Vec&lt;char&gt; = s.chars().collect();
+        // sort the given id ascending
+        c.sort();
+        BoxId { sorted_chars: c }
+    }
+}
+</code></pre>
+<p>จากนั้นมาสร้างฟังก์ชันสำหรับนับตัวอักษรที่ซ้ำกันสองครั้งแบบนี้ จากโค้ดเริ่มด้วยการวนลูปตัวอักษรที่ละตัวด้วยคำสั่ง <code>iter</code> และให้ส่งค่าอินเด็กซ์กับตัวอักษรกลับมาด้วย <code>enumerate</code> </p>
+<p>จากนั้นเช็คว่าถ้า <code>i + </code> มากกว่า <code>max</code> ของจำนวนตัวอักษรให้ออกจากลูปเพราะถือว่าวนจนจบทั้งหมดแล้ว ถัดมาจะเป็นการตรวจสอบว่าตัวอักษรปัจจุบันเป็นตัวเดียวกับตัวอักษรในลำดับถัดไปหรือไม่ ถ้าไม่ใช่ให้วนลูปต่อทันทีไม่ต้องตรวจสอบเพิ่มเติมแล้ว</p>
+<p>ในกรณีที่ตัวอักษรลำดับถัดไปเป็นค่าเดียวกันต้องมีการตรวจสอบเพิ่มเติมอีกคือต้องไม่ใช่การซ้ำกันสามครั้ง​ โดยตรวจสอบกับตัวอักษรในลำดับถัดไปอีกสองตำแหน่ง และตัวอักษรในลำดับก่อนหน้าหนึ่งตำแหน่ง</p>
+<pre><code class="language-rust">fn contains_two_of_any_letter(&amp;self) -&gt; bool {
+    let max = self.sorted_chars.len();
+
+    for (i, c) in self.sorted_chars.iter().enumerate() {
+        if i + 1 &gt; max - 1 {
+            break;
+        }
+        if *c != self.sorted_chars[i + 1] {
+            continue;
+        }
+
+        // might contain three of any letter forward
+        if i + 2 &lt; max {
+            if *c == self.sorted_chars[i + 2] {
+                continue;
+            }
+        }
+        // might contain three of any letter backward
+        if i &gt; 0 {
+            if *c == self.sorted_chars[i - 1] {
+                continue;
+            }
+        }
+
+        return true;
+    }
+
+    false
+}
+</code></pre>
+<p>จากนั้นสร้างฟังก์ชันสำหรับตรวจสอบตัวอักษรที่ซ้ำกันสามครั้ง หลักการจะคล้ายกับ <code>contains_two_of_any_letter</code> แต่ว่าไม่จำเป็นลำดับถัดไปหรือย้อนหลังเพราะโจทย์กำหนดว่าจะมีตัวอักษรซ้ำกันได้มากสุดแค่สามครั้งเท่านั้น</p>
+<pre><code class="language-rust"> fn contains_three_of_any_letter(&amp;self) -&gt; bool {
+    let max = self.sorted_chars.len();
+
+    for (i, c) in self.sorted_chars.iter().enumerate() {
+        if i + 2 &gt; max - 1 {
+            break;
+        }
+        if *c == self.sorted_chars[i + 1] &amp;&amp; *c == self.sorted_chars[i + 2] {
+            return true;
+        }
+    }
+
+    false
+}
+</code></pre>
+<p>เมื่อได้ฟังก์ชันสำหรับตรวจสอบตัวอักษรซ้ำกันสองและสามครั้งแล้วเอามาประกอบกันที่ <code>main</code> จะได้คำตอบสำหรับพาร์ทแรกแล้ว</p>
+<pre><code class="language-rust">fn main() {
+    let args: Vec&lt;String&gt; = env::args().collect();
+    let input = &amp;args[1];
+    let mut list_of_box_ids: Vec&lt;BoxId&gt; = vec![];
+
+    if let Ok(lines) = read_lines(input) {
+        for line in lines {
+            if let Ok(line) = line {
+                let box_id = BoxId::from_string(line);
+                list_of_box_ids.push(box_id);
+            }
+        }
+    }
+
+    let contains_two: Vec&lt;&amp;BoxId&gt; = list_of_box_ids.iter().filter(|box_id| box_id.contains_two_of_any_letter()).collect();
+    let contains_three: Vec&lt;&amp;BoxId&gt; = list_of_box_ids.iter().filter(|box_id| box_id.contains_three_of_any_letter()).collect();
+    println!(&quot;first part answer is: {}&quot;, contains_two.len() * contains_three.len());
+}
+</code></pre>
+<hr>
+<p>ต่อกันที่พาร์ทสองโจทย์ต้องการให้หาว่าหมายเลขกล่องใดบ้างที่ใกล้เคียงกันโดยยกตัวอย่างตามนี้</p>
+<pre><code>abcde
+fghij
+klmno
+pqrst
+fguij
+axcye
+wvxyz
+</code></pre>
+<p>ซึ่งหมายเลข <code>fghij</code> และ <code>fguij</code> มีความใกล้เคียงกันมากที่สุดโดยต่างกันแค่หนึ่งตำแหน่งคือ <code>h</code> และ <code>u</code> ซึ่งถ้าเอาตำแหน่งที่ต่างกันออกจะได้หมายเลขกล่องที่เป็นคำตอบคือ <code>fgij</code></p>
+<p>เนื่องจากพาร์ทแรกหมายเลขกล่องที่ได้มาจะถูกเรียงลำดับ ดังนั้นจึงต้องเพิ่มอีกตัวฟิลด์เข้าไปที่ <code>BoxId</code> เพื่อเก็บหมายเลขกล่องก่อนที่จะถูกเรียงลำดับ</p>
+<pre><code class="language-rust">#[derive(Debug, Default)]
+struct BoxId {
+    // for comparing with each other BoxId
+    chars: Vec&lt;char&gt;,
+    sorted_chars: Vec&lt;char&gt;,
+
+}
+</code></pre>
+<p>จากนั้นสร้างฟังก์ชันสำหรับหาว่ามีตัวอักษรที่แตกต่างกันกี่ตำแหน่ง</p>
+<pre><code class="language-rust">/// Return number of different characters between box id `a` and `b`.
+fn differ(a: &amp;BoxId, b: &amp;BoxId) -&gt; usize {
+    let mut diff: usize = 0;
+    for (i, c) in a.chars.iter().enumerate() {
+        if *c != b.chars[i] {
+            diff += 1;
+        }
+    }
+    diff
+}
+</code></pre>
+<p>ต่อมาก็เอารายการกล่องทั้งหมดมาวนลูปโดยเริ่มตรวจสอบไปทีละกล่องเป็นคู่ ๆ ซึ่งจะเป็นการวนลูปแบบ n^2 และในลูปจะเรียกใช้ฟังก์ชัน <code>differ</code> เพื่อหาว่าหมายเลขกล่องใดบ้างที่มีความแตกต่างที่น้อยที่สุด</p>
+<pre><code class="language-rust">fn find_two_correct_box_ids(list_of_box_ids: &amp;Vec&lt;BoxId&gt;) -&gt; Option&lt;(&amp;BoxId, &amp;BoxId)&gt; {
+    for (i, a) in list_of_box_ids.iter().enumerate() {
+        for b in list_of_box_ids.iter().skip(i + 1) {
+            if differ(a, b) == 1 {
+                return Some((a, b));
+            }
+        }
+    }
+    None
+}
+</code></pre>
+<p>พอได้หมายเลขกล่องที่เป็นคำตอบออกมาสองกล่องแล้วก็เอามาอินเตอร์เซกชันเพื่อเอาเฉพาะตัวอักษรที่เหมือนกัน</p>
+<pre><code class="language-rust">/// Return a set of characters are in both of box id `a` and `b`.
+fn intersect(a: &amp;BoxId, b: &amp;BoxId) -&gt; Vec&lt;char&gt; {
+    let mut chars: Vec&lt;char&gt; = vec![];
+    for (i, c) in a.chars.iter().enumerate() {
+        if *c == b.chars[i] {
+            chars.push(*c);
+        }
+    }
+    chars
+}
+</code></pre>
+<p>เอาโค้ดทั้งหมดมาประกอบกันก็จะได้คำตอบของพาร์ทที่สองแล้ว</p>
+<pre><code class="language-rust">fn main() {
+    ...
+    
+    if let Some((a, b)) = find_two_correct_box_ids(&amp;list_of_box_ids) {
+        println!(&quot;second part answer is: {}&quot;, String::from_iter(intersect(&amp;a, &amp;b)));
+    }
+}
+</code></pre>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>

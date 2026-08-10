@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>TDD Kata 1 - String Calculator — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+  
+  <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>TDD Kata 1 - String Calculator</h1>
+        <div class="post-meta">
+          <time>2015-06-01</time>
+          <div class="post-tags"><span class="post-tag">tdd</span><span class="post-tag">kata</span><span class="post-tag">go</span></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>ในการเขียนโปรแกรมมีแนวคิดนึงที่ยึดหลักการเขียนเทสก่อนลงมืออิมพลิเมนต์ฟังก์ชันจริงหรือที่เรียกว่า Test-driven development (TDD) หลักการคือเริ่มต้นด้วยการเขียนเทส, รันแล้วพัง, แก้ไขโปรแกรม, รันแล้วผ่าน วนอยู่แบบนี้</p>
+<p>แต่มันไม่ใช่เรื่องง่ายที่จะจินตนาการว่าเทสควรเป็นอย่างไรเพราะยังไม่ได้อิมพลิเมนต์ฟังก์ชันนั้นจริง ๆ แต่ของแบบนี้สามารถฝึกฝนกันได้ มารู้จักกับการฝึกฝนที่เรียกว่า TDD Kata กัน อนึ่งคำว่า Kata ในภาษาญี่ปุ่นหมายถึงการฝึกฝนซ้ำแล้วซ้ำเล่าจนร่างกายสามารถจดจำได้เอง</p>
+<blockquote>
+<p>Kata is to learn by repeating over and over again</p>
+</blockquote>
+<h2>สารบัญ</h2>
+<ul>
+<li><a href="/2015/6/1/tdd-kata-1-string-calculator">TDD Kata 1 - String Calculator</a></li>
+<li><a href="/2016/1/28/tdd-kata-2-the-bowling-game">TDD Kata 2 - Bowling Game</a></li>
+</ul>
+<hr>
+<p>โจทย์ในครั้งนี้คือ <a href="https://osherove.com/tdd-kata-1/">String Calculator</a> คำแนะนำคือทำไปทีละขั้นอย่าอ่านล่วงหน้าและควรใช้เวลาทำโจทย์ไม่เกิน 15 นาที ถ้าพร้อมแล้วลุย!</p>
+<ol>
+<li>สร้างฟังก์ชันสำหรับคำนวณสตริงโดยมีอินพุตและเอาท์พุตแบบนี้</li>
+</ol>
+<pre><code>int Add(string numbers)
+</code></pre>
+<p>ฟังก์ชันสามารถรับค่าเป็นตัวเลข​ได้สูงสุดสองตัว โดยแต่คั่นด้วยเครื่องหมายลูกน้ำ (,) และส่งเอาท์พุตเป็นผลรวมของตัวเลขที่รับเข้ามา ตัวอย่างอินพุตเช่น &quot;&quot; หรือ &quot;1&quot; หรือ &quot;1,2&quot; ล้วนยอมรับ ในกรณีที่สตริงเป็นค่าว่างให้ถือว่าเป็น 0</p>
+<p>เริ่มต้นจากการเขียนเทสด้วย</p>
+<pre><code class="language-go"># string_calculator_test.go
+
+func TestAdd(t *testing.T) {
+        // Given
+        tests := map[string]struct{
+                input    string
+                expected int
+        }{
+                &quot;Should return 0&quot;: {
+                        input:    &quot;&quot;,
+                        expected: 0,
+                },
+                &quot;Should return 1&quot;: {
+                        input:    &quot;1&quot;,
+                        expected: 1,
+                },
+                &quot;Should return 3&quot;: {
+                        input:    &quot;1,2&quot;,
+                        expected: 3,
+                },
+        }
+
+        // When
+        for name, test := range tests {
+                t.Run(name, func(t *testing.T) {
+                        result := Add(test.input)
+                        if result != test.expected {
+                                t.Errorf(&quot;expected %d but got: %d&quot;, test.expected, result)
+                        }
+                })
+        }
+}
+</code></pre>
+<p>และแน่นอนว่าเราต้องสร้างฟังก์ชัน <code>Add</code> ขึ้นมาด้วยโดยจะยังไม่มีการอิมพลิเมนต์อะไรนอกจากส่งค่า &quot;0&quot; กลับไป</p>
+<pre><code class="language-go"># string_calculator.go
+
+func Add(numbers string) int {
+        return 0
+}
+</code></pre>
+<p>เมื่อรันเทสจะพบว่า <em>พัง</em> ไป 2 ใน 3 เคสซึ่งนี่คือความตั้งใจอยู่แล้ว ลองมาแก้ไขให้มันทำงานได้ถูกต้องตามหลักการ TDD กัน</p>
+<pre><code class="language-go"># string_calculator.go
+
+import (
+        &quot;strings&quot;
+        &quot;strconv&quot;
+)
+
+func Add(numbers string) int {
+        if numbers == &quot;&quot; {
+                return 0
+        }
+      
+        n := toNumbers(numbers)
+        var sum int 
+        for _, i := range n {
+                sum += i
+        }
+
+        return sum 
+}
+
+// convert numbers string into slice of integer.
+func toNumbers(numbers string) []int {
+        n := strings.Split(numbers, &quot;,&quot;)
+        m := make([]int, 0)
+        
+        for _, i := range n {
+                j, err := strconv.Atoi(i)
+                if err != nil {
+                        continue
+                }
+                m = append(m, j)
+        }
+
+        return m
+}
+</code></pre>
+<p>มีการสร้างฟังก์ชันใหม่ <code>toNumbers</code> สำหรับทำหน้าที่แปลงสตริงเป็น <code>[]int</code> และฟังก์ชัน <code>Add</code> ให้ทำหน้าที่รวมผลลัพธ์ ตอนนี้ผลเทสน่าจะผ่านหมดทุกข้อแล้ว ไปดูเงื่อนไขถัดไปกันต่อ</p>
+<hr>
+<ol start="2">
+<li>ทำให้ฟังก์ชัน <code>Add</code> สามารถคำนวณผลลัพธ์จากตัวเลขใด ๆ ที่ส่งเข้ามาได้</li>
+</ol>
+<p>อันดับแรกต้องเพิ่มเทสเข้าไปก่อนแบบนี้</p>
+<pre><code class="language-go"># string_calculator_test.go
+
+func TestAdd(t *testing.T) {
+        // Given
+        tests := map[string]struct{
+                input    string
+                expected int
+        }{
+                ...
+                &quot;Should return 90&quot;: {
+                        input:    &quot;89,1&quot;,
+                        expected: 90,
+                },
+        }
+
+        ...
+}
+</code></pre>
+<p>เสร็จแล้วก็รันเทสเพื่อดูว่าต้องแก้ไรฟังก์ชันเพิ่มไหม ก็จะพบว่าเทสผ่านอยู่แล้วทุกข้อ เนื่องจากฟังก์ชัน <code>toNumbers</code> มีการแปลงสตริงเป็นตัวเลขได้ตามเงื่อนไขข้อนี้อยู่แล้ว</p>
+<hr>
+<ol start="3">
+<li>ทำให้ฟังก์ชัน <code>Add</code> รองรับเครื่องหมายขึ้นบรรทัดใหม่ (เพิ่มเติมจากลูกน้ำ)</li>
+</ol>
+<p>กรณีที่อินพุตเป็น &quot;1\n2,3&quot; จะได้ผลลัพธ์เป็น 6 แต่กลับกันถ้าอินพุตเป็น &quot;1,\n&quot; ให้แสดงข้อผิดพลาดแทน แต่เนื่องจากฟังก์ชัน <code>Add</code> ไม่ได้มีการรีเทิร์นข้อผิดพลาดกลับ ดังนั้นในข้อที่ต้องแสดงข้อผิดพลาดจะเป็นการสั่ง <code>panic</code> ใน Go แทน </p>
+<p>มาเขียนเทสกันก่อนโดยเพิ่ม <code>willPanic</code> เข้าไปเพื่อให้รู้ว่าเคสไหนบ้างที่ต้องตรวจสอบว่าจะเกิดข้อผิดพลาดได้</p>
+<pre><code class="language-go"># string_calculator_test.go
+
+func TestAdd(t *testing.T) {
+        // Given
+        tests := map[string]struct{
+                input     string
+                expected  int
+                willPanic bool
+        }{
+                ...
+                &quot;Should return 6&quot;: {
+                        input:    &quot;1\n2,3&quot;,
+                        expected: 6,
+                },
+                &quot;Should panic&quot;: {
+                        input:     &quot;1,\n&quot;,
+                        willPanic: true
+                },
+        }
+
+        // When
+        for name, test := range tests {
+                t.Run(name, func(t *testing.T) {
+                        if test.willPanic {
+                                defer func() {
+                                        if r := recover(); r == nil {
+                                                t.Error(&quot;expected panic&quot;)
+                                        }
+                                }()
+                        }
+
+                        result := Add(test.input)
+                        if result != test.expected {
+                                t.Errorf(&quot;expected %d but got: %d&quot;, test.expected, result)
+                        }
+                })
+        }
+}
+</code></pre>
+<p>รันเทสเพื่อดูว่าผลลัพธ์จะเป็นอย่างไร ก็พบว่า 2 เคสที่เพิ่มเข้าไปพังทันที มาแก้ไขฟังก์ชัน <code>Add</code> และ <code>toNumbers</code> เพื่อให้เทสผ่านดีกว่า</p>
+<p>เริ่มจากแปลง &quot;\n&quot; ให้เป็น &quot;,&quot; แบบนี้ ทำให้ไม่ว่าจะส่งตัวคั่นอะไรมาโปรแกรมก็รู้จัก </p>
+<pre><code class="language-go"># string_calculator.go
+
+// convert numbers string into slice of integer.
+func toNumbers(numbers string) []int {
+        numbers = strings.ReplaceAll(numbers, &quot;\n&quot;, &quot;,&quot;)
+        n := strings.Split(numbers, &quot;,&quot;)
+        m := make([]int, 0)
+
+        ...
+}
+</code></pre>
+<p>หลังจากแก้ไขตรงนี้ลองกลับไปรันเทสดูจะพบว่าเคสที่พังในตอนแรกนั้นผ่านแล้ว 1 เคส เหลืออีกเคสที่ต้องแสดงผลข้อผิดพลาดกรณีที่ส่งสตริงเข้ามาเป็น &quot;1,\n&quot;</p>
+<p>เหมือนเดิมเราจะแก้ไขกันที่ฟังก์ชัน <code>toNumbers</code> เนื่องจากกระบวนการอ่านสตริงแล้วเปลี่ยนเป็น <code>[]int</code> ทำที่ฟังก์ชันนี้</p>
+<p>ถ้ายังจำได้จะมีจังหวะนึงที่เรียกใช้ <code>strconv.Atoi</code> ซึ่งตัวฟังก์ชันนี้จะรีเทิร์นข้อผิดพลาดกลับมาถ้าไม่สามารถแปลงค่าเป็นตัวเลขได้ เดิมเราแค่ปล่อยผ่านแล้ววนลูปต่อ ครั้งนี้เราจะเปลี่ยนให้มัน <code>panic</code> แทนแบบนี้</p>
+<pre><code class="language-go"># string_calculator.go
+
+func toNumbers(numbers string) []int {
+        ...
+
+        for _, i := range n {
+                j, err := strconv.Atoi(i)
+                if err != nil {
+                        panic(err)
+                }
+                m = append(m, j)
+        }
+
+        ...
+}
+</code></pre>
+<p>ทีนี้ลองรันเทสดูอีกรอบจะพบว่าผ่านหมดแล้วทุกเคส ไปที่ข้อถัดไปกัน</p>
+<hr>
+<ol start="4">
+<li>รองรับตัวคั่นที่หลากหลายมากขึ้น</li>
+</ol>
+<p>จากเดิมที่โปรแกรมรองรับตัวคั่นอยู่สองแบบคือลูกน้ำกับเครื่องหมายขึ้นบรรทัดใหม่ ผู้ใช้สามารถส่งรูปแบบของสตริงที่สามารถระบุตัวคั่นอื่น ๆ เข้ามาได้ในรูปแบบนี้</p>
+<pre><code>//[delimiter]\n[numbers...]
+</code></pre>
+<p>ตัวอย่างเช่น &quot;//;\n1;2&quot; จะต้องได้ผลลัพธ์เท่ากับ 3 โดยที่ตัวคั่นเป็นเครื่องเซมิโคลอน &quot;;&quot; นอกจากนี้เคสทั้งหมดที่ทำไปข้างต้นจะต้องทำงานได้อยู่เหมือนเดิม</p>
+<p>เริ่มจากแก้ไขเทสกันก่อน</p>
+<pre><code class="language-go"># string_calculator_test.go
+
+func TestAdd(t *testing.T) {
+        // Given
+        tests := map[string]struct{
+                input     string
+                expected  int
+                willPanic bool
+        }{
+                ...
+                &quot;With semicolon, should return 3&quot;: {
+                        input:    &quot;//;\n1;2&quot;,
+                        expected: 3,
+                },
+        }
+
+        ...
+}
+</code></pre>
+<p>แน่นอนว่าพอรันเทสแล้วพังแน่นอนแบบนี้</p>
+<pre><code>--- FAIL: TestAdd (0.00s)
+    --- FAIL: TestAdd/With_semicolon,_should_return_3 (0.00s)
+panic: strconv.Atoi: parsing &quot;//;&quot;: invalid syntax [recovered]
+    panic: strconv.Atoi: parsing &quot;//;&quot;: invalid syntax
+</code></pre>
+<p>มาแก้ไขฟังก์ชันให้รองรับการแปลงรูปแบบสตริงเป็นตัวคั่นโดยเพิ่มฟังก์ชัน <code>parseString</code> อันนี้เข้าไป</p>
+<pre><code class="language-go"># string_calculator.go
+
+import &quot;regexp&quot;
+
+// parse numbers string and return both delimiter (if exist or default comma) and numbers string.
+func parseString(numbers string) (string, string) {
+        re := regexp.MustCompile(`^//(.+)\n(.+)`)
+        matches := re.FindStringSubmatch(numbers)
+
+        // This means the given numbers string matches with the pattern,
+        // then set the delimiter with the given string.
+        if len(matches) == 3 {
+                return matches[1], matches[2]
+        }
+
+        // There is no matching pattern, so just return the given numbers string
+        // with the default delimiter.
+        return &quot;,&quot;, numbers
+}
+</code></pre>
+<p>เริ่มต้นด้วยการแก้ไขฟังก์ชัน <code>toNumbers</code> ให้รับพารามิเตอร์เป็น <code>numbers</code> กับ <code>delimiter</code> ต่อมาเปลี่ยน <code>strings.ReplaceAll</code> กับ <code>strings.Split</code> ให้รับตัวแปร <code>delimiter</code> แทนที่ลูกน้ำ <code>,</code> และสุดท้ายให้ฟังก์ชัน <code>Add</code> เรียกใช้งานฟังก์ชัน <code>parseString</code> ก่อนส่งค่าต่อให้กับ <code>toNumbers</code></p>
+<pre><code class="language-go"># string_calculator.go
+
+func Add(numbers string) int {
+        ...
+
+        n := toNumbers(parseString(numbers))
+
+        ...
+}
+
+func toNumbers(delimeter, numbers string) []int {
+        numbers = strings.ReplaceAll(numbers, &quot;\n&quot;, delimiter)
+        n := strings.Split(numbers, delimiter)
+        ...
+}
+</code></pre>
+<p>จากนั้นรันเทสดูจะพบว่าผ่านหมดแล้วทุกเคส มาดูที่ข้อถัดไปกัน</p>
+<hr>
+<ol start="5">
+<li>ถ้าส่งตัวเลขติดลบเข้ามาให้แสดงข้อผิดพลาด</li>
+</ol>
+<p>นอกจากนี้ต้องแสดงตัวเลขติดลบที่เจอในสตริงออกมาด้วยในขณะเดียวกันถ้ามีตัวเลขติดลบมากกว่าหนึ่งให้แสดงทั้งหมดออกมาด้วยเช่นกัน ก่อนอื่นแก้ไขเทสโดยเพิ่ม <code>panicMessage</code> สำหรับใช้ตรวจสอบว่ากรณีเกิดข้อผิดพลาดขึ้นจะได้ข้อความตามที่กำหนดไว้หรือไม่</p>
+<pre><code class="language-go"># string_calculator_test.go
+
+func TestAdd(t *testing.T) {
+        // Given
+        tests := map[string]struct {
+                input        string
+                expected     int
+                willPanic    bool
+                panicMessage string // a panic message for assertion
+        }{
+                ...
+                `Should panic with &quot;negative not allowed: -1&quot; message`: {
+                        input:        &quot;-1,2&quot;,
+                        willPanic:    true,
+                        panicMessage: &quot;negative not allowed: -1&quot;,
+                },
+                `Should panic with &quot;negative not allowed: -1,-3,-5&quot; message`: {
+                        input:        &quot;-1,2,-3,4,-5&quot;,
+                        willPanic:    true,
+                        panicMessage: &quot;negative not allowed: -1,-3,-5&quot;,
+                },
+        }
+
+        // When
+        for name, test := range tests {
+                t.Run(name, func(t *testing.T) {
+                        if test.willPanic {
+                                defer func() {
+                                        if r := recover(); r == nil {
+                                                t.Error(&quot;expected panic&quot;)
+
+                                                if test.panicMessage != &quot;&quot; &amp;&amp; r != test.panicMessage {
+                                                        t.Errorf(&quot;expected %s but got: %s&quot;, test.panicMessage, r)
+                                                }
+                                        }
+                                }()
+                        }
+
+                        ...
+                })
+        }
+}
+</code></pre>
+<p>รันเทสเพื่อดูผลลัพธ์ซึ่งพังแน่นอน ต่อจากนั้นถึงขั้นตอนการแก้ไขโปรแกรมเพื่อให้รันเทสผ่านดังนี้</p>
+<pre><code class="language-go"># string_calculator.go
+
+
+func Add(numbers string) int {
+        ...
+        var sum int
+        negatives := make([]int, 0)
+        for _, i := range n {
+                if i &lt; 0 {
+                        negatives = append(negatives, i)
+                }
+                sum += i
+        }
+
+        if len(negatives) &gt; 0 {
+                panic(fmt.Sprintf(&quot;negative not allowed: %v&quot;, negatives))
+        }
+
+        ...
+}
+</code></pre>
+<p>เริ่มจากการตรวจสอบตัวเลขทุกตัวก่อนจะทำการบวกเข้าไปที่ตัวแปร <code>sum</code> ถ้าเป็นจำนวติดลบให้เพิ่มเข้าไปอยู่ในลิสต์ของ <code>negatives</code> หลังจากนั้นเมื่อจบลูปถ้าตัวแปร <code>negatives</code> มีจำนวนมากกว่า 1 ให้สั่ง <code>panic</code> และพิมพ์จำนวนตัวเลขติดลบทั้งหมดออกมาในข้อความข้อผิดพลาด เสร็จแล้วทดลองรันอีกทีจะพบว่าตอนนี้เทสผ่านหมดแล้ว ไปดูข้อถัดไปกันดีกว่า</p>
+<hr>
+<ol start="6">
+<li>ตัวเลขที่มีค่ามากกว่า 1,000 ไม่ต้องเอามาคำนวณ</li>
+</ol>
+<p>ยกตัวอย่างเช่นถ้ามี 1,001 + 2 ผลลัพธ์ที่ได้จะเท่ากับ 2 เนื่องจากตัวเลข 1,001 ไม่ถูกเอามาคำนวณด้วย ทำการเพิ่มเทสเคสนี้เข้าไปแบบนี้</p>
+<pre><code class="language-go"># string_calculator_test.go
+
+
+func TestAdd(t *testing.T) {
+        // Given
+        tests := map[string]struct {
+                input        string
+                expected     int
+                willPanic    bool
+                panicMessage string // a panic message for assertion
+        }{
+                ...
+                &quot;Should return 2&quot;: {
+                        input:    &quot;1001,2&quot;,
+                        expected: 2,
+                },
+        }
+
+        ...
+}
+</code></pre>
+<p>ถ้ารันเทสดูจะพบว่าโปรแกรมรีเทิร์นเป็น 1,003 เนื่องจากยังไม่ได้อิมพลิเมนต์เงื่อนไขตรงนี้เข้าไป จากนั้นแก้ไขฟังก์ชัน <code>Add</code> โดยเพิ่มเงื่อนไขตรวจสอบค่าของตัวแปร <code>i</code> ก่อนทำการบวกเข้าไปที่ <code>sum</code> ทุกครั้งแบบนี้</p>
+<pre><code class="language-go"># string_calculator.go
+
+func Add(numbers string) int {
+        ...
+        for _, i := range n {
+                ...
+                if i &gt; 1000 {
+                        continue
+                }
+                sum += i
+        }
+
+        ...
+}
+</code></pre>
+<p>เท่านี้เทสก็ผ่านแล้วไปที่ข้อถัดไปกันเลย</p>
+<hr>
+<ol start="7">
+<li>ตัวคั่นสามารถมีความยาวเท่าไรก็ได้</li>
+</ol>
+<p>ตัวอย่างเช่น &quot;//[***]\n1***2***3&quot; จะต้องได้ผลลัพธ์เท่ากับ 6 เริ่มจากเพิ่มเทสเข้าไปตามนี้</p>
+<pre><code class="language-go"># string_calculator_test.go
+
+func TestAdd(t *testing.T) {
+        // Given
+        tests := map[string]struct{
+                input     string
+                expected  int
+                willPanic bool
+        }{
+                ...
+                &quot;With *** delimiter, should return 6&quot;: {
+                        input:    &quot;//***\n1***2***3&quot;,
+                        expected: 6,
+                },
+        }
+
+        ...
+}
+</code></pre>
+<p>เทสนี้จะรันผ่านอยู่แล้วโดยปริยายอันเนื่องจากฟังก์ชัน <code>parseString</code> ที่ใช้เป็น regular expression ดังนั้นไปข้อถัดไปเลย</p>
+<hr>
+<ol start="8">
+<li>รองรับตัวคั่นที่หลากหลายและมากกว่าหนึ่งแบบ</li>
+</ol>
+<p>จากเดิมที่สามารถระบุตัวคั่นเข้ามาได้เพียงหนึ่งแบบให้แก้ไขเพื่อรองรับการระบุตัวคั่นที่มากกว่าหนึ่งแบบได้ตามรูปแบบนี้</p>
+<pre><code>//[delim1][delim2]\n
+</code></pre>
+<p>ตัวอย่างเช่น &quot;//[*][%]\n1*2%3&quot; จะต้องได้ผลลัพธ์เท่ากับ 6 โดยทั้งเครื่องหมายดอกจัน &quot;*&quot; และเครื่องหมายเปอร์เซ็นต์ &quot;%&quot; สามารถเป็นตัวคั่นได้ทั้งคู่</p>
+<p>เริ่มจากเพิ่มเทสเคสนี้เข้าไปก่อนตามนี้</p>
+<pre><code class="language-go"># string_calculator_test.go
+
+func TestAdd(t *testing.T) {
+        // Given
+        tests := map[string]struct{
+                input     string
+                expected  int
+                willPanic bool
+        }{
+                ...
+                &quot;With multiple delimiters, should return 6&quot;: {
+                        input:    &quot;//[*][%]\n1*2%3&quot;,
+                        expected: 6,
+                },
+        }
+
+        ...
+}
+</code></pre>
+<p>รันเทสเพื่อดูผลลัพธ์จะพบว่าโปรแกรมพยายามจะแปลง &quot;*&quot; และ &quot;%&quot; ให้เป็นตัวเลขเนื่องจากยังไม่รู้จักรูปแบบตัวคั่นใหม่นี้ ได้เวลาแก้ไขโปรแกรม​โดยครั้งนี้จะแก้ไขที่ฟังก์ชัน <code>parseString</code> และเพิ่มฟังก์ชันใหม่ <code>parseDelimiters</code> และ <code>buildReplacer</code> ตามนี้</p>
+<pre><code class="language-go"># string_calculator.go
+
+// parse delimiters string into slice of string.
+func parseDelimiters(delimiters string) []string {
+        re := regexp.MustCompile(`\[([^\]\[\r\n]*)\]`)
+        matches := re.FindAllString(delimiters, -1)
+
+        // This means the given delimiters matches with the pattern.
+        if len(matches) &gt; 0 {
+                return matches
+        }
+
+        return nil
+}
+
+// builder a replacer which is a pair of old-new string
+func buildReplacer(delimiters []string) []string {
+        replacer := make([]string, 0)
+        for _, delimiter := range delimiters {
+                replacer = append(replacer,
+                        // trim unwanted [ and ]
+                        strings.TrimRight(
+                          strings.TrimLeft(delimiter, &quot;[&quot;), &quot;]&quot;,
+                        ),
+                        &quot;,&quot;,
+                )
+        }
+        return replacer
+}
+</code></pre>
+<p>ที่ฟังก์ชัน <code>parseDelimiters</code> จะทำหน้าที่แปลงรูปแบบของตัวคั่นให้เป็น <code>[]string</code> เพื่อส่งต่อให้กับฟังก์ชัน <code>buildReplacer</code> เพื่อสร้างตัวแปลงสำหรับเปลี่ยนตัวคั่นทั้งหมดที่ส่งมาในสตริงให้เป็นลูกน้ำแทน </p>
+<p>ยกตัวอย่างเช่นถ้าส่งตัวคั่นเข้ามาเป็น &quot;[*][%]&quot; ที่ฟังก์ชัน <code>parseDelimiters</code> จะได้ผลลัพธ์เป็น <code>[]string{&quot;[*]&quot;, &quot;[%]&quot;]}</code> และเมื่อส่งต่อให้กับฟังก์ชัน <code>buildReplacer</code> จะได้ผลลัพธ์ออกมาเป็น <code>[]string{&quot;*&quot;, &quot;,&quot;, &quot;%&quot;, &quot;,&quot;}</code></p>
+<p>เสร็จแล้วทำการแก้ไขฟังก์ชัน <code>parseString</code> เพื่อเรียกใช้งานทั้งสองฟังก์ชันที่สร้างใหม่ตามนี้</p>
+<pre><code class="language-go"># string_calculator.go
+
+func parseString(numbers string) (string, string) {
+        ...
+        if len(matches) == 3 {
+                delimiters := parseDelimiters(matches[1])
+                if delimiters == nil {
+                        return matches[1], matches[2]
+                }
+                if len(delimiters) == 1 {
+                        return delimiters[1], matches[2]
+                }
+                // convert all delimiters in the numbers string with comma instead
+                return &quot;,&quot;, strings.NewReplacer(buildReplacer(delimiters)...).Replace(matches[2])
+        }
+
+        ...
+}
+</code></pre>
+<p>จากเดิมที่ตรวจสอบแค่ <code>if len(matches) == 3</code> หรือไม่แล้วรีเทิร์นตัวคั่นกับสตริงตัวเลขออกไปเลย ต้องเพิ่มจังหวะการตรวจสอบว่า <code>delimiters</code> มีมากกว่าหนึ่งตัวหรือไม่ ถ้าไม่มีหรือมีแค่ 1 จะทำการรีเทิร์นตัวคั่นตัวแรก (เพราะมีแค่ตัวเดียว) กลับไป </p>
+<p>ถ้าไม่อย่างนั้นจะทำการเปลี่ยนตัวคั่นทั้งหมดที่อยู่ในสตริงตัวเลขให้เป็นลูกน้ำโดยจับจากตัวคั่นที่ส่งมาทั้งหมด ถ้ารันเทส ณ ตอนนี้จะพบว่าผ่านหมดแล้วทุกเคส ไปต่อกันที่ข้อสุดท้าย</p>
+<hr>
+<ol start="9">
+<li>รองรับตัวคั่นที่หลากหลายและมากกว่าหนึ่งแบบและมีความยาวเท่าไรก็ได้</li>
+</ol>
+<p>เคสนี้จะคล้ายกับข้อก่อนหน้าที่น่าจะผ่านได้ทันทีเพราะใช้ regular expression ในการหาว่าตัวคั่นอยู่ตรงไหน ก่อนอื่นมาเพิ่มเทสสำหรับข้อนี้ก่อน </p>
+<p>โดยอินพุตจะคล้ายกับข้อก่อนหน้าเพียงแต่เพิ่มความยาวดอกจันและเปอร์เซ็นต์เป็นสามเท่า &quot;//[***][%%%]\n1***2%%%3&quot; ผลลัพธ์จะต้องเท่ากับ 6 จากนั้นรันเทสเพื่อดูผลลัพธ์ซึ่งควรจะผ่านทั้งหมด</p>
+<pre><code class="language-go"># string_calculator_test.go
+
+func TestAdd(t *testing.T) {
+        // Given
+        tests := map[string]struct{
+                input     string
+                expected  int
+                willPanic bool
+        }{
+                ...
+                &quot;With *** and %%%, should return 6&quot;: {
+                        input:    &quot;//[***][%%%]\n1***2%%%3&quot;,
+                        expected: 6,
+                },
+        }
+
+        ...
+}
+</code></pre>
+<hr>
+<p>ตัวอย่างโค้ดฉบับเต็มสามารถดูได้ที่ <a href="https://go.dev/play/p/HwEj2buPvM2">Go Playground</a></p>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>

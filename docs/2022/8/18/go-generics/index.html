@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Generics ใน Go — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+  
+  <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Generics ใน Go</h1>
+        <div class="post-meta">
+          <time>2022-08-18</time>
+          <div class="post-tags"><span class="post-tag">go</span></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>Generics เป็นหนึ่งในฟีเจอร์ที่นักพัฒนาเรียกร้องกันมา <a href="https://groups.google.com/g/golang-nuts/c/70-pdwUUrbI/m/onMsQspcljcJ?pli=1">ตั้งแต่เปิดตัวภาษา</a> และ <a href="https://go.dev/blog/why-generics">เริ่มพัฒนาจริง ๆ ตอนปี 2019</a> ในที่สุดก็ปล่อยออกมาให้ใช้งานกันแล้วที่เวอร์ชัน 1.18 มาลองดูกันว่าสามารถทำอะไรได้บ้าง</p>
+<h2>TL;DR</h2>
+<p><a href="https://github.com/nomkhonwaan/nomkhonwaan/blob/main/go/generics/main.go">GitHub</a></p>
+<hr>
+<p>Generics เป็นแนวคิดของภาษายุคใหม่ที่อนุญาตให้ฟังก์ชันสามารถทำงานกับตัวแปรประเภทใดก็ได้ ที่ตรงกับเงื่อนไขของฟังก์ชันนั้น ๆ </p>
+<p>ยกตัวอย่างเช่นฟังก์ชัน <code>sort.Sort</code> ที่ทำงานได้แค่กับตัวแปรที่อิมพลิเมนต์อินเตอร์เฟซ​ <code>sort.Interface</code> เท่านั้นซึ่งถ้าต้องการเรียงลำดับตัวแปรประเภทอื่นต้องอิมพลิเมนต์ฟังก์ชันเพิ่มอีก 3 ฟังก์ชันคือ </p>
+<ul>
+<li><code>Len()</code></li>
+<li><code>Less(i, j int) bool</code></li>
+<li><code>Swap(i, j int)</code></li>
+</ul>
+<p>การมาของ generics ช่วยให้การเขียนฟังก์ชันเรียงลำดับสามารถส่งสไลด์ของ <code>[]float64</code>, <code>[]int</code> และ <code>[]string</code> เข้าไปที่ฟังก์ชัน <code>sortAny</code> ได้ทันทีโดยไม่ต้องแปลงเป็น <code>sort.Float64Slice</code>, <code>sort.IntSlice</code> และ <code>sort.StringSlice</code></p>
+<pre><code class="language-go">package main
+
+import (
+        &quot;fmt&quot;
+        &quot;sort&quot;
+
+        &quot;golang.org/x/exp/constraints&quot;
+)
+
+func main() {
+        f := []float64{4.2, 2.9, 5.32, 1.70, 3.65}
+        sortAny(f)
+        fmt.Println(f)
+
+        i := []int{6, 5, 1, 3, 4, 2}
+        sortAny(i)
+        fmt.Println(i)
+
+        s := []string{&quot;He&quot;, &quot;She&quot;, &quot;They&quot;, &quot;It&quot;, &quot;We&quot;}
+        sortAny(s)
+        fmt.Println(s)
+}
+
+func sortAny[T constraints.Ordered](t []T) {
+        sort.Slice(t, func(i, j int) bool { return t[i] &lt; t[j] })
+}
+</code></pre>
+<p>สังเกตที่ฟังก์ชัน <code>sortAny</code> จะมี syntax ใหม่เป็นวงเล็บสี่เหลี่ยม </p>
+<pre><code class="language-go">[T constraints.Ordered]
+</code></pre>
+<p>ถ้ากดเข้าไปดูจะพบว่า <code>constraints.Ordered</code> ประกาศเป็นอินเตอร์เฟซประกอบไปด้วย <code>Integer | Float | ~string</code></p>
+<pre><code class="language-go">// Ordered is a constraint that permits any ordered type: any type
+// that supports the operators &lt; &lt;= &gt;= &gt;.
+// If future releases of Go add new ordered types,
+// this constraint will be modified to include them.
+type Ordered interface {
+    Integer | Float | ~string
+}
+</code></pre>
+<p>การประกาศอินเตอร์เฟซแบบนี้ทำให้ฟังก์ชันที่รองรับ <code>constraints.Ordered</code> สามารถรับตัวแปร <code>Integer</code>, <code>Float</code> และ <code>~string</code> ที่อยู่กายใต้ <code>constraints.Ordered</code> ได้เช่นกัน </p>
+<p>สิ่งที่ต้องรู้คือ Go ไม่อนุญาตให้ผสมประเภทตัวแปรได้ อย่างโค้ดด้านล่างนี้จะไม่สามารถคอมไพล์ได้เนื่องจากมีการผสมกันระหว่าง <code>[]float64</code> และ <code>[]int</code> แม้ว่าทั้ง <code>[]float64</code> และ <code>[]int</code> จะอยู่ภายใต้ <code>constraints.Ordered</code> เหมือนกันก็ตาม</p>
+<pre><code class="language-go">func main() {
+        f := []float64{4.2, 2.9, 5.32, 1.70, 3.65}
+        sortAny(f)
+        printAnySorted(f)
+
+        i := []int{6, 5, 1, 3, 4, 2}
+        sortAny(i)
+        printAnySorted(i)
+
+        s := []string{&quot;He&quot;, &quot;She&quot;, &quot;They&quot;, &quot;It&quot;, &quot;We&quot;}
+        sortAny(s)
+        printAnySorted(s)
+
+        // error type []int of i does not match inferred type []float64 for []T
+        printAnySorted(f, i)
+}
+
+func printAnySorted[T constraints.Ordered](t ...[]T) {
+    for _, v := range t {
+        fmt.Println(v)
+    }
+}
+</code></pre>
+<p>สังเกตที่ <code>~string</code> ความหมายของสัญลักษณ์​ <code>~</code> คือนอกจาก <code>string</code> แล้วยังรวมไปถึงประเภทของตัวแปรที่ถูกสร้างขึ้นจาก <code>string</code> อีกทีเช่นกัน ตัวอย่าง <code>MyString</code> ด้านล่างนี้</p>
+<pre><code class="language-go">func main() {
+    ...
+
+    u := []MyString{&quot;C&quot;, &quot;D&quot;, &quot;B&quot;, &quot;A&quot;, &quot;E&quot;}
+    sortAny(u)
+    fmt.Println(u)
+}
+
+type MyString string
+</code></pre>
+<hr>
+<p>นอกจากนี้ Go ยังเตรียมอินเตอร์เฟซบางส่วนสำหรับประเภทตัวแปรพื้นฐานมาให้แล้วอย่างเช่น <code>comparable</code></p>
+<pre><code class="language-go">func main() {
+        ...
+
+        fmt.Println(equal(&quot;hello&quot;, &quot;world!&quot;))
+}
+
+func equal[K comparable](i, j K) bool {
+        return i == j
+}
+</code></pre>
+<p>หรือการประกาศ generics ที่ระดับ <code>struct</code> แบบนี้</p>
+<pre><code class="language-go">func main() {
+        ...
+
+    n := node[string]{val: &quot;test&quot;}
+    fmt.Println(n)
+}
+
+type node[T constraints.Ordered] struct {
+    val T
+}
+</code></pre>
+<hr>
+<p>อ้างอิง</p>
+<ol>
+<li><a href="https://go.dev/doc/tutorial/generics">Tutorial: Getting started with generics</a></li>
+<li><a href="https://go.dev/blog/when-generics">When To Use Generics</a></li>
+</ol>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Advent of Code 2018 Day 5 - Alchemical Reduction — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+  
+  <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Advent of Code 2018 Day 5 - Alchemical Reduction</h1>
+        <div class="post-meta">
+          <time>2023-06-24</time>
+          <div class="post-tags"><span class="post-tag">advent-of-code</span><span class="post-tag">rust</span></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>คุณสามารถแอบเข้าไปในห้องแล็บได้สำเร็จ การพัฒนาชุดสูทต้นแบบของเอลฟ์มีความก้าวหน้าพอสมควร แต่ยังคงติดปัญหาเรื่องการลดขนาดของชุดสูทที่จะใช้งานจริง</p>
+<h2>สารบัญ</h2>
+<ul>
+<li><a href="/2022/7/6/advent-of-code-2018-day-1-chronal-calibration">Advent of Code 2018 Day 1 - Chronal Calibration</a></li>
+<li><a href="/2022/7/28/advent-of-code-2018-day-2-inventory-management-system">Advent of Code 2018 Day 2 - Inventory Management System</a></li>
+<li><a href="/2022/8/5/advent-of-code-2018-day-3-no-matter-how-you-slice-it">Advent of Code 2018 Day 3 - No Matter How You Slice it</a></li>
+<li><a href="/2022/8/22/advent-of-code-2018-day-4-repose-record">Advent of Code 2018 Day 4 - Repose Record</a></li>
+<li><a href="/2023/6/24/advent-of-code-2018-day-5-alchemical-reduction">Advent of Code 2018 Day 5 - Alchemical Reduction</a></li>
+</ul>
+<h2>TL;DR</h2>
+<p><a href="https://github.com/nomkhonwaan/nomkhonwaan/blob/main/advent-of-code/2018/day_5_alchemical_reduction.rs">GitHub</a></p>
+<hr>
+<p>ถึงแม้ว่าเทคโนโลยีในปี ค.ศ. 1518 จะสามารถแก้ปัญหานี้ได้ในที่สุด แต่ว่าตอนนี้คุณสามารถช่วยพวกเขาได้ คุณตรวจสอบองค์ประกอบทางเคมีของวัสดุที่ใช้ทำชุดสูทและพบว่ามันถูกสร้างขึ้นจากสายโพลิเมอร์ที่ยาวมาก</p>
+<hr>
+<p>มาถึงส่วนของโจทย์วันนี้</p>
+<p>พอลิเมอร์เกิดจากยูนิตเล็ก ๆ ซึ่งจะทำปฏิกิริยาเมื่อยูนิตสองตัวที่เป็นประเภทเดียวกันถูกกระตุ้นและมีขั้วตรงข้ามถูกทำลาย ประเภทของยูนิตแทนที่ด้วยตัวอักษรเช่น <code>r</code> และขั้วของยูนิตแทนที่ด้วยตัวอักษรพิมพ์ใหญ่เช่น <code>R</code> เรียกยูนิตแบบนี้ว่าเป็นยูนิตประเภทเดียวกันที่มีขั้วตรงข้าม หรืออีกตัวอย่างคือ <code>r</code> กับ <code>s</code> ที่เป็นยูนิตคนละประเภทกันและจะไม่ทำปฏิกิริยาต่อกัน</p>
+<p>ตัวอย่างเช่น</p>
+<ul>
+<li><code>aA</code>, <code>a</code> และ <code>A</code> จะทำปฏิกิริยากันและสลายไป</li>
+<li><code>abBA</code>, <code>bB</code> จะทำปฏิกิริยากันและสลายไปเหลือ <code>aA</code> ซึ่งจะเข้าเงื่อนไขด้านบนคือ <code>a</code> และ <code>A</code> จะทำปฏิกิริยากันและสลายไป</li>
+<li><code>abAB</code>, ไม่เกิดอะไรขึ้นเนื่องจากไม่มียูนิตประเภทเดียวกันติดกัน</li>
+<li><code>aabAAB</code>, ไม่เกิดอะไรขึ้นเนื่องจาก <code>aa</code> และ <code>AA</code> ที่อยู่ติดกันเป็นขั้วเดียวกัน</li>
+</ul>
+<p>โจทย์ต้องการให้หาความยาวของสายพอลิเมอร์หลังจากเกิดปฏิกิริยาแล้ว ดูแล้วไม่น่ายากเริ่มต้นด้วยการดาวน์โหลดอินพุตไฟล์เข้ามาในโปรแกรมก่อน เนื่องจากรอบนี้อินพุตจะเป็นข้อความยาว ๆ เพียงบรรทัดเดียวดังนั้นตรวจสอบให้ดีว่าอินพุตต้อง<em>ไม่มี</em>บรรทัดเกินมา</p>
+<p>รอบนนี้จะเปลี่ยนฟังก์ชันที่ใช้สำหรับอ่านไฟล์สักเล็กน้อยจากเดิมที่อ่านทีละบรรทัดเปลี่ยนเป็นอ่านทีเดียวทั้งไฟล์​แทน แบบนี้</p>
+<pre><code class="language-rust">fn main() {
+    let args: Vec&lt;String&gt; = env::args().collect();
+    let input = &amp;args[1];
+    let polymer = read_file(input).unwrap();
+
+    ...
+}
+
+fn read_file&lt;P: AsRef&lt;path::Path&gt;&gt;(path: P) -&gt; io::Result&lt;String&gt; {
+    let mut file = fs::File::open(path)?;
+    let mut buf = String::new();
+    file.read_to_string(&amp;mut buf)?;
+    Ok(buf)
+}
+</code></pre>
+<p>จากนั้นเขียนฟังก์ชัน <code>reduce</code> สำหรับวนลูปสายพอลิเมอร์เพื่อทำการตัดยูนิตที่เกิดปฏิกิริยาออก โดยเงื่อนไขของฟังก์ชันคือจะวนลูปเรื่อย ๆ จนกว่าจะไม่เกิดปฏิกิริยาแล้วถึงจะหยุดและส่งยูนิตที่เหลืองทั้งหมดกลับ</p>
+<pre><code class="language-rust">fn reduce(&amp;polymer: String) -&gt; String {
+    let mut units: Vec&lt;char&gt; = polymer.chars().collect();
+
+    loop {
+        let mut reacted = false;
+
+        for i in 0..units.len() - 1 {
+            if react(&amp;units[i], &amp;units[i + 1]) {
+                // Remove the current and next item from the units vector.
+                units.remove(i);
+                // The above remove function makes the next index changed,
+                // so the next index will be i instead of i + 1.
+                units.remove(i);
+
+                reacted = true;
+                break;
+            }
+        }
+
+        // Loop until no reaction, then break.
+        if !reacted {
+            break;
+        }
+    }
+
+    units.iter().collect()
+}
+</code></pre>
+<p>และสร้างสำหรับฟังก์ชันสำหรับใช้ตรวจสอบการเกิดปฏิกิริยาระหว่างยูนิตที่อยู่ติดกัน โดยมีเงื่อนไขคือถ้ายูนิตคู่นั้นมีขั้วแบบเดียวกันหรือไม่ใช่ประเภทเดียวกันจะไม่เกิดปฏิกิริยาใด ๆ </p>
+<pre><code class="language-rust">fn react(n: &amp;char, m: &amp;char) -&gt; bool {
+    // Nothing happens when they are the same type and their polarities match.
+    // Example: aa, AA, CC
+    if n == m {
+        return false 
+    }
+    // At this statement, they might be the same type or not,
+    // But their polarities are not the same for sure.
+    return n.to_ascii_lowercase() == m.to_ascii_lowercase();
+}
+</code></pre>
+<p>จากนั้นเรียกใช้งานฟังก์ชัน <code>reduce</code> จาก <code>main</code> ก็จะได้คำตอบของพาร์ทที่หนึ่ง</p>
+<pre><code class="language-rust">fn main() {
+    let args: Vec&lt;String&gt; = env::args().collect();
+    let input = &amp;args[1];
+    let polymer = read_file(input).unwrap();
+
+    println!(&quot;first part answer is: {}&quot;, reduce(&amp;polymer).len());
+}
+</code></pre>
+<hr>
+<p>ในพาร์ทที่สองโจทย์ต้องการให้หาว่าถ้าหากลบยูนิตใด ๆ ก็ตามออกแล้วสามารถทำให้สายพอลิเมอร์มีขนาดที่สั้นที่สุดได้โดยไม่สนใจว่าขั้วจะตรงข้ามกันหรือไม่ </p>
+<p>ตัวอย่างเช่น <code>dabAcCaCBAcCcaDA</code></p>
+<ul>
+<li>ถ้าลบ <code>A/a</code> ออกจะได้ <code>dbcCCBcCcD</code> หลังจากที่ปล่อยให้เกิดปฏิกิริยาแล้วจะเหลือ <code>dbCBcD</code> ซึ่งมีความยาว 6</li>
+<li>ถ้าลบ <code>B/b</code> ออกจะได้ <code>daAcCaCAcCcaDA</code> หลังจากที่ปล่อยให้เกิดปฏิกิริยาแล้วจะเหลือ <code>daCAcaDA</code> ซึ่งมีความยาว 8</li>
+<li>ถ้าลบ <code>C/c</code> ออกจะได้ <code>dabAaBAaDA</code> หลังจากที่ปล่อยให้เกิดปฏิกิริยาแล้วจะเหลือ <code>daDA</code> ซึ่งมีความยาว 4</li>
+<li>ถ้าลบ <code>D/d</code> ออกจะได้ <code>abAcCaCBAcCcaA</code> หลังจากที่ปล่อยให้เกิดปฏิกิริยาแล้วจะเหลือ <code>abCBAc</code> ซึ่งมีความยาว 6</li>
+</ul>
+<p>จากตัวอย่างข้างต้นหมายความว่าถ้าลบ <code>C/c</code> ออกจากจะทำให้ได้สายพอลิเมอร์ที่มีขนาดสั้นที่สุด</p>
+<p>ด้วยเงื่อนไขนี้ทำให้จำเป็นต้องมีการเพิ่มโค้ดส่วนของการตัดยูนิตออกก่อนที่จะส่งเข้าฟังก์ชัน <code>reduce</code> โดยเพิ่มโค้ดเข้าไปที่ <code>main</code> แบบนี้</p>
+<pre><code class="language-rust">
+fn main() {
+    ...
+
+    let instances = &quot;abcdefghijklmnopqrstuvwxyz&quot;;
+    let mut shortest_polymer_len = polymer.len();
+
+    for instance in instances.chars().collect::&lt;Vec&lt;char&gt;&gt;() {
+        let mut produced_polymer = polymer.clone();
+        produced_polymer = produced_polymer.replace(instance, &quot;&quot;);
+        produced_polymer = produced_polymer.replace(instance.to_ascii_uppercase(), &quot;&quot;);
+
+        let polymer_len = reduce(&amp;produced_polymer).len();
+        if polymer_len &lt; shortest_polymer_len {
+            shortest_polymer_len = polymer_len;
+        }
+    }
+
+    println!(&quot;second part answer is: {}&quot;, shortest_polymer_len);
+}
+</code></pre>
+<p>จากโค้ดคือจะทำการวนลูปทั้งหมด 26 ครั้งตามจำนวนตัวอักษร เพื่อทดลองดูว่าหลังจากลบยูนิตดังกล่าวออกจากสายพอลิเมอร์แล้วจะได้ขนาดเท่าไรหลังจากเกิดปฏิกิริยา เท่านี้ก็จะได้คำตอบของพาร์ทที่สองแล้ว</p>
+<hr>
+<h3>อัพเดท</h3>
+<p>เนื่องจากโค้ดเดิมโปรแกรมจะทำงานตามลำดับ (sequential) ในการทดลองตัดยูนิตออก ก่อนที่จะเอาไปเช็คการเกิดปฏิกิริยา ซึ่งจำนวนยูนิตที่ต้องทดลองตัดมีทั้งหมด 26 ตัวอักษรทำให้โปรแกรมต้องรอการทำงานแต่ละรอบให้จบก่อนถึงจะสามารถทำงานรอบถัดไปได้ ซึ่งในความเป็นจริงนั้นแต่ละตัวอักษรที่จะเอามาทดลองตัดเป็นอิสระต่อกัน (independent) เลยออกมาเป็นโค้ดเวอร์ชันปรับปรุงแบบนี้ด้วยการใช้งาน <code>tokio</code> และ <code>async</code></p>
+<pre><code class="language-rust">#[tokio::main]
+async fn main() {
+    let args: Vec&lt;String&gt; = env::args().collect();
+    let input = &amp;args[1];
+    let polymer = read_file(input).unwrap();
+
+    println!(&quot;first part answer is: {}&quot;, reduce(&amp;polymer).len());
+
+    let instances = &quot;abcdefghijklmnopqrstuvwxyz&quot;;
+    let mut tasks = vec![];
+
+    for instance in instances.chars().collect::&lt;Vec&lt;char&gt;&gt;() {
+        let task = tokio::task::spawn(produce(polymer.clone(), instance));
+        tasks.push(task);
+    }
+
+    let shortest_polymer_len = join_all(tasks)
+        // At this moment, you will get Vec&lt;Result&lt;usize, JoinError&gt;&gt;
+        .await 
+        .into_iter()
+        // Filter only success result (it should success for all)
+        .filter_map(Result::ok)
+        // Transform the Vec&lt;Result&lt;usize, JoinError&gt;&gt; to Vec&lt;usize&gt;
+        .collect::&lt;Vec&lt;usize&gt;&gt;()
+        .into_iter()
+        // Find the minimum among the result
+        .min();
+
+    println!(
+        &quot;second part answer is: {}&quot;,
+        // Get the minimum result, otherwise use the origin length as the result
+        shortest_polymer_len.unwrap_or(polymer.len())
+    );
+}
+</code></pre>
+<p>เริ่มจากเพิ่ม annotation <code>#[tokio::main]</code> และ <code>async</code> เข้าไปที่ฟังก์ชัน <code>main</code> เพื่อเรียกใช้ macro ของ <code>tokio</code> ที่จะไปแปลงฟังก์ชัน <code>main</code> อีกทีหนึ่ง ซึ่งจริง ๆ ถ้าไม่เรียกใช้ macro ก็สามารถเรียก <code>tokio::runtime::Runtime</code> เองได้เช่นกัน</p>
+<p>จากนั้นในลูป <code>for</code> แทนที่จะทำงานตรง ๆ เปลี่ยนมาเรียกฟังก์ชัน <code>produce</code> โดยการสั่ง <code>tokio::task::spawn</code> ออกไปอีก thread แทน</p>
+<p>ซึ่งเจ้าฟังก์ชัน <code>produce</code> ก็จะทำงานคล้ายกับที่เขียนไว้ในฟังก์ชัน <code>main</code> เดิมเพียงแต่เปลี่ยนมาส่งค่าความยาวของสายพอลิเมอร์กลับ แทนที่จะ assign ใส่ตัวแปร <code>shortest_polymer_len</code> ตรง ๆ</p>
+<pre><code class="language-rust">async fn produce(mut polymer: String, instance: char) -&gt; usize {
+    polymer = polymer.replace(instance, &quot;&quot;);
+    polymer = polymer.replace(instance.to_ascii_uppercase(), &quot;&quot;);
+
+    reduce(&amp;polymer).len()
+}
+</code></pre>
+<p>และนี้คือผลลัพธ์ที่ได้หลังจากเปลี่ยนมาทำงานแบบ async จากเดิมที่ใช้เวลารันโดยเฉลี่ยอยู่ที่ประมาณ​ 80s</p>
+<pre><code class="language-text">first part answer is: 9704
+second part answer is: 6942
+
+________________________________________________________
+Executed in   81.27 secs    fish           external
+   usr time   80.53 secs    0.13 millis   80.53 secs
+   sys time    0.15 secs    1.17 millis    0.15 secs
+</code></pre>
+<p>เหลือเวลารันโดยเฉลี่ยอยู่ที่ 15s ลดลงไปกว่า 5 เท่า!</p>
+<pre><code class="language-text">first part answer is: 9704
+second part answer is: 6942
+
+________________________________________________________
+Executed in   15.22 secs    fish           external
+   usr time   98.24 secs    0.10 millis   98.24 secs
+   sys time    0.13 secs    1.18 millis    0.13 secs
+</code></pre>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>

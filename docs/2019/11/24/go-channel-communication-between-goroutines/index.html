@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Channel กับการสื่อสารระหว่าง Goroutines — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+  
+  <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Channel กับการสื่อสารระหว่าง Goroutines</h1>
+        <div class="post-meta">
+          <time>2019-11-24</time>
+          <div class="post-tags"><span class="post-tag">go</span><span class="post-tag">goroutines</span></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>Go มี built-in concurrency ที่เรียกว่า Goroutines การทำงานคล้ายกับ Thread ที่อยู่ใน Java แต่มีขนาดเล็กและเบากว่า ซึ่ง Go เคลมว่า<a href="https://go.dev/doc/faq#goroutines">สามารถรันได้ถึงหนึ่งแสน Goroutines</a> </p>
+<blockquote>
+<p>It is practical to create hundreds of thousands of goroutines in the same address space.</p>
+</blockquote>
+<p>แต่สิ่งที่จะเล่าถึงในบล็อกนี้คือ Goroutines, สิ่งที่ใช้ในการสื่อสารกันระหว่าง Goroutines เรียกว่าตัวแปรแชนแนล มาดูว่าแชนแนลใน Go สามารถใช้อะไรได้บ้าง</p>
+<h2>ตัวแปรแชนแนล</h2>
+<p>แชนแนลสามารถสร้างจากตัวแปรประเภทไหนก็ได้โดยใส่คีย์เวิร์ด <code>chan</code> ข้างหน้าและใช้คำสั่ง <code>make</code> แบบนี้</p>
+<pre><code class="language-go">bufferedCh := make(chan string, 10)
+unbufferedCh := make(chan struct{})
+</code></pre>
+<p>ตัวแปรแชนแนลสามารถสร้างได้สองรูปแบบคือมีบัฟเฟอร์และไม่มีบัฟเฟอร์ ตัวอย่างเช่นตัวแปร <code>bufferedCh</code> ตอนสร้างระบุประเภทเป็น <code>string</code> มีขนาดบัฟเฟอร์​ 10 ในขณะที่ <code>unbufferedCh</code> เป็นประเภท <code>struct{}</code> และไม่ระบุบัฟเฟอร์</p>
+<p><em>ความแตกต่างระหว่างแชนแนลที่มีกับไม่มีบัฟเฟอร์?</em></p>
+<p>แชนแนลที่มีบัฟเฟอร์ให้นึกภาพร้านซูชิจานเวียนที่เชฟสามารถปั้นซูชิทีละหลาย ๆ คำและใส่ลงมาบนสายพานโดยที่จำนวนของซูชิที่อยู่บนสายพานได้ขึ้นอยู่กับความยาวของสายพาน ตราบเท่าที่สายพานยังมีที่ว่างเซฟก็สามารถปั้นซูชิใส่ลงมาได้เรื่อย ๆ เหมือนกันกับแชนแนลที่มีบัฟเฟอร์ถ้ายังมีที่ว่างเราก็ยังสามารถใส่ค่าเข้าไปในแชนแนลได้เรื่อย ๆ โดยไม่ต้องมีคนรอรับ</p>
+<p>แชนแนลที่ไม่มีบัฟเฟอร์ให้นึกภาพร้านอาหารญี่ปุ่นโอมากาเสะ (Omakase) ตามปกติของการทานร้านโอมากาเสะเซฟจะปั้นซูชิคำถัดไปเมื่อลูกค้าทานคำที่เสิร์ฟในจานหมดก่อนเพื่อรักษาความสดอร่อยของซูชิ เหมือนกันกับแชนแนลที่ไม่มีบัฟเฟอร์เราจะไม่สามารถส่งข้อมูลถัดไปเข้าตัวแปรแชนแนลได้ถ้าข้อมูลก่อนหน้าไม่ถูกดึงออกไปก่อน</p>
+<p>ตัวอย่างโค้ดด้านล่างนี้แสดงให้เห็นดึงการเกิด deadlock เพราะไม่มีการดึงข้อมูลออกจากตัวแปร <code>unbufferedCh</code> ก่อนส่งค่าเข้าไป</p>
+<pre><code class="language-go">package main
+
+func main() {
+        unbufferedCh := make(chan struct{})
+
+        // deadlock!
+        unbufferedCh &lt;- struct{}{}
+}
+</code></pre>
+<p><a href="https://go.dev/play/p/XkknCPbPmVB">Go Playground</a></p>
+<p>แผนภาพด้านล่างนี้แสดงถึงการรับส่งข้อมูลระหว่าง Goroutines ผ่านตัวแปรแชนแนลที่ไม่มีบัฟเฟอร์ สังเกตว่าถ้าเป็นการรับ-ส่งข้อมูลผ่านแชนแนลที่ไม่มีบัฟเฟอร์แต่อยู่ต่าง Goroutines กันจะไม่เกิด deadlock</p>
+<p><img src="https://img.pic.in.th/Channel-and-Goroutines-Unbuffered-Channel.drawio.png" alt="Unbuffered channel"></p>
+<p>ลองแก้ไขโค้ดตัวอย่างข้างบนให้สามารถรับ-ส่งข้อมูลได้โดยไม่เกิด deadlock ได้แบบนี้</p>
+<pre><code class="language-go">package main
+
+func main() {
+        unbufferedCh := make(chan struct{})
+
+        go func(receiveOnlyCh &lt;-chan struct{}) {
+                &lt;-receiveOnlyCh
+        }(unbufferedCh)
+
+        unbufferedCh &lt;- struct{}{}
+}
+</code></pre>
+<p>ในขณะที่ตัวแปรแชนแนลที่มีบัฟเฟอร์สามารถนั้นสามารถส่งข้อมูลเข้าไปได้ก่อนโดยไม่ต้องรอให้มีการรับใน Goroutines เดียวกันได้เลยแบบนี้</p>
+<pre><code class="language-go">package main
+
+func main() {
+        bufferedCh := make(chan struct{},  10)
+        bufferedCh &lt;- struct{}{}
+        bufferedCh &lt;- struct{}{}
+
+        &lt;-bufferedCh
+        &lt;-bufferedCh
+}
+</code></pre>
+<p>แต่ถ้าเกิดว่ามีการรอรับมากกว่าที่ส่งเข้าไปใน Goroutines เดียวกันก็ยังเกิด deadlock ได้</p>
+<pre><code class="language-go">package main
+
+func main() {
+        bufferedCh := make(chan struct{}, 10)
+        bufferedCh &lt;- struct{}{}
+        bufferedCh &lt;- struct{}{}
+
+        &lt;-bufferedCh
+        &lt;-bufferedCh
+        &lt;-bufferedCh
+}
+</code></pre>
+<p><a href="https://go.dev/play/p/DeF_5nyXYHA">Go Playground</a></p>
+<p>แผนภาพแสดงตัวอย่างการรับ-ส่งข้อมูลผ่านแชนแนลที่มีบัฟเฟอร์</p>
+<p><img src="https://img.pic.in.th/Channel-and-Goroutines-Buffered-Channel.drawio.png" alt="Buffered channel"></p>
+<hr>
+<p><em>ทิศทางของแชนแนล</em></p>
+<p>ตามปกติแล้วตัวแปลแชนแนลสามารถรับ-ส่งข้อมูลได้ทั้งสองทาง แต่ถ้าต้องการให้รับหรือส่งได้ทางเดียวสามารถประกาศทิศทางของแชนแนลได้โดยการระบุด้วยเครื่องหมาย <code>&lt;-</code> ที่ด้านหน้าหรือหลังคำว่า <code>chan</code> แบบนี้</p>
+<pre><code class="language-go">package main
+
+func main() {
+        unbufferdCh := make(chan struct{})
+        receiveOnly(unbufferdCh)
+        sendOnly(unbufferdCh)
+}
+
+// receiveOnly accepts read-only channel.
+func receiveOnly(receiveOnlyCh &lt;-chan struct{}) {}
+
+// sendOnly accepts write-only channel.
+func sendOnly(sendOnlyCh chan&lt;- struct{}) {}
+</code></pre>
+<p>ถ้าพยายามจะส่งส่งข้อมูลเข้าแชนแนลที่รับทางเดียว Go จะตรวจเจอตั้งแต่ตอนคอมไพล์และฟ้องข้อผิดพลาดแบบนี้</p>
+<pre><code class="language-go">// receiveOnly accepts read-only channel.
+func receiveOnly(receiveOnlyCh &lt;-chan struct{}) {
+        // try to send data to read-only channel
+        receiveOnlyCh &lt;- struct{}{}
+}
+</code></pre>
+<pre><code>./prog.go:12:2: invalid operation: cannot send to receive-only channel receiveOnlyCh (variable of type &lt;-chan struct{})
+
+Go build failed.
+</code></pre>
+<h2>Fan-out, fan-in</h2>
+<p>หนึ่งในรูปแบบการใช้งานแชนแนลโดยส่งตัวแปรแชนแนลผ่านแต่ละฟังก์ชันเพื่อทำงานกับข้อมูลที่อยู่ข้างในแชนแนล </p>
+<p>โดยต้นทางฟังก์ชันที่สร้างแชนแนลและส่งออกเรียกว่า <em>fan-out</em> ส่วนอีกทางฟังก์ชันที่รับแชนแนลเข้ามาและรวมผลลัพธ์ให้เหลือตัวเดียวเรียกว่า <em>fan-in</em> </p>
+<p>ลองดูตัวอย่างโค้ดด้านล่างนี้</p>
+<pre><code class="language-go">package main
+
+import (
+        &quot;log&quot;
+        &quot;sync&quot;
+)
+
+func main() {
+        input := generate(2, 3, 4)
+        output1 := square(input)
+        output2 := square(input)
+
+        final := merge(output1, output2)
+
+        for n := range final {
+                log.Println(n)
+        }
+}
+
+func generate(numbers ...int) &lt;-chan int {
+        out := make(chan int)
+        go func() {
+                for _, n := range numbers {
+                        out &lt;- n
+                }
+                close(out)
+        }()
+        return out
+}
+
+func square(input &lt;-chan int) &lt;-chan int {
+        out := make(chan int)
+        go func() {
+                for n := range input {
+                        out &lt;- n * n
+                }
+                close(out)
+        }()
+        return out
+}
+
+func merge(outputs ...&lt;-chan int) &lt;-chan int {
+        out := make(chan int)
+        wg := sync.WaitGroup{}
+        wg.Add(len(outputs))
+
+        go func() {
+                wg.Wait()
+                close(out)
+        }()
+
+        for _, output := range outputs {
+
+                go func(output &lt;-chan int) {
+                        for n := range output {
+                                out &lt;- n
+                        }
+                        wg.Done()
+                }(output)
+        }
+
+        return out
+}
+</code></pre>
+<p><a href="https://go.dev/play/p/NibvAdKcpXG">Go Playground</a></p>
+<p>ฟังก์ชัน <code>generate</code> ทำหน้านี้รับ <code>[]int</code> เข้ามาแล้วส่งต่อให้กับตัวแปรแชนแนล <code>out</code> จากนั้นฟังก์ชัน <code>square</code> รับตัวแปรแชนแนล <code>out</code> จาก <code>generate</code> แล้วนำค่าที่ได้มายกกำลังสองและรีเทิร์นกลับเป็นแชนแนลเหมือนกัน ณ ตรงนี้ฟังก์ชัน <code>square</code> จะถูกเรียกสองครั้งโดยแต่ละตัวจะแทนหนึ่ง Goroutines ซึ่งหมายความว่าในการรันแต่ละครั้งจำนวนอินพุตที่ <code>square</code> ได้รับอาจจะแตกต่างกันไป</p>
+<p>สุดท้ายคือฟังก์ชัน <code>merge</code> ที่ทำหน้าที่เอาผลลัพธ์ที่ได้จาก <code>square</code> มารวมกันให้ออกเพียงหนึ่งแชนแนลเท่านั้นและส่งไป <code>log.Println</code> ที่ <code>main</code> ถ้าลองรันโค้ดดูจะพบว่าลำดับของตัวเลขที่แสดงผลออกมานั้นไม่ได้เรียงกันตามอินพุตที่ใส่เข้าไป สาเหตุมาจากว่าตอนที่ส่งไปยัง <code>square</code> นั้นตัวเลขได้ถูกสุ่มส่งให้กับ <code>output1</code> หรือ <code>output2</code> และทำงานจบไม่พร้อมกันทำให้ผลลัพธ์สุดท้ายอาจจะไม่ได้เรียงกันตามอินพุตที่ใส่ไป</p>
+<p>ถ้าจะให้เห็นภาพมากขึ้นลองแก้ไขโปรแกรมให้รับอินพุตเป็นตัวเลขจำนวนหลาย ๆ ตัวแล้วสังเกตผลลัพธ์ที่ได้จากการรันในแต่ละครั้งดู</p>
+<p>แผนภาพด้านล่างแสดงให้เห็นว่าการส่งข้อมูลไปยัง <code>square</code> อินพุตสามารถถูกแบ่งออกเป็นสองกลุ่มคือ <code>2, 3</code> และ <code>4</code> โดยกลุ่มแรกจะได้ออกมาเป็น <code>output1</code> และกลุ่มสองจะได้ออกมาเป็น <code>output2</code></p>
+<p><img src="https://img.pic.in.th/Channel-and-Goroutines-Fan-out-fan-in.drawio.png" alt="Fan-out, fan-in"></p>
+<h2>Futures</h2>
+<p>ฟิวเจอร์เป็นรูปแบบของการใช้งาน Goroutines ที่คาดหวังว่าจะได้ผลลัพธ์กลับมาในอนาคตซึ่งในระหว่างที่รอผลลัพธ์สามารถทำงานอย่างอื่นรอได้ รูปแบบของฟิวเจอร์จะพบได้ใน Scala หรือ Promise ใน JavaScript</p>
+<p>ตัวอย่างโค้ดด้านล่างนี้มีการเรียกไปยังเว็บไซต์​ JSONPlaceholder เพื่อเอาข้อมูลโพสต์กลับมา​ โดยฟังก์ชัน <code>request</code> จะยังไม่ได้รีเทิร์น <code>data</code> กลับมาทันทีแต่เป็น <code>chan data</code> แทน</p>
+<pre><code class="language-go">package main
+
+import (
+        &quot;encoding/json&quot;
+        &quot;fmt&quot;
+        &quot;io&quot;
+        &quot;net/http&quot;
+)
+
+type data struct {
+        body struct {
+                UserID int    `json:&quot;userId&quot;`
+                ID     int    `json:&quot;id&quot;`
+                Title  string `json:&quot;title&quot;`
+                Body   string `json:&quot;body&quot;`
+        }
+        err error
+}
+
+func main() {
+        future, err := request(http.MethodGet, &quot;https://jsonplaceholder.typicode.com/posts/1&quot;, nil)
+        if err != nil {
+                panic(err)
+        }
+
+        // Do other things
+
+        d := &lt;-future
+        if d.err != nil {
+                panic(d.err)
+        }
+
+        fmt.Printf(&quot;%#v\n&quot;, d.body)
+}
+
+func request(method string, url string, body io.Reader) (&lt;-chan data, error) {
+        r, err := http.NewRequest(method, url, body)
+        if err != nil {
+                return nil, err
+        }
+
+        future := make(chan data)
+
+        go func() {
+                rs, err := http.DefaultClient.Do(r)
+                if err != nil {
+                        future &lt;- data{err: err}
+                        return
+                }
+                defer rs.Body.Close()
+
+                var d data
+                d.err = json.NewDecoder(rs.Body).Decode(&amp;d.body)
+
+                future &lt;- d
+                close(future)
+        }()
+
+        return future, nil
+}
+</code></pre>
+<p><a href="https://go.dev/play/p/oPrSZ9HY3Uf">Go Playground</a></p>
+<p>แผนภาพด้านล่างแสดงให้เห็นถึงฟังก์ชัน <code>request</code> ที่รีเทิร์นแชนแนลกลับมาให้ <code>main</code> ก่อนเพื่อให้ <code>main</code> สามารถทำงานอย่างอื่นระหว่างรอผลลัพธ์จาก JSONPlaceholder </p>
+<p><img src="https://img.pic.in.th/Channel-and-Goroutines-Futures.drawio.png" alt="Futures"></p>
+<hr>
+<p>อ้างอิง</p>
+<ol>
+<li><a href="https://go.dev/blog/pipelines">The Go Blog - Go Concurrency Patterns: Pipelines and cancellation</a></li>
+<li><a href="https://medium.com/@thejasbabu/concurrency-patterns-golang-5c5e1bcd0833">Thejas Babu - Concurrency Patterns: Golang</a></li>
+</ol>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Coin Change และ Dynamic Programming — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+  
+  <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Coin Change และ Dynamic Programming</h1>
+        <div class="post-meta">
+          <time>2022-08-07</time>
+          <div class="post-tags"><span class="post-tag">leetcode</span><span class="post-tag">dynamic-programming</span></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>เรื่องมีอยู่ว่าได้ลองทำโจทย์ <a href="https://leetcode.com/problems/coin-change/">Coin Change</a> ทีแรกคิดว่าไม่น่ายากแต่พอส่งคำตอบกลับติดอยู่ที่ <code>[186, 419, 83, 408]</code> จะทำอย่างไรให้ใช้เหรียญที่น้อยที่สุดเพื่อแทนค่า <code>6249</code>?</p>
+<h2>TL;DR</h2>
+<p><a href="https://github.com/nomkhonwaan/nomkhonwaan/blob/main/leetcode/322_coin_change.rs">GitHub</a></p>
+<hr>
+<p>แรกสุดใช้ <a href="https://en.wikipedia.org/wiki/Greedy_algorithm">Greedy Algorithm</a> ในการหาคำตอบซึ่งจะเริ่มจากการใช้เหรียญที่มีมูลค่ามากที่สุดก่อนจากนั้นไล่ไปเรื่อย ๆ จนกว่า <code>amount</code> จะเป็นศูนย์หรือไม่มีเหรียญเหลือแล้ว </p>
+<p>ตัวอย่างที่ลองเขียนด้วย Rust</p>
+<pre><code class="language-rust">fn coin_change(coins: Vec&lt;i32&gt;, amount: i32) -&gt; i32 {
+    let mut coins = coins;
+    let mut amount = amount;
+
+    if amount &lt; 1 {
+        return 0;
+    }
+
+    coins.sort_by(|a, b| b.cmp(a));
+
+    let mut number_of_coins = 0i32;
+
+    for coin in coins.into_iter() {
+        if coin &lt;= amount {
+            // divide an amount with coin value to count number of coins in change
+            number_of_coins += amount / coin;
+            // reduce an amount value using modulo
+            amount = amount % coin;
+        }
+
+        if amount == 0 {
+            return number_of_coins;
+        }
+    }
+
+    -1
+}
+</code></pre>
+<p>ปัญหาของวิธีนี้คือมันใช้แก้โจทย์ได้แค่บางส่วน แต่ปัญหาส่วนใหญ่มันใช้ไม่ได้ยกตัวอย่างเช่น <code>[2, 3, 6, 7]</code> ถ้าต้องการเปลี่ยนเหรียญเพื่อแทนค่า <code>12</code> จะได้ผลลัพธ์ <code>3</code> ซึ่งเกิดจาก</p>
+<pre><code>7 + 3 + 2
+</code></pre>
+<p>แต่คำตอบที่ดีที่สุด (optimally) คือ <code>2</code> ซึ่งเกิดจาก <code>6 + 6</code></p>
+<hr>
+<p>เนื่องจากโง่เกินกว่าจะหาวิธีได้เลยยอมอ่านฟอรัมที่เขาถกปัญหากัน มีคนแนะนำว่าให้ใช้หลักการ dynamic programming หรือ DP เลยนึกถึงตอนสมัยเรียน data structure </p>
+<p><em>ถ้าย้อนเวลากลับไปได้จะบอกตัวเองสมัยเป็นนักศึกษาว่า &quot;อย่าแอบหลับ&quot; วิชานี้อีก</em></p>
+<p><a href="https://en.wikipedia.org/wiki/Dynamic_programming">Dynamic programming</a> ถูกคิดค้นขึ้นในปี 1950s โดย Richard Bellman เพื่อใช้ในการแก้ไขปัญหาที่มีความซับซ้อนด้วยการแตกปัญหาออกเป็นชิ้นย่อย ๆ (sub-problem) และใช้กระบวนการเวียนเกิด (recursion) ในการแก้ไขปัญหาย่อย ๆ ไปทีละขั้นจนมาถึงปัญหาใหญ่</p>
+<p>สิ่งที่เกิดขึ้นเมื่อแก้ปัญหาด้วยกระบวนการเวียนเกิดคือปัญหาย่อย ๆ ส่วนมากมันเหมือนกัน (<a href="https://en.wikipedia.org/wiki/Overlapping_subproblems">overlapping sub-problems</a>) กับกระบวนการหาเส้นทางที่ดีที่สุดในโครงสร้างของปัญหาย่อย  (<a href="https://en.wikipedia.org/wiki/Optimal_substructure">optimal substructure</a>)</p>
+<p>ลองแก้โจทย์ด้านบนด้วยกระบวนเวียนเกิดเพื่อคำนวณทุกค่าที่สามารถเกิดขึ้นได้หลังจากลบมูลค่าออกด้วยเหรียญใด ๆ</p>
+<pre><code class="language-rust">fn coin_change(coins: Vec&lt;i32&gt;, amount: i32) -&gt; i32 {
+    let max = amount + 1;
+
+    // define a stopping point when an amount is less than one
+    if amount &lt; 1 {
+        return 0;
+    }
+
+    let mut res = max;
+
+    for coin in coins.iter() {
+        if *coin &lt;= amount {
+            let sub_res = Solution::coin_change(coins.clone(), amount - coin);
+
+            // check if the sub-problem response is not -1 which means there is no result
+            if sub_res != -1 {
+                res = min(sub_res + 1, res);
+            }
+        }
+    }
+
+    if res &gt; amount {
+        return -1;
+    }
+
+    res
+}
+</code></pre>
+<p>จะพบว่าแก้โจทย์​ <code>[2, 3, 6, 7]</code> ได้อย่างถูกต้องแล้ว ถ้าเขียนเป็นแผงผังการเวียนเกิดเฉพาะกรณีลบด้วยเหรียญ <code>2</code> ได้ประมาณนี้</p>
+<p><img src="https://img.pic.in.th/Dynamic-Programming-Recursion-2.png" alt="Recursion Diagram"></p>
+<p>แต่ละกล่องแทนฟังก์ชันที่ทำงานในการเวียนเกิด (sub-problem) กล่องที่สีเหมือนกันหมายความว่าทำงานเหมือนกันได้ผลลัพธ์เดียวกัน (overlapping sub-problems) </p>
+<p>ในการคำนวณชุดข้อมูลที่มีขนาดน้อย ๆ อาจจะไม่ได้รู้สึกถึงความแตกต่างมาก แต่ถ้าเป็นชุดตัวเลขที่มีขนาดใหญ่อย่างเช่นโจทย์ <code>[186, 419, 83, 408]</code> จะพบว่าใช้เวลาในการคำนวณนานเกินไป</p>
+<hr>
+<p>หนึ่งในวิธีที่ใช้เพิ่มประสิทธิภาพคือการจดสิ่งที่เคยคำนวณแล้วเอาไว้ (<a href="https://en.wikipedia.org/wiki/Memoization">memoization</a>) ลองมาปรับปรุงโปรแกรมเพื่อลดการคำนวณซ้ำด้วย <code>HashMap</code> แบบนี้</p>
+<pre><code class="language-rust">fn main() {
+    let mut table = HashMap::new();
+
+    // set base value
+    table.insert(0,0);
+
+    assert_eq!(20, Solution::coin_change(vec![186, 419, 83, 408], 6249, &amp;mut table));
+}
+
+fn coin_change(coins: Vec&lt;i32&gt;, amount: i32, table: &amp;mut HashMap&lt;i32, i32&gt;) -&gt; i32 {
+    let max = amount + 1;
+
+    // define a stopping point when an amount is less than one
+    if amount &lt; 1 {
+        return 0;
+    }
+
+    // if already calculated, return it
+    if let Some(res) = table.get(&amp;amount) {
+        return *res;
+    }
+
+    let mut res = max;
+
+    for coin in coins.iter() {
+        if *coin &lt;= amount {
+            let sub_res = Solution::coin_change(coins.clone(), amount - coin, table);
+
+            // check if the sub-problem response is not -1 which means there is no result
+            if sub_res != -1 {
+                res = min(sub_res + 1, res);
+            }
+        }
+    }
+
+    if res &gt; amount {
+        return -1;
+    }
+
+    // memo result
+    table.insert(amount, res);
+    res
+}
+</code></pre>
+<p>แม้ว่าจะปรับปรุงกระบวนการให้เร็วขึ้นแล้วแต่มันยังมีวิธีที่ดีกว่าคือการคำนวณด้วย Bottom-Up สังเกตจากแผนภาพด้านบนถ้าแทนวิธีการที่ดีที่สุดในแต่ละมูลค่าจากด้านล่างขึ้นบนด้วยอาเรย์จะได้แบบนี้</p>
+<pre><code>index: [0,  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+value: [0, -1, 1, 1, 2, 2, 1, 1, 2, 2,  2,  3,  2]
+</code></pre>
+<p>จะพบว่ามันมีรูปแบบเป็น <code>min(table[amount - coin]) + 1</code> ยกตัวอย่างเช่นมูลค่า <code>12</code> ถ้าเอามาเข้าสูตรตามตำนวนเหรียญ <code>[2, 3, 6, 7]</code> จะได้แบบนี้</p>
+<pre><code>table[12 - 2] = 2 // index 10, value 2
+table[12 - 3] = 2 // index 9,  value 2
+table[12 - 6] = 1 // index 6,  value 1
+table[12 - 7] = 2 // index 5,  value 2
+
+// find the smallest value and plus 1 for the result
+min(2, 2, 1, 2) + 1 = 2
+</code></pre>
+<p>มาแก้ไขโปรแกรมให้คำนวณด้วยวิธี Bottom-Up แทนเท่านี้ก็สามารถหาคำตอบของโจทย์ได้ทันเวลาแล้ว</p>
+<pre><code class="language-rust">fn coin_change(coins: Vec&lt;i32&gt;, amount: i32) -&gt; i32 {
+    // use amount plus 1 as max value to avoiding overflow
+    let max = amount + 1;
+    let mut table = vec![max; amount as usize + 1];
+
+    // base value 
+    table[0] = 0;
+
+    // inclusive loop until an amount
+    for i in 1..amount + 1 {
+        for coin in coins.iter() {
+            if *coin &lt;= i {
+                table[i as usize] = min(table[i as usize], table[(i - coin) as usize] + 1);
+            }
+        }
+    }
+
+    let res = table[amount as usize];
+    if res &gt; amount {
+        return -1;
+    }
+
+    res
+}
+</code></pre>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>
