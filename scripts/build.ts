@@ -26,7 +26,7 @@ interface Post {
 
 // Set BASE_PATH to "/nomkhonwaan" for project site (nomkhonwaan.github.io/nomkhonwaan)
 // Set to "" for custom domain (nomkhonwaan.com) or user site (nomkhonwaan.github.io)
-const BASE_PATH = "/nomkhonwaan";
+const BASE_PATH = "";
 
 // ── Markdown helpers ───────────────────────────────────────────────────────
 
