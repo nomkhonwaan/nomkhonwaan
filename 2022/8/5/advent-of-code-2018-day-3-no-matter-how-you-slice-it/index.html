@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Advent of Code 2018 Day 3 - No Matter How You Slice it — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/nomkhonwaan/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/nomkhonwaan/styles.css" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+  
+  <main>
+    <a href="/nomkhonwaan/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Advent of Code 2018 Day 3 - No Matter How You Slice it</h1>
+        <div class="post-meta">
+          <time>2022-08-05</time>
+          <div class="post-tags"><span class="post-tag">advent-of-code</span><span class="post-tag">rust</span></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>ในที่สุดบรรดาเอลฟ์ก็สามารถสร้างตัวอย่างชุดซานต้าต่อได้ (ต้องขอบคุณใครบางคนที่เขียนหมายเลขกล่องที่ถูกต้องไว้บนกำแพงเมื่อคืน) แต่เรื่องราวยังคงไม่จบพวกเขาเถียงกันว่าจะตัดผ้าอย่างไรดี</p>
+<h2>สารบัญ</h2>
+<ul>
+<li><a href="/nomkhonwaan/2022/7/6/advent-of-code-2018-day-1-chronal-calibration">Advent of Code 2018 Day 1 - Chronal Calibration</a></li>
+<li><a href="/nomkhonwaan/2022/7/28/advent-of-code-2018-day-2-inventory-management-system">Advent of Code 2018 Day 2 - Inventory Management System</a></li>
+<li><a href="/nomkhonwaan/2022/8/5/advent-of-code-2018-day-3-no-matter-how-you-slice-it">Advent of Code 2018 Day 3 - No Matter How You Slice it</a></li>
+<li><a href="/nomkhonwaan/2022/8/22/advent-of-code-2018-day-4-repose-record">Advent of Code 2018 Day 4 - Repose Record</a></li>
+<li><a href="/nomkhonwaan/2023/6/24/advent-of-code-2018-day-5-alchemical-reduction">Advent of Code 2018 Day 5 - Alchemical Reduction</a></li>
+</ul>
+<h2>TL;DR</h2>
+<p><a href="https://github.com/nomkhonwaan/nomkhonwaan/blob/main/advent-of-code/2018/day_3_no_matter_how_you_slice_it.rs">GitHub</a></p>
+<hr>
+<p>ผ้าที่พวกเขาต้องการจะตัดนั้นมีขนาดค่อนข้างใหญ่เป็นรูปทรงสี่เหลี่ยมจตุรัสมีขนาดแต่ละด้านยาว 1,000 นิ้ว (ประมาณ 25.4 เมตร) </p>
+<p>เอลฟ์แต่ละคนต่างก็อ้างว่าบริเวณผ้าของตนเหมาะที่จะตัดเป็นชุดของซานต้ากันทั้งนั้น</p>
+<hr>
+<p>มาถึงส่วนของโจทย์ในวันนี้</p>
+<p>เอลฟ์แต่ละคนจะมีหมายเลขที่ใช้สำหรับอ้างอิงบริเวณผ้าของตัวเองอยู่ในรูปแบบ <code>#123 @ 3,2: 5x4</code> โดยที่ <code>123</code> คือหมายเลขไอดี, <code>3</code> คือความห่างจากขอบซ้ายของผ้าสามนิ้ว, <code>2</code> คือความห่างจากขอบบนของผ้าสองนิ้ว, <code>5</code> คือความกว้างของบริเวณผ้า, <code>4</code> คือความสูงของบริเวณผ้า สามารถแสดงเป็นแผนภาพได้ดังนี้</p>
+<p>โดยส่วนที่เป็น <code>#</code> คือบริเวณที่ถูกอ้างสิทธิ์อยู่และ <code>.</code> คือส่วนที่ยังไม่มีเจ้าของ</p>
+<pre><code>...........
+...........
+...#####...
+...#####...
+...#####...
+...#####...
+...........
+...........
+...........
+</code></pre>
+<p>ปัญหาก็คือบริเวณผ้าของแต่ละเอลฟ์มันทับซ้อนกันอยู่ยกตัวอย่างรายการอ้างสิทธิ์ด้านล่าง</p>
+<pre><code>#1 @ 1,3: 4x4
+#2 @ 3,1: 4x4
+#3 @ 5,5: 2x2
+</code></pre>
+<p>เมื่อแสดงเป็นแผนภาพจะเห็นส่วนที่ทับซ้อนกันระหว่างหมายเลข <code>1</code> และ <code>2</code> แสดงเป็นตัว <code>X</code> แบบนี้</p>
+<pre><code>........
+...2222.
+...2222.
+.11XX22.
+.11XX22.
+.111133.
+.111133.
+........
+</code></pre>
+<p>โจทย์ต้องการให้หาว่ามีพื้นที่ทับซ้อนกันมากกว่าหนึ่งครั้งทั้งหมดเท่าไร เริ่มต้นเหมือนกันกับวันก่อนหน้าด้วยการดาวน์โหลดอินพุต &quot;input.txt&quot; </p>
+<p>จากนั้นใช้ฟังก์ชันเดิมเพื่ออ่านทีละบรรทัด จากนั้นสร้าง <code>Rectangle</code> สำหรับใช้เก็บค่าความห่างจากขอบทั้งบนและล่างกับความกว้างและความสูงแบบนี้</p>
+<p>ที่ <code>from_string</code> จะใช้ Regular Expression เพื่อแปลงค่าที่ส่งเข้ามา สามารถใช้เว็บ <a href="https://regex101.com/">regex101</a> เพื่อดูการจับคู่กับสตริงได้</p>
+<pre><code class="language-rust">/// Contain each rectangle data.
+#[derive(Default)]
+struct Rectangle {
+    id: String,
+    left_edge: i32,
+    top_edge: i32,
+    wide: i32,
+    tall: i32,
+}
+
+impl Rectangle {
+    fn from_string(s: String) -&gt; Self {
+        let re = Regex::new(r&quot;^#(\d+)\s@\s(\d+),(\d+):\s(\d+)x(\d+)&quot;).unwrap();
+        let captures = re.captures(&amp;s).unwrap();
+
+        Rectangle {
+            id: captures.get(1).map(|m| m.as_str().to_string()).unwrap(),
+            left_edge: captures.get(2).map(|m| m.as_str().parse::&lt;i32&gt;().unwrap()).unwrap(),
+            top_edge: captures.get(3).map(|m| m.as_str().parse::&lt;i32&gt;().unwrap()).unwrap(),
+            wide: captures.get(4).map(|m| m.as_str().parse::&lt;i32&gt;().unwrap()).unwrap(),
+            tall: captures.get(5).map(|m| m.as_str().parse::&lt;i32&gt;().unwrap()).unwrap(),
+        }
+    }
+}
+</code></pre>
+<p>กลับมาที่ <code>main</code> จะคล้ายเดิมคือทำการวนลูปทีละบรรทัดและแปลงค่าสตริงเป็น <code>Rectangle</code></p>
+<pre><code class="language-rust">fn main() {
+    let args: Vec&lt;String&gt; = env::args().collect();
+    let input = &amp;args[1];
+    let mut list_of_rectangles: Vec&lt;Rectangle&gt; = vec![];
+
+    if let Ok(lines) = read_lines(input) {
+        for line in lines {
+            if let Ok(line) = line {
+                let rectangle = Rectangle::from_string(line);
+                list_of_rectangles.push(rectangle);
+            }
+        }
+    }
+}
+</code></pre>
+<p>จากนั้นทำการสร้างจุดจากตำแหน่งของแต่ละสี่เหลี่ยมโดยเริ่มจากด้านซ้ายบนไปจนถึงด้านขวาล่าง ยกตัวอย่างเช่นถ้าสี่เหลี่ยมอยู่ห่างจากขอบบน 2 และขอบซ้าย 3 โดยมีความกว้าง 4 และความสูง 5 </p>
+<pre><code>..........
+..........
+...xxxx...
+...xxxx...
+...xxxx...
+...xxxx...
+...xxxx...
+..........
+..........
+</code></pre>
+<p>จะได้ตำแหน่งทั้งหมดตามนี้</p>
+<pre><code>(3,2), (4,2), (5,2), (6,2)
+(3,3), (4,3), (5,3), (6,3)
+(3,4), (4,4), (5,4), (6,4)
+(3,5), (4,5), (5,5), (6,5)
+(3,6), (4,6), (5,6), (6,6)
+</code></pre>
+<p>ตัวฟังก์ชันไม่ซับซ้อนอะไรใช้การวนลูปจากขอบด้านซ้ายไปจนถึงด้านขวาและซ้อนด้วยลูปจากขอบด้านบนไปจนถึงด้านล่าง</p>
+<pre><code class="language-rust">
+impl Rectangle {
+    fn from_string(s: String) -&gt; Self {
+        ...
+    }
+
+    fn to_points(&amp;self) -&gt; Vec&lt;(i32, i32)&gt; {
+        let mut points: Vec&lt;(i32, i32)&gt; = vec![];
+        for i in self.left_edge..self.left_edge + self.wide {
+            for j in self.top_edge..self.top_edge + self.tall {
+                points.push((i, j));
+            }
+        }
+        points
+    }
+}
+</code></pre>
+<p>กลับมาที่ <code>main</code> ทำการวนลูปและแปลงค่าเป็น <code>Vec&lt;(i32, i32)&gt;</code> จากนั้นเอาไปใส่ <code>HashMap&lt;(i32, i32), i32&gt;</code> เพื่อที่จะนับว่าตำแหน่งนี้โดนอ้างถึงกี่ครั้ง และสุดท้ายทำการนับตำแหน่งที่ถูกอ้างถึงมากกว่าหนึ่งครั้งก็จะได้คำตอบของพาร์ทแรกแล้ว</p>
+<pre><code class="language-rust">let counted_points: HashMap&lt;(i32, i32), i32&gt; = list_of_rectangles
+    .clone()
+    .iter()
+    // at this point, the rectangle will become vector of points
+    //
+    // [(x0,y0), (x1,y1), ..., (xn, yn)]
+    .flat_map(|rectangle| rectangle.to_points())
+    // at this point, the vector of points will become a hashmap like this
+    //
+    // [
+    //   (x0,y0): 1,
+    //   (x1,y1): 2,
+    //   ...
+    //   (xn,yn): 1,
+    // ]
+    .fold(HashMap::new(), |mut result, pair| {
+        // insert pair to the hash map and increase count by 1
+        result.insert(pair, match result.get(&amp;pair) {
+            Some(count) =&gt; count + 1,
+            _ =&gt; 1,
+        });
+        result
+    });
+
+let collided_points: HashMap&lt;(i32, i32), i32&gt; = counted_points
+    .clone()
+    .into_iter()
+    .filter(|(_, v)| *v &gt; 1) // to filter only points are collided more than 1
+    .collect();
+
+println!(&quot;first part answer is: {}&quot;, collided_points.len());
+</code></pre>
+<hr>
+<p>พาร์ทที่สองโจทย์ต้องการให้หาว่าสี่เหลี่ยมใดที่ไม่ถูกอ้างอิงเลย (เช่นสี่เหลี่ยมหมายเลข 3 จากตัวอย่างข้างบน)</p>
+<p>ทำคล้าย ๆ กันโดยแทนที่จะกรองเอาจุดที่ถูกอ้างอิงมากกว่าหนึ่งครั้งเปลี่ยนเป็นเอาเฉพาะจุดที่ถูกอ้างอิงเพียงครั้งเดียวเท่านั้น</p>
+<pre><code class="language-rust">let non_collided_points: Vec&lt;(i32, i32)&gt; = counted_points
+    .clone()
+    .into_iter()
+    .filter(|(_, v)| *v == 1) // to filter only points are not counted more than 1
+    // at this point, the hashmap will become a vector of points
+    //
+    // [(x0,y0), (x1,y1), ..., (xn,yx)]
+    .map(|(k, _)| k)
+    .collect();
+</code></pre>
+<p>จากนั้นก็สั่งวนลูปสี่เหลี่ยมทั้งหมดเพื่อเอาจุดมาเช็คว่าสี่เหลี่ยมไหนที่จุดทั้งหมดอยู่ในรายการของ <code>non_collided_points</code> และเมื่อเจอก็สั่งให้หยุดการทำงานจากลูปและพิมพ์หมายเลขสี่เหลี่ยมเพื่อแสดงคำตอบของพาร์ทที่สอง</p>
+<pre><code class="language-rust">for rectangle in list_of_rectangles.into_iter() {
+    let yes = rectangle.to_points()
+        .iter()
+        .all(|point| {
+            non_collided_points.contains(point)
+        });
+    if yes {
+        println!(&quot;second part answer is: {}&quot;, &amp;rectangle.id);
+        break;
+    }
+}
+</code></pre>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>

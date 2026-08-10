@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Advent of Code 2022 Day 1 - Calorie Counting — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/nomkhonwaan/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/nomkhonwaan/styles.css" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+  
+  <main>
+    <a href="/nomkhonwaan/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Advent of Code 2022 Day 1 - Calorie Counting</h1>
+        <div class="post-meta">
+          <time>2022-12-02</time>
+          <div class="post-tags"><span class="post-tag">advent-of-code</span><span class="post-tag">rust</span></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>โดยปกติแล้วกวางเรนเดียร์ของซานต้าจะกินอาหารกวางเรนเดียร์เป็นประจำ แต่พวกมันต้องการพลังเวทย์มนต์จำนวนมากในการส่งของขวัญวันคริสต์มาส เพื่อการนั้นแล้ว ของว่างสุดโปรดของพวกมันคือผลดวงดาวชนิดพิเศษที่เติบโตในป่าลึกเท่านั้น เหล่าเอลฟ์ได้พาคุณเดินทางประจำปีไปยังป่าที่ผลไม้ชนิดนี้ขึ้นอยู่</p>
+<h2>สารบัญ</h2>
+<ul>
+<li><a href="/nomkhonwaan/2022/12/2/advent-of-code-2022-day-1-calorie-counting">Advent of Code 2022 Day 1 - Calorie Counting</a></li>
+</ul>
+<h2>TL;DR</h2>
+<p><a href="https://github.com/nomkhonwaan/nomkhonwaan/blob/main/advent-of-code/2022/day_1_calorie_counting.rs">GitHub</a></p>
+<hr>
+<p>การจะจัดหาพลังงานเวทย์มนตร์ให้เพียงพอนั้น คณะสำรวจจำเป็นต้องได้รับดวงดาวอย่างน้อย 50 ดวงภายในวันที่ 25 ธันวาคม แม้พวกเอลฟ์จะยืนยันว่าในป่ามีผลไม้มากมาย แต่คุณก็เก็บผลไม้ที่เจอระหว่างทางเผื่อไว้ด้วย</p>
+<p>ป่าที่คุณมาสำรวจนั้นรกชัฏยากต่อการใช้ยานพาหนะหรือแม้แต่ทางอากาศ การเดินทางของพวกเอลฟ์จึงมักจะเป็นการเดินทางด้วยเท้า เมื่อเรือของคุณเข้าใกล้ฝั่ง เหล่าเอลฟ์จะเริ่มนับสต๊อกเสบียงของพวกเขา สิ่งสำคัญอย่างแรกคือเสบียงอาหารที่เอลฟ์แต่ละคนพกติดตัวมา</p>
+<p>เหล่าเอลฟ์จะผลัดกันเขียนจำนวนแคลอรีที่มีอยู่ในอาหาร ของว่าง อาหารปันส่วน ฯลฯ ที่พวกเขานำมาด้วย บรรทัดละหนึ่งรายการ เอลฟ์แต่ละคนจะแยกเสบียงของตนเองออกจากสินค้าคงคลังของเอลฟ์ก่อนหน้า ด้วยบรรทัดว่าง</p>
+<p>ตัวอย่างเช่น </p>
+<pre><code>1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000
+</code></pre>
+<p>ตัวเลขที่เห็นคือรายการพลังงานของอาหารที่เอลฟ์แต่ละคนมี จากรายการข้างต้นแปลว่ามีเอลฟ์ห้าคนในลิสต์</p>
+<p>เอลฟ์คนแรกพกอาหารที่ให้พลังงาน 1000, 2000 และ 3000 แคลอรี่​ ซึ่งผลรวมทั้งหมดจะได้ 6000 แคลอรี่
+<br>เอลฟ์คนที่สองพกอาหารที่ให้พลังงาน 4000 แคลอรี่
+<br>เอลฟ์คนที่สามพกอาหารที่ให้พลังงาน 5000 และ 6000 แคลอรี่ ซึ่งผลรวมทั้งหมดจะได้ 11000 แคลอรี่
+<br>เอลฟ์คนที่สี่พกอาหารที่ให้พลังงาน 7000, 8000 และ 9000 แคลอรี่ ซึ่งผลรวมทั้งหมดจะได้ 24000 แคลอรี่
+<br>เอลฟ์คนที่ห้าพกอาหารที่ให้พลังงาน 10000 แคลอรี่</p>
+<p>ในกรณีที่เอลฟ์ต้องการอาหารเพิ่มเติม พวกเขาอยากรู้ว่าเอลฟ์ที่พกอาหารมามากที่สุดนั้นมีกี่แคลอรี่ ในตัวอย่างด้านบนคือเอลฟ์คนที่สี่​ซึ่งพกอาหารมาทั้งหมด 24,000 แคลอรี่</p>
+<hr>
+<p>โจทย์ต้องการให้หาว่าผลรวมของพลังงานอาหารที่มากที่สุดของเอลฟ์เท่ากับเท่าไร</p>
+<p>เริ่มต้นเหมือนกับทุกครั้งด้วยการดาวน์โหลดอินพุตไฟล์เข้ามาในโปรแกรมและทำการแปลงตัวเลขในแต่ละบรรทัดให้เป็น <code>u32</code>​</p>
+<p>ในภาษา Rust การแปลงสตริงให้เป็น <code>u32</code> สามารถทำได้ด้วยการเรียกใช้ฟังก์ชัน <code>parse</code> โดยมีเงื่อนไขว่าถ้าเจอบรรทัดที่เป็นค่าว่าง <code>is_empty</code> ให้ทำเอาผลรวมแคลอรี่เพิ่มเข้าไปที่ <code>elves</code> ที่เป็นประเภท <code>Vec&lt;u32&gt;</code> และทำการรีเซ็ต <code>carrying_calories</code> ให้เป็น <code>0</code> เพื่อใช้สำหรับคำนวณพลังงานรวมของเอลฟ์คนถัดไป</p>
+<pre><code class="language-rust">use std::{env, fs, io, io::BufRead, path};
+
+fn main() {
+    let args: Vec&lt;String&gt; = env::args().collect();
+    let input = &amp;args[1];
+    let mut elves: Vec&lt;u32&gt; = vec![];
+
+    if let Ok(lines) = read_lines(input) {
+        let mut carrying_calories = 0u32;
+        for line in lines {
+            if let Ok(line) = line {
+                if line.is_empty() {
+                    elves.push(carrying_calories);
+                    carrying_calories = 0;
+                    continue;
+                }
+
+                carrying_calories += line.parse::&lt;u32&gt;().expect(&quot;invalid number&quot;);
+            }
+        }
+    }
+    
+    // descending order
+    elves.sort_by(|a, b| b.cmp(a));
+
+    println!(&quot;first part answer is: {}&quot;, elves[0]);
+}
+
+fn read_lines&lt;P: AsRef&lt;path::Path&gt;&gt;(path: P) -&gt; io::Result&lt;io::Lines&lt;io::BufReader&lt;fs::File&gt;&gt;&gt; {
+    let file = fs::File::open(path)?;
+    Ok(io::BufReader::new(file).lines())
+}
+</code></pre>
+<p>เมื่อได้ <code>Vec&lt;u32&gt;</code> ที่มีผลรวมของพลังงานทั้งหมดแล้วให้ทำการเรียงลำดับจากมากไปน้อยด้วยฟังก์ชัน <code>sort_by</code> ตามโค้ดด้านบน เท่านี้ <code>elves[0]</code> ก็คือเอลฟ์คนที่พกอาหารที่มีผลรวมพลังงานมากที่สุดซึ่งเป็นคำตอบของพาร์ทแรกแล้ว</p>
+<hr>
+<p>เมื่อได้คำตอบแล้วว่าใครพกอาหารที่ให้พลังงานมามากที่สุดเหล่าเอลฟ์ก็กังวลว่าอาหารอาจจะไม่พอ เพื่อป้องกันปัญหานี้เหล่าเอลฟ์อยากรู้ว่าใครที่พกอาหารที่ให้พลังงานมากที่สุดสามคนแรก เพื่อที่ว่าถ้าเอลฟ์คนใดคนนึงกินอาหารหมดก่อน พวกเขาก็ยังมีอีกสองคนสำรองอยู่ว</p>
+<p>ตัวอย่างข้างต้นเอลฟ์สามอันดับแรกคือเอลฟ์ที่สี่ (มีพลังงาน 24,000 แคลอรี) ตามด้วยเอลฟ์ที่สาม (มีพลังงาน 11,000 แคลอรี) ตามด้วยเอลฟ์ที่ห้า (มีพลังงาน 10,000 แคลอรี) ผลรวมของแคลอรีที่เอลฟ์ทั้งสามนี้มีคือ 45,000</p>
+<p>ค้นหาเอลฟ์สามอันดับแรกที่มีพลังงานมากที่สุดและหาว่ามีพลังงานทั้งหมดกี่แคลอรี?</p>
+<hr>
+<p>ในพาร์ทที่สองโจทย์ต้องการให้ผลรวมของพลังงานที่มากที่สุดของเอลฟ์สามคนแรกซึ่งตรงนี้สามารถหาคำตอบได้ด้วยการเอา <code>elves[0] + elves[1] + elves[2]</code> แบบนี้ได้เลย</p>
+<pre><code class="language-rust">
+fn main() {
+    ...
+
+    // descending order
+    elves.sort_by(|a, b| b.cmp(a));
+
+    println!(&quot;first part answer is: {}&quot;, elves[0]);
+    println!(&quot;second part answer: {}&quot;, elves[0] + elves[1] + elves[2]);
+}
+</code></pre>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>
