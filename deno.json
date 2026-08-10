@@ -12,7 +12,8 @@
   "tasks": {
     "start": "deno run -A --watch=static/,routes/ dev.ts",
     "build": "deno run -A dev.ts build",
-    "preview": "deno run -A main.ts"
+    "preview": "deno run -A main.ts",
+    "gh-pages": "deno run -A scripts/build.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
