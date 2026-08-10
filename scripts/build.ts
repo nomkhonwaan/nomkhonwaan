@@ -22,11 +22,25 @@ interface Post {
   url: string; // e.g. /2016/1/28/tdd-kata-2-the-bowling-game
 }
 
+// ── Configuration ──────────────────────────────────────────────────────────
+
+// Set BASE_PATH to "/nomkhonwaan" for project site (nomkhonwaan.github.io/nomkhonwaan)
+// Set to "" for custom domain (nomkhonwaan.com) or user site (nomkhonwaan.github.io)
+const BASE_PATH = "/nomkhonwaan";
+
 // ── Markdown helpers ───────────────────────────────────────────────────────
 
 function renderMarkdown(md: string): string {
   try {
-    return marked.parse(md, { mangle: false, headerIds: false }) as string;
+    let html = marked.parse(md, { mangle: false, headerIds: false }) as string;
+    // Prefix internal links and images with BASE_PATH
+    if (BASE_PATH) {
+      html = html.replace(
+        /(href|src)="\/(?!\/)/g,
+        `$1="${BASE_PATH}/`,
+      );
+    }
+    return html;
   } catch {
     return md;
   }
@@ -183,11 +197,11 @@ function layout(title: string, body: string, extraHead = ""): string {
   <meta name="color-scheme" content="light dark" />
   <title>${title} — Nomkhonwaan</title>
   <meta name="description" content="Trust me I'm Petdo" />
-  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" href="${BASE_PATH}/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="${BASE_PATH}/styles.css" />
   ${extraHead}
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
@@ -208,7 +222,7 @@ function renderIndex(posts: Post[]): string {
   const items = posts.map((p) => `
       <li class="post-item">
         <div class="post-title">
-          <a href="${p.url}">${p.title}</a>
+          <a href="${BASE_PATH}${p.url}">${p.title}</a>
         </div>
         <div class="post-date">${p.publish_date}</div>
         ${p.description ? `<div class="post-desc">${p.description}</div>` : ""}
@@ -222,7 +236,7 @@ function renderIndex(posts: Post[]): string {
   return layout("Nomkhonwaan", `
   <main>
     <section class="profile">
-      <img src="/avatar.png" alt="Natcha Luangaroonchai" class="profile-avatar" />
+      <img src="${BASE_PATH}/avatar.png" alt="Natcha Luangaroonchai" class="profile-avatar" />
       <h1 class="profile-name">Nomkhonwaan</h1>
       <p class="profile-desc">Trust me I'm Petdo</p>
       <div class="profile-links">
@@ -252,7 +266,7 @@ function renderPost(post: Post): string {
 
   return layout(post.title, `
   <main>
-    <a href="/" class="back-link">&larr; Back to home</a>
+    <a href="${BASE_PATH}/" class="back-link">&larr; Back to home</a>
 
     <article>
       <header class="post-header">
@@ -277,7 +291,7 @@ function render404(): string {
   <main class="not-found">
     <h1>404</h1>
     <p>The page you were looking for doesn't exist.</p>
-    <a href="/">Go back home</a>
+    <a href="${BASE_PATH}/">Go back home</a>
   </main>`);
 }
 
@@ -311,6 +325,12 @@ async function main() {
 
   // Copy static assets
   await copy("static", OUT_DIR, { overwrite: true });
+  // Copy root favicon.ico (the static/ one is a placeholder)
+  try {
+    await Deno.copyFile("favicon.ico", join(OUT_DIR, "favicon.ico"));
+  } catch {
+    // ignore if favicon doesn't exist at root
+  }
   console.log("  ✓ static/ → docs/");
 
   console.log("\n✅ Build complete! Output in docs/");
