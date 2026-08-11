@@ -1,5 +1,5 @@
 {
-  "version": "3",
+  "version": "5",
   "redirects": {
     "https://esm.sh/@preact/signals-core@^1.4.0?target=denonext": "https://esm.sh/@preact/signals-core@1.14.4?target=denonext",
     "https://esm.sh/@types/babel__helper-validator-identifier@~7.15.2/index.d.ts": "https://esm.sh/@types/babel__helper-validator-identifier@7.15.2/index.d.ts",
@@ -413,6 +413,8 @@
     "https://esm.sh/@preact/signals-core@1.14.4?target=denonext": "fc2ace510655938a2c29970ebdedf064468976b33ec59b41df5b8c6ed779ce2b",
     "https://esm.sh/@preact/signals@1.2.1": "bd5cc52434609f73fc8dc00e0cf8517cc64e033c819aa92cb6ec10dad213a624",
     "https://esm.sh/@preact/signals@1.2.1/denonext/signals.mjs": "b9b2a96602505641cb3086cad30e41497d30a06cc43befb5b13f260d45df168a",
+    "https://esm.sh/katex@0.16.9": "4e8af6b3090f5a3bf38fa18f15e4d9276cdf653bef1123c7b0f734de59b525ee",
+    "https://esm.sh/katex@0.16.9/denonext/katex.mjs": "189675b770c19c1d603c9fe050954826780bd63884c470d6f5cb8a83ec7fceae",
     "https://esm.sh/marked@5.1.1": "219c2bda1bd9e3c9f337b4925f886d367135ea39ff0fe7720874baff67b2cfbd",
     "https://esm.sh/marked@5.1.1/denonext/marked.mjs": "25321b3306604a8d73ddbdfc14cd245a1514ead65334ff9ae48844e5537bedf8",
     "https://esm.sh/preact@10.19.2": "a54c21042d5aace76ae26ab8870375502c2fda726204221068dbc1fb385b3d4b",

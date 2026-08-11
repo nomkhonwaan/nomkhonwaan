@@ -9,6 +9,7 @@ import { extname, join, dirname } from "std/path/mod.ts";
 import { ensureDir, copy } from "std/fs/mod.ts";
 import { parse } from "std/yaml/parse.ts";
 import { marked } from "https://esm.sh/marked@5.1.1";
+import katex from "https://esm.sh/katex@0.16.9";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -30,9 +31,43 @@ const BASE_PATH = "";
 
 // ── Markdown helpers ───────────────────────────────────────────────────────
 
+function renderKaTeX(md: string): string {
+  // Render display math $$...$$ first
+  let result = md.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) => {
+    try {
+      return katex.renderToString(expr.trim(), { displayMode: true, throwOnError: false });
+    } catch {
+      return `$$${expr}$$`;
+    }
+  });
+  // Render inline math $...$ (but not inside code blocks or already-replaced areas)
+  // Split into lines to avoid code blocks
+  const lines = result.split('\n');
+  let inCodeBlock = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
+    // Replace inline $...$ math
+    lines[i] = line.replace(/(?<!\$)\$([^$\n]+?)\$(?!\$)/g, (_, expr) => {
+      try {
+        return katex.renderToString(expr.trim(), { displayMode: false, throwOnError: false });
+      } catch {
+        return `$${expr}$`;
+      }
+    });
+  }
+  return lines.join('\n');
+}
+
 function renderMarkdown(md: string): string {
   try {
-    let html = marked.parse(md, { mangle: false, headerIds: false }) as string;
+    // First render KaTeX, then pass to marked
+    const withMath = renderKaTeX(md);
+    let html = marked.parse(withMath, { mangle: false, headerIds: false }) as string;
     // Prefix internal links and images with BASE_PATH
     if (BASE_PATH) {
       html = html.replace(
@@ -202,6 +237,7 @@ function layout(title: string, body: string, extraHead = ""): string {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="${BASE_PATH}/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
   ${extraHead}
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>

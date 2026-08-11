@@ -1,8 +1,40 @@
 import { marked } from "https://esm.sh/marked@5.1.1";
+import katex from "https://esm.sh/katex@0.16.9";
+
+function renderKaTeX(md: string): string {
+  // Render display math $$...$$ first
+  let result = md.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) => {
+    try {
+      return katex.renderToString(expr.trim(), { displayMode: true, throwOnError: false });
+    } catch {
+      return `$$${expr}$$`;
+    }
+  });
+  // Render inline math $...$
+  const lines = result.split('\n');
+  let inCodeBlock = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
+    lines[i] = line.replace(/(?<!\$)\$([^$\n]+?)\$(?!\$)/g, (_, expr) => {
+      try {
+        return katex.renderToString(expr.trim(), { displayMode: false, throwOnError: false });
+      } catch {
+        return `$${expr}$`;
+      }
+    });
+  }
+  return lines.join('\n');
+}
 
 export function renderMarkdown(md: string) {
   try {
-    return marked.parse(md, { mangle: false, headerIds: false });
+    const withMath = renderKaTeX(md);
+    return marked.parse(withMath, { mangle: false, headerIds: false });
   } catch (e) {
     console.error("renderMarkdown error:", e);
     return md;
