@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Builder Pattern ใน Go — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+  
+  <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Builder Pattern ใน Go</h1>
+        <div class="post-meta">
+          <time>2026-08-12</time>
+          <div class="post-tags"><span class="post-tag">go</span></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>Builder Pattern เป็นรูปแบบที่ใช้งานเมื่อการสร้างอ๊อบเจ๊คมีพารามิเตอร์หลายตัวหรือมีขั้นตอนซับซ้อน การแยกการตั้งค่าออกเป็นเมทอดแบบ chain จะช่วยให้โค้ดอ่านง่าย ลดโค้ดซ้ำ และจัดการค่าของ <code>struct</code> ได้เป็นระบบ ใน Go แนวทางนี้ทำให้โค้ดการสร้างตัวแปรที่ซับซ้อนดูสวยงามและสะอาดขึ้น</p>
+<p>ตัวอย่างนี้จะใช้ไลบรารี <code>github.com/ibm-messaging/mq-golang/v5/ibmmq</code> เพื่อสาธิตการสร้างการเชื่อมต่อและการประกาศข้อความด้วย Builder</p>
+<hr>
+<p>สมมติว่าเราต้องการเชื่อมต่อกับ Queue Manager โดยมีค่าที่ต้องกำหนดอย่าง <code>QueueManager</code>, <code>ConnectionName</code>, <code>Channel</code>, <code>UserID</code> และ <code>Password</code> หากเขียนโค้ดตรง ๆ เราต้องเตรียม <code>MQCNO</code>, <code>MQCD</code> และ <code>MQCSP</code> ด้วยตัวเอง ซึ่งทำให้โค้ดยาวและอ่านยาก</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;log&quot;
+
+    ibmmq &quot;github.com/ibm-messaging/mq-golang/v5/ibmmq&quot;
+)
+
+func buildConnectionDirectly() (*ibmmq.MQQueueManager, error) {
+    cno := ibmmq.NewMQCNO()
+    cno.Options = ibmmq.MQCNO_CLIENT_BINDING
+
+    cd := ibmmq.NewMQCD()
+    cd.ChannelName = &quot;DEV.APP.SVRCONN&quot;
+    cd.ConnectionName = &quot;localhost(1414)&quot;
+    cno.ClientConn = cd
+
+    csp := ibmmq.NewMQCSP()
+    csp.UserId = &quot;app&quot;
+    csp.Password = &quot;password&quot;
+    cno.SecurityParms = csp
+
+    qm, err := ibmmq.Connx(&quot;QM1&quot;, cno)
+    if err != nil {
+        return nil, err
+    }
+    return qm, nil
+}
+
+func main() {
+    qm, err := buildConnectionDirectly()
+    if err != nil {
+        log.Fatalf(&quot;failed to connect to MQ: %v&quot;, err)
+    }
+    defer qm.Disc()
+
+    fmt.Println(&quot;connected to MQ queue manager&quot;, qm.Name)
+}
+</code></pre>
+<p>โค้ดตัวอย่างนี้ทำงานได้ดี แต่รายละเอียดการสร้าง connection ถูกกระจายอยู่หลายจุด เมื่อเราต้องการเพิ่มตัวเลือก เช่น <code>SSLConfig</code> หรือ <code>Timeout</code> โค้ดก็จะยิ่งเดินหน้าลำบาก</p>
+<hr>
+<p>Builder Pattern จะย้ายรายละเอียดการประกอบค่าไปไว้ใน Builder แล้วเปิด API ให้ฝั่งเรียกใช้งานอ่านง่ายขึ้น</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;log&quot;
+
+    ibmmq &quot;github.com/ibm-messaging/mq-golang/v5/ibmmq&quot;
+)
+
+type MQConnectionBuilder struct {
+    qMgrName      string
+    connectionName string
+    channelName   string
+    userID        string
+    password      string
+}
+
+func NewMQConnectionBuilder() *MQConnectionBuilder {
+    return &amp;MQConnectionBuilder{}
+}
+
+func (b *MQConnectionBuilder) WithQueueManager(name string) *MQConnectionBuilder {
+    b.qMgrName = name
+    return b
+}
+
+func (b *MQConnectionBuilder) WithConnectionName(conn string) *MQConnectionBuilder {
+    b.connectionName = conn
+    return b
+}
+
+func (b *MQConnectionBuilder) WithChannel(channel string) *MQConnectionBuilder {
+    b.channelName = channel
+    return b
+}
+
+func (b *MQConnectionBuilder) WithCredentials(userID, password string) *MQConnectionBuilder {
+    b.userID = userID
+    b.password = password
+    return b
+}
+
+func (b *MQConnectionBuilder) Build() (*ibmmq.MQQueueManager, error) {
+    cno := ibmmq.NewMQCNO()
+    cno.Options = ibmmq.MQCNO_CLIENT_BINDING
+
+    cd := ibmmq.NewMQCD()
+    cd.ChannelName = b.channelName
+    cd.ConnectionName = b.connectionName
+    cno.ClientConn = cd
+
+    if b.userID != &quot;&quot; || b.password != &quot;&quot; {
+        csp := ibmmq.NewMQCSP()
+        csp.UserId = b.userID
+        csp.Password = b.password
+        cno.SecurityParms = csp
+    }
+
+    return ibmmq.Connx(b.qMgrName, cno)
+}
+
+func main() {
+    builder := NewMQConnectionBuilder().
+        WithQueueManager(&quot;QM1&quot;).
+        WithConnectionName(&quot;localhost(1414)&quot;).
+        WithChannel(&quot;DEV.APP.SVRCONN&quot;).
+        WithCredentials(&quot;app&quot;, &quot;password&quot;)
+
+    qm, err := builder.Build()
+    if err != nil {
+        log.Fatalf(&quot;failed to connect to MQ: %v&quot;, err)
+    }
+    defer qm.Disc()
+
+    fmt.Println(&quot;connected to MQ queue manager&quot;, qm.Name)
+}
+</code></pre>
+<p>ข้อดีของ Builder คือโค้ดฝั่งใช้งานย่อมอ่านง่ายขึ้น และรายละเอียดการสร้าง connection ถูกซ่อนอยู่ใน Builder ทำให้เราสามารถเพิ่มตัวเลือกใหม่ได้โดยไม่ต้องแก้โค้ดใน <code>main</code></p>
+<hr>
+<p>อีกงานที่ Builder Pattern เหมาะมากคือการประกอบข้อความที่จะส่งใน IBM MQ เรามักต้องกำหนดค่าใน <code>MQMD</code> และ <code>MQPMO</code> หากใช้ Builder โค้ดฝั่งส่งจะดูชัดเจนและโฟกัสที่ค่าที่เปลี่ยนแปลงได้</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;github.com/ibm-messaging/mq-golang/v5/ibmmq&quot;
+)
+
+type MQPutMessageBuilder struct {
+    md      *ibmmq.MQMD
+    pmo     *ibmmq.MQPMO
+    message []byte
+}
+
+func NewMQPutMessageBuilder() *MQPutMessageBuilder {
+    return &amp;MQPutMessageBuilder{
+        md:  ibmmq.NewMQMD(),
+        pmo: ibmmq.NewMQPMO(),
+    }
+}
+
+func (b *MQPutMessageBuilder) WithFormat(format string) *MQPutMessageBuilder {
+    b.md.Format = format
+    return b
+}
+
+func (b *MQPutMessageBuilder) WithPersistence(persistence int32) *MQPutMessageBuilder {
+    b.md.Persistence = persistence
+    return b
+}
+
+func (b *MQPutMessageBuilder) WithReplyToQueue(replyTo string) *MQPutMessageBuilder {
+    copy(b.md.ReplyToQName[:], []byte(replyTo))
+    return b
+}
+
+func (b *MQPutMessageBuilder) WithMessage(body []byte) *MQPutMessageBuilder {
+    b.message = body
+    return b
+}
+
+func (b *MQPutMessageBuilder) Build() (*ibmmq.MQMD, *ibmmq.MQPMO, []byte) {
+    return b.md, b.pmo, b.message
+}
+</code></pre>
+<p>เมื่อใช้งาน Builder ฝั่งส่งข้อความก็จะเหมือนเป็นการประกาศค่าที่อ่านได้ง่าย ไม่ต้องกลับไปจัดการโครงสร้าง <code>MQMD</code> / <code>MQPMO</code> ซ้ำ ๆ</p>
+<pre><code class="language-go">func sendMessage(qm *ibmmq.MQQueueManager, queueName string) error {
+    qObject, err := qm.Open(ibmmq.NewMQOD().SetObjectName(queueName), ibmmq.MQOO_OUTPUT)
+    if err != nil {
+        return err
+    }
+    defer qObject.Close(0)
+
+    md, pmo, body := NewMQPutMessageBuilder().
+        WithFormat(&quot;MQSTR&quot;).
+        WithPersistence(ibmmq.MQPER_PERSISTENT).
+        WithReplyToQueue(&quot;REPLY.QUEUE&quot;).
+        WithMessage([]byte(&quot;hello from builder pattern&quot;)).
+        Build()
+
+    if err := qObject.Put(md, pmo, body); err != nil {
+        return err
+    }
+    return nil
+}
+</code></pre>
+<p>Builder Pattern เหมาะกับงานที่ต้องสร้างตัวแปรหลายตัวและต้องจัดการกับ API ที่ซับซ้อนอย่าง IBM MQ เพราะมันช่วยแยกส่วนการตั้งค่าจากส่วนที่เรียกใช้งานจริง ทำให้โค้ดฝั่งใช้งานดูสะอาดขึ้น โดยไม่ต้องรู้รายละเอียดภายในของ <code>MQCNO</code>, <code>MQCD</code>, <code>MQMD</code> หรือ <code>MQPMO</code></p>
+<hr>
+<p>Unit testing</p>
+<p>Builder Pattern ทำให้การเขียนเทสต์ง่ายขึ้น เพราะเราไม่จำเป็นต้องพึ่งพา MQ server จริงในเทสต์ ตัวอย่างนี้เป็น unit test ของ <code>MQPutMessageBuilder</code> เพื่อยืนยันว่า <code>Build()</code> คืนค่า <code>MQMD</code> และ payload ตามที่ตั้งไว้</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;testing&quot;
+    &quot;github.com/ibm-messaging/mq-golang/v5/ibmmq&quot;
+)
+
+func TestMQPutMessageBuilder_Build(t *testing.T) {
+    b := NewMQPutMessageBuilder().
+        WithFormat(&quot;MQSTR&quot;).
+        WithPersistence(ibmmq.MQPER_NOT_PERSISTENT).
+        WithReplyToQueue(&quot;REPLY.Q&quot;).
+        WithMessage([]byte(&quot;payload&quot;))
+
+    md, _, body := b.Build()
+
+    if md.Format != &quot;MQSTR&quot; {
+        t.Fatalf(&quot;expected format MQSTR, got %s&quot;, md.Format)
+    }
+    if string(body) != &quot;payload&quot; {
+        t.Fatalf(&quot;expected body &#39;payload&#39;, got %s&quot;, string(body))
+    }
+
+    reply := string(md.ReplyToQName[:])
+    if len(reply) == 0 || reply[:7] != &quot;REPLY.Q&quot; {
+        t.Fatalf(&quot;reply-to queue not set correctly: %q&quot;, reply)
+    }
+}
+</code></pre>
+<hr>
+<p>สรุปแล้ว Builder Pattern เป็นเครื่องมือที่ช่วยให้การสร้างอ๊อบเจ๊คที่มีพารามิเตอร์หลายตัวหรือมีขั้นตอนซับซ้อนดูเป็นระเบียบมากขึ้น ใน Go เราสามารถใช้เมทอดแบบ chain เพื่อแยกการตั้งค่าออกจากการทำงานจริง ทำให้โค้ดอ่านง่าย ลดโค้ดซ้ำ และเพิ่มความยืดหยุ่นในการปรับเปลี่ยนหรือเพิ่มตัวเลือกใหม่ในอนาคต</p>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>
