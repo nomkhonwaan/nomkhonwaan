@@ -367,6 +367,18 @@ async function main() {
   } catch {
     // ignore if favicon doesn't exist at root
   }
+  // Copy CNAME for custom domain (nomkhonwaan.com)
+  try {
+    await Deno.copyFile("CNAME", join(OUT_DIR, "CNAME"));
+    console.log("  ✓ CNAME → docs/CNAME");
+  } catch {
+    console.warn("  ⚠ CNAME file not found at root");
+  }
+
+  // Create .nojekyll to disable Jekyll processing on GitHub Pages
+  await Deno.writeTextFile(join(OUT_DIR, ".nojekyll"), "");
+  console.log("  ✓ .nojekyll");
+
   console.log("  ✓ static/ → docs/");
 
   console.log("\n✅ Build complete! Output in docs/");
