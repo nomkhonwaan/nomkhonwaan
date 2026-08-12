@@ -1,21 +1,36 @@
 import { Handlers } from "$fresh/server.ts";
-import { getPostsPaginated } from "../utils/posts.ts";
-import type { Post, Pagination } from "../utils/posts.ts";
+import { getPostsPaginated } from "../../../utils/posts.ts";
+import type { Post, Pagination } from "../../../utils/posts.ts";
 
 export const handler: Handlers = {
   async GET(_req, ctx) {
-    const { posts, pagination } = await getPostsPaginated(1);
+    const page = parseInt(ctx.params.page, 10);
+    // Page 1 is the homepage, redirect to /
+    if (page <= 1) {
+      return new Response("", {
+        status: 302,
+        headers: { Location: "/" },
+      });
+    }
+    const { posts, pagination } = await getPostsPaginated(page);
+    if (pagination.page !== page) {
+      return new Response("", {
+        status: 302,
+        headers: { Location: `/page/${pagination.page}` },
+      });
+    }
     return ctx.render({ posts, pagination });
   },
 };
 
-export default function Home(
+export default function PagePage(
   { data }: { data: { posts: Post[]; pagination: Pagination } },
 ) {
   const { posts, pagination } = data;
   const { page, totalPages } = pagination;
   const prevUrl = page > 2 ? `/page/${page - 1}` : page > 1 ? "/" : null;
   const nextUrl = page < totalPages ? `/page/${page + 1}` : null;
+
   return (
     <main>
       <section class="profile">
@@ -31,7 +46,7 @@ export default function Home(
 
       <section>
         <ul class="post-list">
-          {data.posts.map((p) => (
+          {posts.map((p) => (
             <li class="post-item">
               <div class="post-title">
                 <a href={p.url}>{p.title}</a>

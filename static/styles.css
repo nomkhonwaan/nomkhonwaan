@@ -304,6 +304,43 @@ hr {
   font-size: 0.9rem;
 }
 
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+}
+
+.pagination-link {
+  font-size: 0.9rem;
+  color: var(--link);
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.pagination-link:hover {
+  background: var(--tag-bg);
+  border-color: var(--link);
+  text-decoration: none;
+}
+
+.pagination-link.disabled {
+  color: var(--muted-light);
+  border-color: var(--border);
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.pagination-info {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 /* Footer */
 .footer {
   text-align: center;

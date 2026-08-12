@@ -11,6 +11,12 @@ export interface Post {
   url: string;
 }
 
+export interface Pagination {
+  page: number;
+  totalPages: number;
+  total: number;
+}
+
 export function extractFirstParagraph(body: string): string {
   // Get the first paragraph: text before the first heading, blank line, or horizontal rule
   const text = body.trim();
@@ -76,6 +82,21 @@ export async function getPosts(postsDir = "posts") {
   }
   posts.sort((a, b) => (a.publish_date < b.publish_date ? 1 : -1));
   return posts;
+}
+
+const POSTS_PER_PAGE = 10;
+
+export async function getPostsPaginated(
+  page: number,
+  postsDir = "posts",
+): Promise<{ posts: Post[]; pagination: Pagination }> {
+  const all = await getPosts(postsDir);
+  const total = all.length;
+  const totalPages = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
+  const p = Math.max(1, Math.min(page, totalPages));
+  const start = (p - 1) * POSTS_PER_PAGE;
+  const posts = all.slice(start, start + POSTS_PER_PAGE);
+  return { posts, pagination: { page: p, totalPages, total } };
 }
 
 export async function getPostByUrl(url: string) {
