@@ -29,6 +29,9 @@ interface Post {
 // Set to "" for custom domain (nomkhonwaan.com) or user site (nomkhonwaan.github.io)
 const BASE_PATH = "";
 
+// Number of posts shown per page on the homepage
+const POSTS_PER_PAGE = 10;
+
 // ── Markdown helpers ───────────────────────────────────────────────────────
 
 function renderKaTeX(md: string): string {
@@ -254,7 +257,7 @@ function layout(title: string, body: string, extraHead = ""): string {
 </html>`;
 }
 
-function renderIndex(posts: Post[]): string {
+function renderIndex(posts: Post[], pagination: { page: number; totalPages: number }): string {
   const items = posts.map((p) => `
       <li class="post-item">
         <div class="post-title">
@@ -268,6 +271,23 @@ function renderIndex(posts: Post[]): string {
             }</div>`
           : ""}
       </li>`).join("\n");
+
+  const { page, totalPages } = pagination;
+  const prevUrl = page > 2 ? `${BASE_PATH}/page/${page - 1}/` : page > 1 ? `${BASE_PATH}/` : null;
+  const nextUrl = page < totalPages ? `${BASE_PATH}/page/${page + 1}/` : null;
+
+  const paginationHtml = totalPages > 1
+    ? `
+      <nav class="pagination">
+        ${prevUrl
+          ? `<a href="${prevUrl}" class="pagination-link">&larr; หน้าก่อน</a>`
+          : `<span class="pagination-link disabled">&larr; หน้าก่อน</span>`}
+        <span class="pagination-info">หน้า ${page} จาก ${totalPages}</span>
+        ${nextUrl
+          ? `<a href="${nextUrl}" class="pagination-link">หน้าถัดไป &rarr;</a>`
+          : `<span class="pagination-link disabled">หน้าถัดไป &rarr;</span>`}
+      </nav>`
+    : "";
 
   return layout("Nomkhonwaan", `
   <main>
@@ -284,6 +304,7 @@ function renderIndex(posts: Post[]): string {
 
     <section>
       <ul class="post-list">${items}</ul>
+      ${paginationHtml}
     </section>
 
     <footer class="footer">
@@ -338,15 +359,33 @@ const OUT_DIR = "docs";
 async function main() {
   console.log("📦 Building static site...\n");
 
-  // Build index page
-  const posts = await getPosts();
-  const indexHtml = renderIndex(posts);
-  await ensureDir(OUT_DIR);
-  await Deno.writeTextFile(join(OUT_DIR, "index.html"), indexHtml);
-  console.log(`  ✓ index.html (${posts.length} posts)`);
+  // Build paginated index pages
+  const allPosts = await getPosts();
+  const total = allPosts.length;
+  const totalPages = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
+
+  for (let page = 1; page <= totalPages; page++) {
+    const start = (page - 1) * POSTS_PER_PAGE;
+    const posts = allPosts.slice(start, start + POSTS_PER_PAGE);
+    const html = renderIndex(posts, { page, totalPages });
+
+    if (page === 1) {
+      await Deno.writeTextFile(join(OUT_DIR, "index.html"), html);
+      // Also generate page/1/index.html so /page/1/ doesn't 404
+      const dir = join(OUT_DIR, "page", "1");
+      await ensureDir(dir);
+      await Deno.writeTextFile(join(dir, "index.html"), html);
+      console.log(`  ✓ index.html (page ${page}/${totalPages}, ${posts.length} posts)`);
+    } else {
+      const dir = join(OUT_DIR, "page", String(page));
+      await ensureDir(dir);
+      await Deno.writeTextFile(join(dir, "index.html"), html);
+      console.log(`  ✓ page/${page}/index.html (page ${page}/${totalPages}, ${posts.length} posts)`);
+    }
+  }
 
   // Build post pages
-  for (const post of posts) {
+  for (const post of allPosts) {
     const html = renderPost(post);
     // post.url is like /2016/1/28/tdd-kata-2-the-bowling-game
     const outPath = join(OUT_DIR, post.url, "index.html");
