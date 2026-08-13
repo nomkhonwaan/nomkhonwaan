@@ -1,5 +1,5 @@
 ---
-title: "Token Optimization: ใช้ AI เขียนโปรแกรมแทนการอ่านไฟล์ตรง ๆ"
+title: Context Extraction และ Token Optimization
 publish_date: 2026-08-13
 tags: ['ai']
 ---
