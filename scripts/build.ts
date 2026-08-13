@@ -393,6 +393,9 @@ const OUT_DIR = "docs";
 async function main() {
   console.log("📦 Building static site...\n");
 
+  // Ensure output directory exists
+  await ensureDir(OUT_DIR);
+
   // Build paginated index pages
   const allPosts = await getPosts();
   const total = allPosts.length;
