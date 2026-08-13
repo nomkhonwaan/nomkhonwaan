@@ -20,11 +20,11 @@ $ cat /etc/passwd | grep root | awk -F ':' '{print $5}'
 
 มาดูวิธีตั้งค่ากันดีกว่าก่อนอื่นไปที่ iTerm2 > Preferences > Profiles > Keys > Key Mappings จากนั้นกดที่เครื่อง + จะขึ้นหน้าต่างแบบนี้
 
-![Key Mappings](https://img.pic.in.th/Screen-Shot-2565-07-08-at-22.13.10.png)
+![Key Mappings](Screen-Shot-2565-07-08-at-22.13.10.png)
 
 ตรง Keyboard Shortcut ให้คลิกแล้วกดปุ่ม Option + <- และตรง Action ให้เลือกเป็น "Send Escape Sequence" จากนั้นตรง Esc+ ใส่เป็นตัว "b" แบบนี้
 
-![Action - Send Escape Sequence](https://img.pic.in.th/Screen-Shot-2565-07-08-at-22.22.26.png)
+![Action - Send Escape Sequence](Screen-Shot-2565-07-08-at-22.22.26.png)
 
 อันนี้จะเป็นคีย์ลัดสำหรับข้ามคำไปข้างหลัง ทำแบบเดียวกันนี้อีกครั้งโดยเปลี่ยนตรง Keyboard Shortcut เป็น Option + -> โดยที่ Action ยังเป็น "Send Escape Sequence" เหมือนเดิมแต่เปลี่ยนตรง Esc+ ให้ใส่ตัว "f" สำหรับข้ามคำไปข้างหน้า
 
@@ -36,6 +36,6 @@ $ cat /etc/passwd | grep root | awk -F ':' '{print $5}'
 
 วิธีการตั้งค่าเริ่มที่ iTerm2 > Preferences > Profiles > Keys > General จากนั้นตรง Left Option Key ให้เลือก Esc+ ตามในรูป
 
-![General](https://img.pic.in.th/Screen-Shot-2565-07-09-at-15.37.29.png)
+![General](Screen-Shot-2565-07-09-at-15.37.29.png)
 
 ทีนี้เวลาจะลบคำสามารถกด Option + Back เพื่อลบทั้งคำได้
