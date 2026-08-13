@@ -134,7 +134,7 @@ func main() {
 </code></pre>
 <p><a href="https://go.dev/play/p/XkknCPbPmVB">Go Playground</a></p>
 <p>แผนภาพด้านล่างนี้แสดงถึงการรับส่งข้อมูลระหว่าง Goroutines ผ่านตัวแปรแชนแนลที่ไม่มีบัฟเฟอร์ สังเกตว่าถ้าเป็นการรับ-ส่งข้อมูลผ่านแชนแนลที่ไม่มีบัฟเฟอร์แต่อยู่ต่าง Goroutines กันจะไม่เกิด deadlock</p>
-<p><img src="/posts/2019/11/24/go-channel-communication-between-goroutines/Channel-and-Goroutines-Unbuffered-Channel.drawio.png" alt="Unbuffered channel"></p>
+<p><img src="/posts/2019/11/24/Channel-and-Goroutines-Unbuffered-Channel.drawio.png" alt="Unbuffered channel"></p>
 <p>ลองแก้ไขโค้ดตัวอย่างข้างบนให้สามารถรับ-ส่งข้อมูลได้โดยไม่เกิด deadlock ได้แบบนี้</p>
 <pre><code class="language-go">package main
 
@@ -175,7 +175,7 @@ func main() {
 </code></pre>
 <p><a href="https://go.dev/play/p/DeF_5nyXYHA">Go Playground</a></p>
 <p>แผนภาพแสดงตัวอย่างการรับ-ส่งข้อมูลผ่านแชนแนลที่มีบัฟเฟอร์</p>
-<p><img src="/posts/2019/11/24/go-channel-communication-between-goroutines/Channel-and-Goroutines-Buffered-Channel.drawio.png" alt="Buffered channel"></p>
+<p><img src="/posts/2019/11/24/Channel-and-Goroutines-Buffered-Channel.drawio.png" alt="Buffered channel"></p>
 <hr>
 <p><em>ทิศทางของแชนแนล</em></p>
 <p>ตามปกติแล้วตัวแปลแชนแนลสามารถรับ-ส่งข้อมูลได้ทั้งสองทาง แต่ถ้าต้องการให้รับหรือส่งได้ทางเดียวสามารถประกาศทิศทางของแชนแนลได้โดยการระบุด้วยเครื่องหมาย <code>&lt;-</code> ที่ด้านหน้าหรือหลังคำว่า <code>chan</code> แบบนี้</p>
@@ -277,7 +277,7 @@ func merge(outputs ...&lt;-chan int) &lt;-chan int {
 <p>สุดท้ายคือฟังก์ชัน <code>merge</code> ที่ทำหน้าที่เอาผลลัพธ์ที่ได้จาก <code>square</code> มารวมกันให้ออกเพียงหนึ่งแชนแนลเท่านั้นและส่งไป <code>log.Println</code> ที่ <code>main</code> ถ้าลองรันโค้ดดูจะพบว่าลำดับของตัวเลขที่แสดงผลออกมานั้นไม่ได้เรียงกันตามอินพุตที่ใส่เข้าไป สาเหตุมาจากว่าตอนที่ส่งไปยัง <code>square</code> นั้นตัวเลขได้ถูกสุ่มส่งให้กับ <code>output1</code> หรือ <code>output2</code> และทำงานจบไม่พร้อมกันทำให้ผลลัพธ์สุดท้ายอาจจะไม่ได้เรียงกันตามอินพุตที่ใส่ไป</p>
 <p>ถ้าจะให้เห็นภาพมากขึ้นลองแก้ไขโปรแกรมให้รับอินพุตเป็นตัวเลขจำนวนหลาย ๆ ตัวแล้วสังเกตผลลัพธ์ที่ได้จากการรันในแต่ละครั้งดู</p>
 <p>แผนภาพด้านล่างแสดงให้เห็นว่าการส่งข้อมูลไปยัง <code>square</code> อินพุตสามารถถูกแบ่งออกเป็นสองกลุ่มคือ <code>2, 3</code> และ <code>4</code> โดยกลุ่มแรกจะได้ออกมาเป็น <code>output1</code> และกลุ่มสองจะได้ออกมาเป็น <code>output2</code></p>
-<p><img src="/posts/2019/11/24/go-channel-communication-between-goroutines/Channel-and-Goroutines-Fan-out-fan-in.drawio.png" alt="Fan-out, fan-in"></p>
+<p><img src="/posts/2019/11/24/Channel-and-Goroutines-Fan-out-fan-in.drawio.png" alt="Fan-out, fan-in"></p>
 <h2>Futures</h2>
 <p>ฟิวเจอร์เป็นรูปแบบของการใช้งาน Goroutines ที่คาดหวังว่าจะได้ผลลัพธ์กลับมาในอนาคตซึ่งในระหว่างที่รอผลลัพธ์สามารถทำงานอย่างอื่นรอได้ รูปแบบของฟิวเจอร์จะพบได้ใน Scala หรือ Promise ใน JavaScript</p>
 <p>ตัวอย่างโค้ดด้านล่างนี้มีการเรียกไปยังเว็บไซต์​ JSONPlaceholder เพื่อเอาข้อมูลโพสต์กลับมา​ โดยฟังก์ชัน <code>request</code> จะยังไม่ได้รีเทิร์น <code>data</code> กลับมาทันทีแต่เป็น <code>chan data</code> แทน</p>
@@ -344,7 +344,7 @@ func request(method string, url string, body io.Reader) (&lt;-chan data, error) 
 </code></pre>
 <p><a href="https://go.dev/play/p/oPrSZ9HY3Uf">Go Playground</a></p>
 <p>แผนภาพด้านล่างแสดงให้เห็นถึงฟังก์ชัน <code>request</code> ที่รีเทิร์นแชนแนลกลับมาให้ <code>main</code> ก่อนเพื่อให้ <code>main</code> สามารถทำงานอย่างอื่นระหว่างรอผลลัพธ์จาก JSONPlaceholder </p>
-<p><img src="/posts/2019/11/24/go-channel-communication-between-goroutines/Channel-and-Goroutines-Futures.drawio.png" alt="Futures"></p>
+<p><img src="/posts/2019/11/24/Channel-and-Goroutines-Futures.drawio.png" alt="Futures"></p>
 <hr>
 <p>อ้างอิง</p>
 <ol>
