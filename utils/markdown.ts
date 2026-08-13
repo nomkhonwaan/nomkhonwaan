@@ -31,6 +31,14 @@ function renderKaTeX(md: string): string {
   return lines.join('\n');
 }
 
+export function resolveMarkdownImages(md: string, postUrl: string): string {
+  // Resolve relative image paths to absolute /posts/... paths
+  return md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
+    if (url.startsWith("/") || url.startsWith("http")) return match;
+    return `![${alt}](/posts${postUrl}/${url})`;
+  });
+}
+
 export function renderMarkdown(md: string) {
   try {
     const withMath = renderKaTeX(md);

@@ -39,9 +39,18 @@ export function extractFirstParagraph(body: string): string {
   return "";
 }
 
-export function extractFirstImage(body: string): string | undefined {
+export function extractFirstImage(body: string, postRelPath?: string): string | undefined {
   const match = body.match(/!\[([^\]]*)\]\(([^)]+)\)/);
-  return match ? match[2] : undefined;
+  if (!match) return undefined;
+  const url = match[2];
+  // If it's already absolute (starts with / or http), return as-is
+  if (url.startsWith("/") || url.startsWith("http")) return url;
+  // Resolve relative path against the post's directory
+  if (postRelPath) {
+    const dir = postRelPath.substring(0, postRelPath.lastIndexOf("/"));
+    return `/posts/${dir}/${url}`;
+  }
+  return url;
 }
 
 function toDateString(value: unknown): string {
@@ -87,7 +96,7 @@ export async function getPosts(postsDir = "posts") {
       const rel = path.replace(/^posts[\/]/, "").replace(/\\/g, "/");
       const url = "/" + rel.replace(/\.md$/, "");
       const slug = url.split("/").pop() || "";
-      posts.push({ slug, title, publish_date, tags, cover_image: extractFirstImage(body), description: extractFirstParagraph(body), content: body, url });
+      posts.push({ slug, title, publish_date, tags, cover_image: extractFirstImage(body, rel.replace(/\.md$/, "")), description: extractFirstParagraph(body), content: body, url });
     }
   } catch (e) {
     console.error("getPosts error:", e);

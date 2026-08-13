@@ -67,6 +67,14 @@ function renderKaTeX(md: string): string {
   return lines.join('\n');
 }
 
+function resolveMarkdownImages(md: string, postUrl: string): string {
+  // Resolve relative image paths to absolute /posts/... paths
+  return md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
+    if (url.startsWith("/") || url.startsWith("http")) return match;
+    return `![${alt}](/posts${postUrl}/${url})`;
+  });
+}
+
 function renderMarkdown(md: string): string {
   try {
     // First render KaTeX, then pass to marked
@@ -105,9 +113,18 @@ function extractFirstParagraph(body: string): string {
   return "";
 }
 
-function extractFirstImage(body: string): string | undefined {
+function extractFirstImage(body: string, postRelPath?: string): string | undefined {
   const match = body.match(/!\[([^\]]*)\]\(([^)]+)\)/);
-  return match ? match[2] : undefined;
+  if (!match) return undefined;
+  const url = match[2];
+  // If it's already absolute (starts with / or http), return as-is
+  if (url.startsWith("/") || url.startsWith("http")) return url;
+  // Resolve relative path against the post's directory
+  if (postRelPath) {
+    const dir = postRelPath.substring(0, postRelPath.lastIndexOf("/"));
+    return `/posts/${dir}/${url}`;
+  }
+  return url;
 }
 
 function toDateString(value: unknown): string {
@@ -153,7 +170,7 @@ async function getPosts(postsDir = "posts"): Promise<Post[]> {
         title,
         publish_date,
         tags,
-        cover_image: extractFirstImage(body),
+        cover_image: extractFirstImage(body, rel.replace(/\.md$/, "")),
         description: extractFirstParagraph(body),
         content: body,
         url,
@@ -331,7 +348,7 @@ function renderIndex(posts: Post[], pagination: { page: number; totalPages: numb
 }
 
 function renderPost(post: Post): string {
-  const body = renderMarkdown(post.content);
+  const body = renderMarkdown(resolveMarkdownImages(post.content, post.url));
   const tags = post.tags.length > 0
     ? `<div class="post-tags">${
         post.tags.map((t) => `<span class="post-tag">${t}</span>`).join("")
@@ -417,6 +434,20 @@ async function main() {
 
   // Copy static assets
   await copy("static", OUT_DIR, { overwrite: true });
+
+  // Copy post images (non-markdown files from posts/ to docs/posts/)
+  try {
+    await copy("posts", join(OUT_DIR, "posts"), { overwrite: true });
+    // Remove .md files from the copied posts directory
+    for await (const entry of walk(join(OUT_DIR, "posts"))) {
+      if (entry.endsWith(".md")) {
+        await Deno.remove(entry);
+      }
+    }
+    console.log("  ✓ posts/ (images) → docs/posts/");
+  } catch (e) {
+    console.warn("  ⚠ Could not copy post images:", e);
+  }
   // Copy root favicon.ico (the static/ one is a placeholder)
   try {
     await Deno.copyFile("favicon.ico", join(OUT_DIR, "favicon.ico"));
