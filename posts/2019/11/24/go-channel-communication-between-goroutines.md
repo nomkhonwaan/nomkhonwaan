@@ -44,7 +44,7 @@ func main() {
 
 แผนภาพด้านล่างนี้แสดงถึงการรับส่งข้อมูลระหว่าง Goroutines ผ่านตัวแปรแชนแนลที่ไม่มีบัฟเฟอร์ สังเกตว่าถ้าเป็นการรับ-ส่งข้อมูลผ่านแชนแนลที่ไม่มีบัฟเฟอร์แต่อยู่ต่าง Goroutines กันจะไม่เกิด deadlock
 
-![Unbuffered channel](Channel-and-Goroutines-Unbuffered-Channel.drawio.png)
+![Unbuffered channel](/posts/2019/11/24/Channel-and-Goroutines-Unbuffered-Channel.drawio.png)
 
 ลองแก้ไขโค้ดตัวอย่างข้างบนให้สามารถรับ-ส่งข้อมูลได้โดยไม่เกิด deadlock ได้แบบนี้
 
@@ -97,7 +97,7 @@ func main() {
 
 แผนภาพแสดงตัวอย่างการรับ-ส่งข้อมูลผ่านแชนแนลที่มีบัฟเฟอร์
 
-![Buffered channel](Channel-and-Goroutines-Buffered-Channel.drawio.png)
+![Buffered channel](/posts/2019/11/24/Channel-and-Goroutines-Buffered-Channel.drawio.png)
 
 ---
 
@@ -220,7 +220,7 @@ func merge(outputs ...<-chan int) <-chan int {
 
 แผนภาพด้านล่างแสดงให้เห็นว่าการส่งข้อมูลไปยัง `square` อินพุตสามารถถูกแบ่งออกเป็นสองกลุ่มคือ `2, 3` และ `4` โดยกลุ่มแรกจะได้ออกมาเป็น `output1` และกลุ่มสองจะได้ออกมาเป็น `output2`
 
-![Fan-out, fan-in](Channel-and-Goroutines-Fan-out-fan-in.drawio.png)
+![Fan-out, fan-in](/posts/2019/11/24/Channel-and-Goroutines-Fan-out-fan-in.drawio.png)
 
 ## Futures
 
@@ -295,7 +295,7 @@ func request(method string, url string, body io.Reader) (<-chan data, error) {
 
 แผนภาพด้านล่างแสดงให้เห็นถึงฟังก์ชัน `request` ที่รีเทิร์นแชนแนลกลับมาให้ `main` ก่อนเพื่อให้ `main` สามารถทำงานอย่างอื่นระหว่างรอผลลัพธ์จาก JSONPlaceholder 
 
-![Futures](Channel-and-Goroutines-Futures.drawio.png)
+![Futures](/posts/2019/11/24/Channel-and-Goroutines-Futures.drawio.png)
 
 ---
 

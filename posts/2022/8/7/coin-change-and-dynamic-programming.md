@@ -98,7 +98,7 @@ fn coin_change(coins: Vec<i32>, amount: i32) -> i32 {
 
 จะพบว่าแก้โจทย์​ `[2, 3, 6, 7]` ได้อย่างถูกต้องแล้ว ถ้าเขียนเป็นแผงผังการเวียนเกิดเฉพาะกรณีลบด้วยเหรียญ `2` ได้ประมาณนี้
 
-![Recursion Diagram](Dynamic-Programming-Recursion-2.png)
+![Recursion Diagram](/posts/2022/8/7/Dynamic-Programming-Recursion-2.png)
 
 แต่ละกล่องแทนฟังก์ชันที่ทำงานในการเวียนเกิด (sub-problem) กล่องที่สีเหมือนกันหมายความว่าทำงานเหมือนกันได้ผลลัพธ์เดียวกัน (overlapping sub-problems) 
 
