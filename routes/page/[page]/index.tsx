@@ -48,6 +48,11 @@ export default function PagePage(
         <ul class="post-list">
           {posts.map((p) => (
             <li class="post-item">
+              {p.cover_image && (
+                <a href={p.url} class="post-cover-link">
+                  <img src={p.cover_image} alt="" class="post-cover" />
+                </a>
+              )}
               <div class="post-title">
                 <a href={p.url}>{p.title}</a>
               </div>
