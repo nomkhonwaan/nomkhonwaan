@@ -6,6 +6,7 @@ export interface Post {
   title: string;
   publish_date: string;
   tags?: string[];
+  cover_image?: string;
   description: string;
   content: string;
   url: string;
@@ -20,16 +21,36 @@ export interface Pagination {
 export function extractFirstParagraph(body: string): string {
   // Get the first paragraph: text before the first heading, blank line, or horizontal rule
   const text = body.trim();
-  const match = text.match(/^(.+?)(?:\n\n|\n#{1,6}\s|\n---|\n*$)/s);
-  if (!match) return "";
-  let para = match[1].trim();
-  // Strip markdown links: [text](url) -> text
-  para = para.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1");
-  // Strip inline code backticks
-  para = para.replace(/`([^`]+)`/g, "$1");
-  // Strip bold/italic markers
-  para = para.replace(/(\*{1,3}|_{1,3})(.+?)\1/g, "$2");
-  return para;
+  // Split into paragraphs separated by blank lines
+  const paragraphs = text.split(/\n\n+/);
+  for (const para of paragraphs) {
+    let cleaned = para.trim();
+    // Strip markdown images: ![alt](url)
+    cleaned = cleaned.replace(/!\[([^\]]*)\]\([^)]*\)/g, "");
+    // Strip markdown links: [text](url) -> text
+    cleaned = cleaned.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1");
+    // Strip inline code backticks
+    cleaned = cleaned.replace(/`([^`]+)`/g, "$1");
+    // Strip bold/italic markers
+    cleaned = cleaned.replace(/(\*{1,3}|_{1,3})(.+?)\1/g, "$2");
+    cleaned = cleaned.trim();
+    if (cleaned) return cleaned;
+  }
+  return "";
+}
+
+export function extractFirstImage(body: string, postRelPath?: string): string | undefined {
+  const match = body.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+  if (!match) return undefined;
+  const url = match[2];
+  // If it's already absolute (starts with / or http), return as-is
+  if (url.startsWith("/") || url.startsWith("http")) return url;
+  // Resolve relative path against the post's directory
+  if (postRelPath) {
+    const dir = postRelPath.substring(0, postRelPath.lastIndexOf("/"));
+    return `/posts/${dir}/${url}`;
+  }
+  return url;
 }
 
 function toDateString(value: unknown): string {
@@ -75,7 +96,7 @@ export async function getPosts(postsDir = "posts") {
       const rel = path.replace(/^posts[\/]/, "").replace(/\\/g, "/");
       const url = "/" + rel.replace(/\.md$/, "");
       const slug = url.split("/").pop() || "";
-      posts.push({ slug, title, publish_date, tags, description: extractFirstParagraph(body), content: body, url });
+      posts.push({ slug, title, publish_date, tags, cover_image: extractFirstImage(body, rel.replace(/\.md$/, "")), description: extractFirstParagraph(body), content: body, url });
     }
   } catch (e) {
     console.error("getPosts error:", e);

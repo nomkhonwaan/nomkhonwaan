@@ -1,7 +1,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 import { getPostByUrl } from "../../../../utils/posts.ts";
-import { renderMarkdown, CSS } from "../../../../utils/markdown.ts";
+import { renderMarkdown, resolveMarkdownImages, CSS } from "../../../../utils/markdown.ts";
 import type { Post } from "../../../../utils/posts.ts";
 
 export const handler: Handlers = {
@@ -16,7 +16,7 @@ export const handler: Handlers = {
 
 export default function PostPage({ data }: PageProps<{ post: Post }>) {
   const post = data.post;
-  const body = renderMarkdown(post.content);
+  const body = renderMarkdown(resolveMarkdownImages(post.content, post.url));
 
   return (
     <main>
