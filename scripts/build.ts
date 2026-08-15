@@ -469,6 +469,56 @@ async function main() {
   await Deno.writeTextFile(join(OUT_DIR, ".nojekyll"), "");
   console.log("  ✓ .nojekyll");
 
+  // ── Generate sitemap.xml ──────────────────────────────────────────────
+  const SITE_URL = "https://nomkhonwaan.com";
+  const today = new Date().toISOString().split("T")[0];
+  const newestPostDate = allPosts.length > 0 ? allPosts[0].publish_date : today;
+
+  let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${SITE_URL}/</loc>
+    <lastmod>${newestPostDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>`;
+
+  // Paginated pages
+  for (let page = 2; page <= totalPages; page++) {
+    sitemap += `
+  <url>
+    <loc>${SITE_URL}/page/${page}/</loc>
+    <lastmod>${newestPostDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+  }
+
+  // Post pages
+  for (const post of allPosts) {
+    sitemap += `
+  <url>
+    <loc>${SITE_URL}${post.url}</loc>
+    <lastmod>${post.publish_date}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+  }
+
+  sitemap += `
+</urlset>`;
+
+  await Deno.writeTextFile(join(OUT_DIR, "sitemap.xml"), sitemap);
+  console.log("  ✓ sitemap.xml");
+
+  // ── Generate robots.txt ───────────────────────────────────────────────
+  const robots = `User-agent: *
+Allow: /
+Sitemap: ${SITE_URL}/sitemap.xml
+`;
+  await Deno.writeTextFile(join(OUT_DIR, "robots.txt"), robots);
+  console.log("  ✓ robots.txt");
+
   console.log("  ✓ static/ → docs/");
 
   console.log("\n✅ Build complete! Output in docs/");
