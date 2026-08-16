@@ -333,12 +333,12 @@ function renderIndex(posts: Post[], pagination: { page: number; totalPages: numb
     ? `
       <nav class="pagination">
         ${prevUrl
-          ? `<a href="${prevUrl}" class="pagination-link">&larr; หน้าก่อน</a>`
-          : `<span class="pagination-link disabled">&larr; หน้าก่อน</span>`}
-        <span class="pagination-info">หน้า ${page} จาก ${totalPages}</span>
+          ? `<a href="${prevUrl}" class="pagination-link">&larr; Previous</a>`
+          : `<span class="pagination-link disabled">&larr; Previous</span>`}
+        <span class="pagination-info">Page ${page} of ${totalPages}</span>
         ${nextUrl
-          ? `<a href="${nextUrl}" class="pagination-link">หน้าถัดไป &rarr;</a>`
-          : `<span class="pagination-link disabled">หน้าถัดไป &rarr;</span>`}
+          ? `<a href="${nextUrl}" class="pagination-link">Next &rarr;</a>`
+          : `<span class="pagination-link disabled">Next &rarr;</span>`}
       </nav>`
     : "";
 
