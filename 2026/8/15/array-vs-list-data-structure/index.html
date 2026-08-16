@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>ความแตกต่างของโครงสร้างข้อมูลระหว่าง Array กับ List — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+    <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>ความแตกต่างของโครงสร้างข้อมูลระหว่าง Array กับ List</h1>
+        <div class="post-meta">
+          <time>2026-08-15</time>
+          <div class="post-tags"><a class="post-tag" href="/tag/data-structure">data-structure</a><a class="post-tag" href="/tag/go">go</a></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p>เวลาเราเขียนโปรแกรมนอกจากตัวแปรธรรมดาแล้ว เรามักจะต้องเก็บข้อมูลหลาย ๆ ตัวไว้ด้วยกัน ซึ่งวิธีพื้นฐานที่สุดก็คือการเก็บในรูปของ &quot;ชุดข้อมูล&quot; หรือ collection นั่นเอง</p>
+<p>สองโครงสร้างข้อมูลที่พื้นฐานและพบเจอบ่อยที่สุดก็คือ Array กับ List บทความนี้จะพาไปดูความแตกต่างของทั้งสองในเชิงโครงสร้างข้อมูล ก่อนจะมาเจาะลึกกันว่าในภาษา Go นั้น list ถูก implement ไว้ในรูปแบบไหนบ้าง</p>
+<h2>TL;DR</h2>
+<ul>
+<li>Array โครงสร้างข้อมูลขนาดคงที่ (fixed size) เก็บข้อมูลชนิดเดียวกันในตำแหน่งหน่วยความจำที่ติดกัน</li>
+<li>List โครงสร้างข้อมูลขนาดปรับเปลี่ยนได้ (dynamic size) สามารถเพิ่มหรือลบสมาชิกได้ตลอด</li>
+<li>ในภาษาส่วนใหญ่ list จะ implement ด้วย dynamic array ที่ขยายขนาดอัตโนมัติ</li>
+<li>ใน Go: array = <code>[n]T</code>, list/slice = <code>[]T</code></li>
+</ul>
+<hr>
+<h2>Array เป็นโครงสร้างข้อมูลที่มีขนาดคงที่</h2>
+<p>Array คือโครงสร้างข้อมูลที่เก็บชุดของข้อมูลชนิดเดียวกันในตำแหน่งหน่วยความจำที่อยู่ติดกัน หรือที่เรียกว่า contiguous memory และที่สำคัญคือมี ขนาดคงที่ (fixed size) เมื่อประกาศแล้ว ไม่สามารถเพิ่มหรือลดขนาด ได้อีก</p>
+<pre><code>Address:  [100] [104] [108] [112] [116]
+Value:      10    20    30    40    50
+Index:       0     1     2     3     4
+</code></pre>
+<p>ข้อดีของ array คือเราสามารถคำนวณหาตำแหน่งของสมาชิกตัวที่ <code>i</code> ได้โดยตรงจากสูตร <code>address[i] = base_address + i * size_of_element</code> ทำให้การเข้าถึงสมาชิกทำได้ในเวลา O(1) เสมอ ไม่ว่าอาเรย์จะยาวแค่ไหนก็ตาม</p>
+<h3>คุณสมบัติของ Array</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Array</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ขนาด</td>
+<td>Fixed กำหนดตั้งแต่ประกาศ เปลี่ยนไม่ได้</td>
+</tr>
+<tr>
+<td>ชนิดข้อมูล</td>
+<td>Same type สมาชิกทุกตัวเป็น type เดียวกัน</td>
+</tr>
+<tr>
+<td>การเข้าถึง</td>
+<td>Random access O(1) ผ่าน index</td>
+</tr>
+<tr>
+<td>หน่วยความจำ</td>
+<td>Contiguous ข้อมูลเรียงติดกัน เป็นมิตรกับ CPU cache</td>
+</tr>
+</tbody></table>
+<p>ตัวอย่าง array ในภาษา C:</p>
+<pre><code class="language-c">int arr[5] = {10, 20, 30, 40, 50};
+arr[2] = 99; // random access O(1)
+</code></pre>
+<p>ข้อเสียที่สำคัญของ array ก็คือพอขนาดเต็มแล้วไม่สามารถเพิ่มสมาชิกใหม่ได้ ต้องสร้าง array ใหม่ที่ใหญ่กว่าแล้ว copy ข้อมูลเก่าไปแทน ซึ่งถ้าต้องทำบ่อย ๆ ก็จะเสียเวลาเปล่า ๆ</p>
+<hr>
+<h2>List เป็นโครงสร้างข้อมูลที่ขนาดปรับเปลี่ยนได้</h2>
+<p>List เป็นโครงสร้างข้อมูลที่ ปรับขนาดได้ (dynamic size) เราสามารถเพิ่มหรือลบสมาชิกได้ตลอดเวลา โดยรายละเอียดการจัดการหน่วยความจำด้านหลังถูกซ่อนไว้จากผู้ใช้</p>
+<p>ในทางปฏิบัติ list หลาย ๆ ภาษา implement โดยใช้ dynamic array ซึ่งก็คือ array ที่ขยายขนาดได้เมื่อเต็ม โดยมีหลักการทำงานประมาณนี้ครับ:</p>
+<ol>
+<li>จอง array ขนาดหนึ่งไว้ข้างใน (internal array หรือ backing array)</li>
+<li>เมื่อเพิ่มสมาชิกจนเต็ม ก็สร้าง array ใหม่ที่ใหญ่กว่า (เช่น ขยายเป็น 2 เท่า)</li>
+<li>copy ข้อมูลเก่าไปยัง array ใหม่</li>
+<li>ปล่อย array เก่าทิ้ง</li>
+</ol>
+<p>กระบวนการนี้เรียกว่า grow หรือ resize ซึ่งถึงแม้เวลาที่เกิด resize จะช้าหน่อย O(n) แต่ในภาพรวมแล้ว amortized time หรือเวลาเฉลี่ยต่อครั้งกลับอยู่ที่ O(1)</p>
+<h4>Amortized Time คืออะไร?</h4>
+<p>Amortized time หรือ &quot;เวลาแบบเฉลี่ยสะสม&quot; คือการวัดประสิทธิภาพโดยดูจาก ต้นทุนรวมของการดำเนินการหลายครั้งติดต่อกัน แล้วหารเฉลี่ยออกมา แทนที่จะดูแค่ครั้งใดครั้งหนึ่ง</p>
+<p>ยกตัวอย่างการ append สมาชิก 8 ตัวลงใน list ที่เริ่มต้นด้วย capacity = 1 และขยายเป็น 2 เท่าทุกครั้ง:</p>
+<pre><code>ครั้งที่ 1: append(1)  → cost = 1 (ยังมีที่ว่าง)
+ครั้งที่ 2: append(2)  → cost = 2 (resize + copy 1 + insert 1)
+ครั้งที่ 3: append(3)  → cost = 3 (resize + copy 2 + insert 1)
+ครั้งที่ 4: append(4)  → cost = 1 (ยังมีที่ว่าง)
+ครั้งที่ 5: append(5)  → cost = 5 (resize + copy 4 + insert 1)
+ครั้งที่ 6: append(6)  → cost = 1
+ครั้งที่ 7: append(7)  → cost = 1
+ครั้งที่ 8: append(8)  → cost = 1
+</code></pre>
+<p>รวมต้นทุนทั้งหมด = 1 + 2 + 3 + 1 + 5 + 1 + 1 + 1 = 15</p>
+<p>เมื่อเฉลี่ยต่อครั้ง = 15 / 8 ≈ 1.875 ซึ่งนับว่า O(1)</p>
+<p>นี่คือที่มาของคำว่า amortized O(1) ถึงแม้บางครั้งจะช้า (O(n)) แต่เมื่อมองในภาพรวมของการใช้งานต่อเนื่องหลายครั้งแล้ว ต้นทุนเฉลี่ยต่อครั้งกลับคงที่ เพราะการ resize แต่ละครั้งจะเพิ่มพื้นที่ให้กับ operation ต่อ ๆ ไปอีกหลายครั้ง ทำให้ต้นทุนกระจายตัวออกไปนั่นเอง</p>
+<p>อ่านเพิ่มเติมเกี่ยวกับ Amortized Analysis <a href="https://en.wikipedia.org/wiki/Amortized_analysis">ได้ที่นี่</a></p>
+<h3>คุณสมบัติของ List</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>List</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ขนาด</td>
+<td>Dynamic เพิ่ม/ลดได้ตลอด</td>
+</tr>
+<tr>
+<td>ชนิดข้อมูล</td>
+<td>Same type (ในภาษาที่ type-safe)</td>
+</tr>
+<tr>
+<td>การเข้าถึง</td>
+<td>Random access O(1) ผ่าน index (เพราะใช้ dynamic array)</td>
+</tr>
+<tr>
+<td>การเพิ่มสมาชิก</td>
+<td>O(1) amortized ตอนท้าย, O(n) ถ้าแทรกกลาง</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>List ในภาษาต่าง ๆ</h2>
+<p>list ในแต่ละภาษาจะมีชื่อเรียกแตกต่างกันไป แต่วางตัวเป็นโครงสร้างข้อมูลแบบเดียวกันคือปรับขนาดได้, random access O(1), และมี internal array อยู่ข้างหลัง:</p>
+<pre><code class="language-python"># Python (list)
+nums = [1, 2, 3]
+nums.append(4)
+nums.append(5)
+print(nums)  # [1, 2, 3, 4, 5]
+</code></pre>
+<pre><code class="language-javascript">// JavaScript (Array แตจริง ๆ คือ dynamic array / list)
+const nums = [1, 2, 3];
+nums.push(4);
+nums.push(5);
+console.log(nums);  // [1, 2, 3, 4, 5]
+</code></pre>
+<pre><code class="language-java">// Java (ArrayList)
+List&lt;Integer&gt; nums = new ArrayList&lt;&gt;();
+nums.add(1);
+nums.add(2);
+nums.add(3);
+nums.add(4);
+System.out.println(nums);  // [1, 2, 3, 4]
+</code></pre>
+<p>จะเห็นว่าทุกภาษามี list ที่สามารถเพิ่มสมาชิกได้เรื่อย ๆ โดยผู้ใช้ไม่ต้องสนใจการจัดการหน่วยความจำด้านหลัง</p>
+<hr>
+<h2>แล้วในภาษา Go ล่ะ?</h2>
+<p>ภาษา Go ก็มีทั้งสองโครงสร้างข้อมูลให้ใช้เหมือนกัน โดยเรียก Array และ Slice ซึ่ง slice ใน Go ก็คือ list ในมุมของ data structure นั่นเอง</p>
+<h3>Go Array (ตัวแทนของ Array)</h3>
+<p>Go Array ตรงกับ concept ของ array ในเชิง data structure คือ fixed size, same type, contiguous memory:</p>
+<pre><code class="language-go">var arr [5]int   // array ขนาด 5 ตัว เปลี่ยนขนาดไม่ได้
+arr[0] = 10
+arr[1] = 20
+arr[2] = 30
+</code></pre>
+<p>แต่สิ่งที่ทำให้ Go น่าสนใจคือ ขนาดของ array เป็นส่วนหนึ่งของ type ซึ่งหมายความว่า <code>[5]int</code> กับ <code>[10]int</code> คือ คนละประเภทกัน:</p>
+<pre><code class="language-go">var a [5]int
+var b [10]int
+a = b // ❌ compile error: [5]int != [10]int
+</code></pre>
+<p>แล้วถ้าลอง <code>append</code> สมาชิกเพิ่มเข้าไปใน array ล่ะ? จะเกิดอะไรขึ้น?</p>
+<pre><code class="language-go">arr := [3]int{1, 2, 3}
+arr = append(arr, 4) // ❌ compile error: first argument to append must be a slice; have [3]int
+</code></pre>
+<p>compile error บอกชัดเจนครับว่า <code>append</code> ใช้กับ slice เท่านั้น ไม่ใช่ array เพราะ array มีขนาดคงที่นั่นเอง</p>
+<h3>Go Slice (ตัวแทนของ List)</h3>
+<p>Slice (<code>[]T</code>) คือสิ่งที่ตรงกับ list ในเชิง data structure คือ dynamic size, random access O(1), backed by internal array:</p>
+<pre><code class="language-go">var nums []int              // slice = list ในมุม data structure
+nums = append(nums, 10)     // append เหมือน .push() / .add()
+nums = append(nums, 20)
+nums = append(nums, 30)
+
+fmt.Println(nums)           // [10 20 30]
+fmt.Println(nums[1])        // 20 (random access O(1))
+</code></pre>
+<p>สังเกตว่าประกาศคล้ายกับ array มาก แต่ ไม่ระบุขนาดใน <code>[]</code>:</p>
+<pre><code class="language-go">arr := [3]int{1, 2, 3}  // ✅ Array (fixed size)
+slc := []int{1, 2, 3}   // ✅ Slice = List (dynamic size)
+</code></pre>
+<h3>การทำงานของ Slice เบื้องหลัง</h3>
+<p>Slice ใน Go ถูก implement เป็น dynamic array เช่นเดียวกับ list ในภาษาอื่นครับ:</p>
+<pre><code class="language-go">nums := make([]int, 3, 5) // type []int, length=3, capacity=5
+</code></pre>
+<pre><code>Slice header:
++---------+----------+----------+
+| Pointer | Length=3 | Cap=5    |
++----+----+----------+----------+
+     |
+     v  (underlying array)
+  +---+---+---+---+---+
+  | 0 | 0 | 0 |   |   |
+  +---+---+---+---+---+
+</code></pre>
+<ul>
+<li>Pointer ชี้ไปยัง internal array</li>
+<li>Length จำนวนสมาชิกปัจจุบัน</li>
+<li>Capacity ขยายได้ถึงเท่าไหร่โดยไม่ต้องจอง array ใหม่</li>
+</ul>
+<p>เมื่อ append จน capacity เต็ม Go จะสร้าง array ใหม่ที่ใหญ่กว่า (โดยปกติขยาย 2 เท่า) แล้ว copy ข้อมูลไป เหมือนกับหลักการของ dynamic array ในภาษาอื่นทุกประการ:</p>
+<pre><code class="language-go">nums := []int{1, 2, 3}      // len=3, cap=3
+nums = append(nums, 4)      // len=4, cap=6 (ขยายเป็น 2 เท่า)
+nums = append(nums, 5, 6)   // len=6, cap=6
+nums = append(nums, 7)      // len=7, cap=12 (ขยายอีกครั้ง)
+</code></pre>
+<hr>
+<h2>สรุป</h2>
+<ul>
+<li>Array คือโครงสร้างข้อมูลแบบ fixed size ใน Go ใช้ <code>[n]T</code></li>
+<li>List คือโครงสร้างข้อมูลแบบ dynamic size ใน Go ใช้ <code>[]T</code> (slice)</li>
+</ul>
+<p>ในทางปฏิบัติ Go community แนะนำให้ใช้ slice (<code>[]T</code>) เป็นค่าเริ่มต้น ส่วน array (<code>[n]T</code>) มีไว้สำหรับกรณีเฉพาะ เช่น การประกาศขนาดตายตัวที่ต้องการประสิทธิภาพสูงจริง ๆ</p>
+<p>การเข้าใจ concept ของโครงสร้างข้อมูลให้ถูกต้องเป็นเรื่องสำคัญ เมื่อเราเข้าใจแล้วว่า array คืออะไร list คืออะไร การย้ายไปใช้ภาษาไหนก็ทำได้ไม่ยาก แค่รู้ว่าภาษานั้นเรียกมันว่าอะไรและใช้ syntax แบบไหนก็พอครับ</p>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>
