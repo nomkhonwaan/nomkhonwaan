@@ -290,6 +290,25 @@ function layout(title: string, body: string, extraHead = ""): string {
 </html>`;
 }
 
+// Renders a single tag as a link to its listing page, e.g. /tag/go.
+function tagLink(tag: string): string {
+  const href = `${BASE_PATH}/tag/${encodeURIComponent(tag)}`;
+  return `<a class="post-tag" href="${href}">${tag}</a>`;
+}
+
+// Collects every distinct tag across all posts, ordered by post count.
+function collectTags(posts: Post[]): string[] {
+  const counts = new Map<string, number>();
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+      }
+   }
+  return [...counts.entries()]
+     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+     .map(([tag]) => tag);
+}
+
 function renderIndex(posts: Post[], pagination: { page: number; totalPages: number }): string {
   const items = posts.map((p) => `
       <li class="post-item">
@@ -299,12 +318,12 @@ function renderIndex(posts: Post[], pagination: { page: number; totalPages: numb
         </div>
         <div class="post-date">${p.publish_date}</div>
         ${p.description ? `<div class="post-desc">${p.description}</div>` : ""}
-        ${p.tags.length > 0
-          ? `<div class="post-tags">${
-              p.tags.map((t) => `<span class="post-tag">${t}</span>`).join("")
-            }</div>`
-          : ""}
-      </li>`).join("\n");
+          ${p.tags.length > 0
+            ? `<div class="post-tags">${
+              p.tags.map((t) => tagLink(t)).join("")
+              }</div>`
+            : ""}
+        </li>`).join("\n");
 
   const { page, totalPages } = pagination;
   const prevUrl = page > 2 ? `${BASE_PATH}/page/${page - 1}/` : page > 1 ? `${BASE_PATH}/` : null;
@@ -350,13 +369,11 @@ function renderIndex(posts: Post[], pagination: { page: number; totalPages: numb
 function renderPost(post: Post): string {
   const body = renderMarkdown(resolveMarkdownImages(post.content, post.url));
   const tags = post.tags.length > 0
-    ? `<div class="post-tags">${
-        post.tags.map((t) => `<span class="post-tag">${t}</span>`).join("")
-      }</div>`
-    : "";
+     ? `<div class="post-tags">${
+        post.tags.map((t) => tagLink(t)).join("")
+        }</div>`      : "";
 
-  return layout(post.title, `
-  <main>
+  return layout(post.title, `  <main>
     <a href="${BASE_PATH}/" class="back-link">&larr; Back to home</a>
 
     <article>
@@ -385,6 +402,59 @@ function render404(): string {
     <a href="${BASE_PATH}/">Go back home</a>
   </main>`);
 }
+
+// Renders a tag listing page, e.g. /tag/go, showing every post with that tag.
+function renderTagPage(tag: string, posts: Post[], allTags: string[]): string {
+  const items = posts.map((p) => `
+       <li class="post-item">
+         ${p.cover_image ? `<a href="${BASE_PATH}${p.url}" class="post-cover-link"><img src="${BASE_PATH}${p.cover_image}" alt="" class="post-cover" /></a>` : ""}
+         <div class="post-title">
+           <a href="${BASE_PATH}${p.url}">${p.title}</a>
+         </div>
+         <div class="post-date">${p.publish_date}</div>
+         ${p.description ? `<div class="post-desc">${p.description}</div>` : ""}
+         ${p.tags.length > 0
+            ? `<div class="post-tags">${
+              p.tags.map((t) => tagLink(t)).join("")
+               }</div>`
+            : ""}
+       </li>`).join("\n");
+
+  const allTagsHtml = allTags.length > 0
+     ? `<nav class="tag-cloud"><span class="tag-cloud-label">All tags</span>${
+        allTags.map((t) => `<a class="tag-cloud-link" href="${BASE_PATH}/tag/${encodeURIComponent(t)}">${t}</a>`).join("")
+        }</nav>`
+     : "";
+
+  return layout(`${tag}`, `
+   <main>
+     <section class="profile">
+       <img src="${BASE_PATH}/avatar.png" alt="Natcha Luangaroonchai" class="profile-avatar" />
+       <h1 class="profile-name">Nomkhonwaan</h1>
+       <p class="profile-desc">Trust me I'm Petdo</p>
+       <div class="profile-links">
+         <a href="mailto:me@nomkhonwaan.com">Email</a>
+         <a href="https://github.com/nomkhonwaan">GitHub</a>
+         <a href="https://linkedin.com/in/nomkhonwaan">LinkedIn</a>
+       </div>
+     </section>
+
+     <section>
+       <div class="tag-heading">
+         <a href="${BASE_PATH}/" class="back-link">&larr; Back to home</a>
+         <h1 class="tag-title">${tag}</h1>
+         <p class="tag-count">${posts.length} post${posts.length === 1 ? "" : "s"}</p>
+       </div>
+       ${allTagsHtml}
+       <ul class="post-list">${items}</ul>
+     </section>
+
+     <footer class="footer">
+       &copy; ${new Date().getFullYear()} Natcha Luangaroonchai
+     </footer>
+   </main>`);
+}
+
 
 // ── Main ───────────────────────────────────────────────────────────────────
 
@@ -430,7 +500,16 @@ async function main() {
     await Deno.writeTextFile(outPath, html);
     console.log(`  ✓ ${post.url}/index.html`);
   }
-
+   // Build tag listing pages (one per distinct tag, e.g. /tag/go)
+  const allTags = collectTags(allPosts);
+  for (const tag of allTags) {
+    const tagPosts = allPosts.filter((p) => p.tags.includes(tag));
+    const html = renderTagPage(tag, tagPosts, allTags);
+    const outPath = join(OUT_DIR, "tag", tag, "index.html");
+    await ensureDir(dirname(outPath));
+    await Deno.writeTextFile(outPath, html);
+    console.log(`  ✓ tag/${tag}/index.html (${tagPosts.length} posts)`);
+    }
   // Build 404 page
   await Deno.writeTextFile(join(OUT_DIR, "404.html"), render404());
   console.log("  ✓ 404.html");
@@ -505,18 +584,27 @@ async function main() {
   </url>`;
   }
 
+    // Tag listing pages
+  for (const tag of allTags) {
+    sitemap += `
+  <url>
+     <loc>${SITE_URL}/tag/${encodeURIComponent(tag)}/</loc>
+     <lastmod>${newestPostDate}</lastmod>
+     <changefreq>weekly</changefreq>
+     <priority>0.7</priority>
+   </url>`;
+    }
   sitemap += `
 </urlset>`;
 
   await Deno.writeTextFile(join(OUT_DIR, "sitemap.xml"), sitemap);
   console.log("  ✓ sitemap.xml");
 
-  // ── Generate robots.txt ───────────────────────────────────────────────
+   // ── Generate robots.txt ───────────────────────────────────────────────
   const robots = `User-agent: *
 Allow: /
 Sitemap: ${SITE_URL}/sitemap.xml
-`;
-  await Deno.writeTextFile(join(OUT_DIR, "robots.txt"), robots);
+`;  await Deno.writeTextFile(join(OUT_DIR, "robots.txt"), robots);
   console.log("  ✓ robots.txt");
 
   console.log("  ✓ static/ → docs/");

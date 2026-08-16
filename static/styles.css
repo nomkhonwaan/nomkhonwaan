@@ -220,6 +220,7 @@ hr {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.35rem;
+  flex-wrap: wrap;
 }
 
 .post-tag {
@@ -228,6 +229,60 @@ hr {
   background: var(--tag-bg);
   padding: 0.1em 0.5em;
   border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+a.post-tag:hover {
+  text-decoration: none;
+  filter: brightness(0.95);
+}
+
+/* Tag listing page */
+.tag-heading {
+  margin-bottom: 1.5rem;
+}
+
+.tag-title {
+  font-size: 1.75rem;
+  margin: 0.5rem 0 0.25rem;
+  color: var(--link);
+}
+
+.tag-count {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Tag cloud */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tag-cloud-label {
+  font-size: 0.8rem;
+  color: var(--muted-light);
+  margin-right: 0.25rem;
+}
+
+.tag-cloud-link {
+  font-size: 0.75rem;
+  color: var(--tag-text);
+  background: var(--tag-bg);
+  padding: 0.1em 0.5em;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.tag-cloud-link:hover {
+  text-decoration: none;
+  filter: brightness(0.95);
 }
 
 /* Post page */

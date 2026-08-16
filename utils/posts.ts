@@ -107,6 +107,34 @@ export async function getPosts(postsDir = "posts") {
 
 const POSTS_PER_PAGE = 10;
 
+// Returns the list of tags in descending order of how many posts use them.
+export async function getAllTags(postsDir = "posts"): Promise<string[]> {
+  const posts = await getPosts(postsDir);
+  const counts = new Map<string, number>();
+  for (const post of posts) {
+    for (const tag of post.tags ?? []) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+     }
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([tag]) => tag);
+}
+
+// Returns all posts that contain the given tag, newest first.
+export async function getPostsByTag(
+  tag: string,
+  postsDir = "posts",
+): Promise<Post[]> {
+  const all = await getPosts(postsDir);
+  return all.filter((p) => (p.tags ?? []).includes(tag));
+}
+
+// Builds the canonical URL for a tag listing page, e.g. /tag/go.
+export function tagUrl(tag: string): string {
+  return `/tag/${encodeURIComponent(tag)}`;
+}
+
 export async function getPostsPaginated(
   page: number,
   postsDir = "posts",

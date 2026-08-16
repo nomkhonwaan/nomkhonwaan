@@ -4,6 +4,7 @@
 
 import * as $_page_page_index from "./routes/page/[page]/index.tsx";
 import * as $_year_month_day_slug_ from "./routes/[year]/[month]/[day]/[slug].tsx";
+import * as $_tag_tag_index from "./routes/tag/[tag]/index.tsx";
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $index from "./routes/index.tsx";
@@ -14,6 +15,7 @@ const manifest = {
   routes: {
     "./routes/page/[page]/index.tsx": $_page_page_index,
     "./routes/[year]/[month]/[day]/[slug].tsx": $_year_month_day_slug_,
+    "./routes/tag/[tag]/index.tsx": $_tag_tag_index,
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
     "./routes/index.tsx": $index,

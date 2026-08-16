@@ -63,7 +63,12 @@ export default function PagePage(
               {p.tags && p.tags.length > 0 && (
                 <div class="post-tags">
                   {p.tags.map((tag) => (
-                    <span class="post-tag">{tag}</span>
+                    <a
+                    href={`/tag/${encodeURIComponent(tag)}`}
+                    class="post-tag"
+                   >
+                    {tag}
+                  </a>
                   ))}
                 </div>
               )}

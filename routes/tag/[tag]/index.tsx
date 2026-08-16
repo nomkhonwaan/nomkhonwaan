@@ -1,21 +1,24 @@
 import { Handlers } from "$fresh/server.ts";
-import { getPostsPaginated } from "../utils/posts.ts";
-import type { Post, Pagination } from "../utils/posts.ts";
+import { getPostsByTag } from "../../../utils/posts.ts";
+import type { Post } from "../../../utils/posts.ts";
 
 export const handler: Handlers = {
   async GET(_req, ctx) {
-    const { posts, pagination } = await getPostsPaginated(1);
-    return ctx.render({ posts, pagination });
-  },
+    const tag = ctx.params.tag ?? "";
+    const posts = await getPostsByTag(tag);
+    if (posts.length === 0) {
+      return ctx.renderNotFound();
+    }
+    return ctx.render({ tag, posts });
+   },
 };
 
-export default function Home(
-  { data }: { data: { posts: Post[]; pagination: Pagination } },
-) {
-  const { posts, pagination } = data;
-  const { page, totalPages } = pagination;
-  const prevUrl = page > 2 ? `/page/${page - 1}` : page > 1 ? "/" : null;
-  const nextUrl = page < totalPages ? `/page/${page + 1}` : null;
+export default function TagPage({
+  data,
+}: {
+  data: { tag: string; posts: Post[] };
+}) {
+  const { tag, posts } = data;
   return (
     <main>
       <section class="profile">
@@ -30,8 +33,14 @@ export default function Home(
       </section>
 
       <section>
+        <div class="tag-heading">
+          <a href="/" class="back-link">&larr; Back to home</a>
+           <h1 class="tag-title">{tag}</h1>
+           <p class="tag-count">{posts.length} post{posts.length === 1 ? "" : "s"}</p>
+        </div>
+
         <ul class="post-list">
-          {data.posts.map((p) => (
+          {posts.map((p) => (
             <li class="post-item">
               {p.cover_image && (
                 <a href={p.url} class="post-cover-link">
@@ -47,12 +56,9 @@ export default function Home(
               )}
               {p.tags && p.tags.length > 0 && (
                 <div class="post-tags">
-                  {p.tags.map((tag) => (
-                     <a
-                      href={`/tag/${encodeURIComponent(tag)}`}
-                      class="post-tag"
-                    >
-                      {tag}
+                  {p.tags.map((t) => (
+                    <a href={`/tag/${encodeURIComponent(t)}`} class="post-tag">
+                      #{t}
                     </a>
                   ))}
                 </div>
@@ -60,24 +66,6 @@ export default function Home(
             </li>
           ))}
         </ul>
-
-        {totalPages > 1 && (
-          <nav class="pagination">
-            {prevUrl ? (
-              <a href={prevUrl} class="pagination-link">&larr; หน้าก่อน</a>
-            ) : (
-              <span class="pagination-link disabled">&larr; หน้าก่อน</span>
-            )}
-            <span class="pagination-info">
-              หน้า {page} จาก {totalPages}
-            </span>
-            {nextUrl ? (
-              <a href={nextUrl} class="pagination-link">หน้าถัดไป &rarr;</a>
-            ) : (
-              <span class="pagination-link disabled">หน้าถัดไป &rarr;</span>
-            )}
-          </nav>
-        )}
       </section>
 
       <footer class="footer">
