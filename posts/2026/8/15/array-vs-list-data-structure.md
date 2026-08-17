@@ -111,7 +111,7 @@ print(nums)  # [1, 2, 3, 4, 5]
 ```
 
 ```javascript
-// JavaScript (Array แตจริง ๆ คือ dynamic array / list)
+// JavaScript (Array is actually a dynamic array / list)
 const nums = [1, 2, 3];
 nums.push(4);
 nums.push(5);
@@ -141,7 +141,7 @@ System.out.println(nums);  // [1, 2, 3, 4]
 Go Array ตรงกับ concept ของ array ในเชิง data structure คือ fixed size, same type, contiguous memory:
 
 ```go
-var arr [5]int   // array ขนาด 5 ตัว เปลี่ยนขนาดไม่ได้
+var arr [5]int   // fixed-size array, cannot be resized
 arr[0] = 10
 arr[1] = 20
 arr[2] = 30
@@ -152,14 +152,14 @@ arr[2] = 30
 ```go
 var a [5]int
 var b [10]int
-a = b // ❌ compile error: [5]int != [10]int
+a = b // compile error: [5]int != [10]int
 ```
 
 แล้วถ้าลอง `append` สมาชิกเพิ่มเข้าไปใน array ล่ะ? จะเกิดอะไรขึ้น?
 
 ```go
 arr := [3]int{1, 2, 3}
-arr = append(arr, 4) // ❌ compile error: first argument to append must be a slice; have [3]int
+arr = append(arr, 4) // compile error: first argument to append must be a slice; have [3]int
 ```
 
 compile error บอกชัดเจนครับว่า `append` ใช้กับ slice เท่านั้น ไม่ใช่ array เพราะ array มีขนาดคงที่นั่นเอง
@@ -169,8 +169,8 @@ compile error บอกชัดเจนครับว่า `append` ใช�
 Slice (`[]T`) คือสิ่งที่ตรงกับ list ในเชิง data structure คือ dynamic size, random access O(1), backed by internal array:
 
 ```go
-var nums []int              // slice = list ในมุม data structure
-nums = append(nums, 10)     // append เหมือน .push() / .add()
+var nums []int              // slice = list in data structure terms
+nums = append(nums, 10)     // append like .push() / .add()
 nums = append(nums, 20)
 nums = append(nums, 30)
 
@@ -181,8 +181,8 @@ fmt.Println(nums[1])        // 20 (random access O(1))
 สังเกตว่าประกาศคล้ายกับ array มาก แต่ ไม่ระบุขนาดใน `[]`:
 
 ```go
-arr := [3]int{1, 2, 3}  // ✅ Array (fixed size)
-slc := []int{1, 2, 3}   // ✅ Slice = List (dynamic size)
+arr := [3]int{1, 2, 3}  // Array (fixed size)
+slc := []int{1, 2, 3}   // Slice = List (dynamic size)
 ```
 
 ### การทำงานของ Slice เบื้องหลัง
@@ -213,18 +213,20 @@ Slice header:
 
 ```go
 nums := []int{1, 2, 3}      // len=3, cap=3
-nums = append(nums, 4)      // len=4, cap=6 (ขยายเป็น 2 เท่า)
+nums = append(nums, 4)      // len=4, cap=6 (doubles)
 nums = append(nums, 5, 6)   // len=6, cap=6
-nums = append(nums, 7)      // len=7, cap=12 (ขยายอีกครั้ง)
+nums = append(nums, 7)      // len=7, cap=12 (doubles again)
 ```
 
 ---
 
 ## สรุป
 
-- Array คือโครงสร้างข้อมูลแบบ fixed size ใน Go ใช้ `[n]T`
-- List คือโครงสร้างข้อมูลแบบ dynamic size ใน Go ใช้ `[]T` (slice)
+Array และ List เป็นโครงสร้างข้อมูลพื้นฐานที่ใช้เก็บชุดข้อมูลเหมือนกัน แต่แตกต่างกันที่การจัดการขนาด:
 
-ในทางปฏิบัติ Go community แนะนำให้ใช้ slice (`[]T`) เป็นค่าเริ่มต้น ส่วน array (`[n]T`) มีไว้สำหรับกรณีเฉพาะ เช่น การประกาศขนาดตายตัวที่ต้องการประสิทธิภาพสูงจริง ๆ
+- **Array**: Fixed size (`[n]T`) — ประกาศแล้วเปลี่ยนขนาดไม่ได้
+- **List**: Dynamic size (`[]T`) — เพิ่ม/ลดสมาชิกได้ตลอด
+
+ในทางปฏิบัติ Go community แนะนำให้ใช้ **slice (`[]T`)** เป็นค่าเริ่มต้น ส่วน **array (`[n]T`)** มีไว้สำหรับกรณีเฉพาะ เช่น ค่าคงที่ชุดเล็ก ๆ หรือต้องการควบคุม memory layout
 
 การเข้าใจ concept ของโครงสร้างข้อมูลให้ถูกต้องเป็นเรื่องสำคัญ เมื่อเราเข้าใจแล้วว่า array คืออะไร list คืออะไร การย้ายไปใช้ภาษาไหนก็ทำได้ไม่ยาก แค่รู้ว่าภาษานั้นเรียกมันว่าอะไรและใช้ syntax แบบไหนก็พอครับ
