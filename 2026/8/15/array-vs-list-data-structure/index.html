@@ -215,7 +215,7 @@ nums.append(4)
 nums.append(5)
 print(nums)  # [1, 2, 3, 4, 5]
 </code></pre>
-<pre><code class="language-javascript">// JavaScript (Array แตจริง ๆ คือ dynamic array / list)
+<pre><code class="language-javascript">// JavaScript (Array is actually a dynamic array / list)
 const nums = [1, 2, 3];
 nums.push(4);
 nums.push(5);
@@ -235,7 +235,7 @@ System.out.println(nums);  // [1, 2, 3, 4]
 <p>ภาษา Go ก็มีทั้งสองโครงสร้างข้อมูลให้ใช้เหมือนกัน โดยเรียก Array และ Slice ซึ่ง slice ใน Go ก็คือ list ในมุมของ data structure นั่นเอง</p>
 <h3>Go Array (ตัวแทนของ Array)</h3>
 <p>Go Array ตรงกับ concept ของ array ในเชิง data structure คือ fixed size, same type, contiguous memory:</p>
-<pre><code class="language-go">var arr [5]int   // array ขนาด 5 ตัว เปลี่ยนขนาดไม่ได้
+<pre><code class="language-go">var arr [5]int   // fixed-size array, cannot be resized
 arr[0] = 10
 arr[1] = 20
 arr[2] = 30
@@ -243,17 +243,17 @@ arr[2] = 30
 <p>แต่สิ่งที่ทำให้ Go น่าสนใจคือ ขนาดของ array เป็นส่วนหนึ่งของ type ซึ่งหมายความว่า <code>[5]int</code> กับ <code>[10]int</code> คือ คนละประเภทกัน:</p>
 <pre><code class="language-go">var a [5]int
 var b [10]int
-a = b // ❌ compile error: [5]int != [10]int
+a = b // compile error: [5]int != [10]int
 </code></pre>
 <p>แล้วถ้าลอง <code>append</code> สมาชิกเพิ่มเข้าไปใน array ล่ะ? จะเกิดอะไรขึ้น?</p>
 <pre><code class="language-go">arr := [3]int{1, 2, 3}
-arr = append(arr, 4) // ❌ compile error: first argument to append must be a slice; have [3]int
+arr = append(arr, 4) // compile error: first argument to append must be a slice; have [3]int
 </code></pre>
 <p>compile error บอกชัดเจนครับว่า <code>append</code> ใช้กับ slice เท่านั้น ไม่ใช่ array เพราะ array มีขนาดคงที่นั่นเอง</p>
 <h3>Go Slice (ตัวแทนของ List)</h3>
 <p>Slice (<code>[]T</code>) คือสิ่งที่ตรงกับ list ในเชิง data structure คือ dynamic size, random access O(1), backed by internal array:</p>
-<pre><code class="language-go">var nums []int              // slice = list ในมุม data structure
-nums = append(nums, 10)     // append เหมือน .push() / .add()
+<pre><code class="language-go">var nums []int              // slice = list in data structure terms
+nums = append(nums, 10)     // append like .push() / .add()
 nums = append(nums, 20)
 nums = append(nums, 30)
 
@@ -261,8 +261,8 @@ fmt.Println(nums)           // [10 20 30]
 fmt.Println(nums[1])        // 20 (random access O(1))
 </code></pre>
 <p>สังเกตว่าประกาศคล้ายกับ array มาก แต่ ไม่ระบุขนาดใน <code>[]</code>:</p>
-<pre><code class="language-go">arr := [3]int{1, 2, 3}  // ✅ Array (fixed size)
-slc := []int{1, 2, 3}   // ✅ Slice = List (dynamic size)
+<pre><code class="language-go">arr := [3]int{1, 2, 3}  // Array (fixed size)
+slc := []int{1, 2, 3}   // Slice = List (dynamic size)
 </code></pre>
 <h3>การทำงานของ Slice เบื้องหลัง</h3>
 <p>Slice ใน Go ถูก implement เป็น dynamic array เช่นเดียวกับ list ในภาษาอื่นครับ:</p>
@@ -285,17 +285,18 @@ slc := []int{1, 2, 3}   // ✅ Slice = List (dynamic size)
 </ul>
 <p>เมื่อ append จน capacity เต็ม Go จะสร้าง array ใหม่ที่ใหญ่กว่า (โดยปกติขยาย 2 เท่า) แล้ว copy ข้อมูลไป เหมือนกับหลักการของ dynamic array ในภาษาอื่นทุกประการ:</p>
 <pre><code class="language-go">nums := []int{1, 2, 3}      // len=3, cap=3
-nums = append(nums, 4)      // len=4, cap=6 (ขยายเป็น 2 เท่า)
+nums = append(nums, 4)      // len=4, cap=6 (doubles)
 nums = append(nums, 5, 6)   // len=6, cap=6
-nums = append(nums, 7)      // len=7, cap=12 (ขยายอีกครั้ง)
+nums = append(nums, 7)      // len=7, cap=12 (doubles again)
 </code></pre>
 <hr>
 <h2>สรุป</h2>
+<p>Array และ List เป็นโครงสร้างข้อมูลพื้นฐานที่ใช้เก็บชุดข้อมูลเหมือนกัน แต่แตกต่างกันที่การจัดการขนาด:</p>
 <ul>
-<li>Array คือโครงสร้างข้อมูลแบบ fixed size ใน Go ใช้ <code>[n]T</code></li>
-<li>List คือโครงสร้างข้อมูลแบบ dynamic size ใน Go ใช้ <code>[]T</code> (slice)</li>
+<li><strong>Array</strong>: Fixed size (<code>[n]T</code>) — ประกาศแล้วเปลี่ยนขนาดไม่ได้</li>
+<li><strong>List</strong>: Dynamic size (<code>[]T</code>) — เพิ่ม/ลดสมาชิกได้ตลอด</li>
 </ul>
-<p>ในทางปฏิบัติ Go community แนะนำให้ใช้ slice (<code>[]T</code>) เป็นค่าเริ่มต้น ส่วน array (<code>[n]T</code>) มีไว้สำหรับกรณีเฉพาะ เช่น การประกาศขนาดตายตัวที่ต้องการประสิทธิภาพสูงจริง ๆ</p>
+<p>ในทางปฏิบัติ Go community แนะนำให้ใช้ <strong>slice (<code>[]T</code>)</strong> เป็นค่าเริ่มต้น ส่วน <strong>array (<code>[n]T</code>)</strong> มีไว้สำหรับกรณีเฉพาะ เช่น ค่าคงที่ชุดเล็ก ๆ หรือต้องการควบคุม memory layout</p>
 <p>การเข้าใจ concept ของโครงสร้างข้อมูลให้ถูกต้องเป็นเรื่องสำคัญ เมื่อเราเข้าใจแล้วว่า array คืออะไร list คืออะไร การย้ายไปใช้ภาษาไหนก็ทำได้ไม่ยาก แค่รู้ว่าภาษานั้นเรียกมันว่าอะไรและใช้ syntax แบบไหนก็พอครับ</p>
 </div>
     </article>
