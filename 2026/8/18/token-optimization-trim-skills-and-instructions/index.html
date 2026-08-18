@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Token Optimization: การตัดแต่ง Skill และ Custom Instruction ที่ไม่ได้ใช้ — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+    <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Token Optimization: การตัดแต่ง Skill และ Custom Instruction ที่ไม่ได้ใช้</h1>
+        <div class="post-meta">
+          <time>2026-08-18</time>
+          <div class="post-tags"><a class="post-tag" href="/tag/ai">ai</a></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p><img src="/posts/2026/8/18/184b1af7-9b8d-4e03-9eca-c81a1e367e2d.png" alt="Unused skills and instructions are still loaded into every prompt, consuming tokens unnecessarily"></p>
+<p>ถ้าเราใช้ AI coding agent อยู่นานพอ เราจะพบว่ามันมี &quot;skill&quot; และ &quot;custom instruction&quot; ของเราเองอยู่เป็นสิบ บางตัวเราสร้างไว้แล้วลืมไป บางตัวไม่ได้ใช้มาหลายเดือน แต่ทุกตัวถูกโหลดเข้าไปใน context ทุกครั้งที่เราพิมพ์ prompt ไปด้วยกันหมด</p>
+<p>บล็อกนี้จะมาพูดถึงวิธีตัดแต่ง (trim) skill และ custom instruction ที่ไม่ได้ใช้ เพื่อประหยัด token ลดค่าใช้จ่าย และช่วยให้ agent โฟกัสกับงานจริงได้ดีขึ้น เพราะทุกบรรทัดที่เราไม่ได้ใช้ก็กิน token เหมือนกัน</p>
+<hr>
+<h2>TL;DR</h2>
+<ul>
+<li>ทุก request ของ agent โหลด skill list และ custom instruction ทุกตัวไปด้วยกัน แม้จะไม่ได้ใช้</li>
+<li>Skill ที่ไม่ได้ใช้แต่ description ยาว = กิน token ฟรีทุก prompt</li>
+<li>Custom instruction แบบ global โหลดทุกไฟล์ ควรเปลี่ยนเป็น scoped ด้วย <code>applyTo</code></li>
+<li>วิธีวัด: ประมาณจำนวน token จากขนาดไฟล์ (rule of thumb ~4 ตัวอักษรต่อ 1 token)</li>
+<li>วิธีตัด: ประเมินว่าใช้จริงหรือไม่ → ตัด description ที่ยาวเกินไป → scope ลง → ลบสิ่งซ้ำ</li>
+<li>เป้าหมายคือ &quot;น้อยแต่ตรงเป้า&quot; ไม่ใช่ &quot;เยอะแต่ครบ&quot;</li>
+</ul>
+<hr>
+<h2>Token ของเราไปไหนทุกครั้งที่พิมพ์ prompt</h2>
+<p>หลายคนเข้าใจว่า token ที่ใช้ไปคือแค่สิ่งที่เราพิมพ์บวกคำตอบของ AI แต่จริง ๆ แล้วทุก request มีส่วนคงที่ที่ถูกส่งไปทุกทีด้วย</p>
+<pre><code>Every request to an AI agent includes:
+  System prompt            (fixed)
+  Skill list (name+desc)   (one entry per skill)
+  Custom instructions      (loaded per applyTo)
+  Chat history             (grows over time)
+  ─────────────────────────────────
+  YOUR ACTUAL PROMPT
+</code></pre>
+<p>สองบรรทัดที่เราควบคุมได้คือ skill list และ custom instructions ยิ่งมี skill เยอะ description ยาว หรือ instruction แบบ global มากเท่าไร ยิ่งมี &quot;background noise&quot; ที่ agent ต้องอ่านทุกครั้งแม้จะไม่มีส่วนกับงานตรงหน้าเลย</p>
+<hr>
+<h2>ทำไม skill และ instruction ที่ไม่ได้ใช้ถึงเป็นปัญหา</h2>
+<h3>Skill</h3>
+<p>Skill มักถูกเก็บเป็น <code>SKILL.md</code> ที่มี YAML front matter บอก <code>name</code> และ <code>description</code> ระบบจะเอาแค่ name + description ขึ้นไปใส่ใน prompt เสมอ เพื่อให้ agent ตัดสินใจว่าจะเรียกใช้ skill ตัวไหน</p>
+<pre><code class="language-yaml">---
+name: go-deploy
+description: Build, test, and deploy Go services to Kubernetes.
+  USE FOR: deploy, rollout, rollback, helm, k8s, prod release.
+---
+</code></pre>
+<p>ปัญหาคือถ้าเราเคยสร้าง skill ไว้ใช้เฉพาะกิจแล้วลืมไป เช่น <code>go-deploy</code> ที่ไม่ได้แตะมาสามเดือน มันยังคงกิน token ทุก prompt ทั้งที่แทบไม่ได้ถูกเรียกเลย description ยิ่งยาว ยิ่งแพงโดยเปล่าประโยชน์</p>
+<h3>Custom instruction</h3>
+<p>Custom instruction เช่น <code>copilot-instructions.md</code> หรือ <code>AGENTS.md</code> ถูกโหลดเข้าไปใน context แบบ global ถ้าเราเขียนยาวเป็นหน้า ๆ และใช้กับทุกไฟล์ ทั้งที่จริง ๆ มันควรใช้เฉพาะในบางโฟลเดอร์ มันก็จะถูกส่งไปทุก request เหมือนกัน</p>
+<hr>
+<h2>วัดก่อนตัด: ประมาณ token footprint</h2>
+<p>ก่อนจะตัดอะไรต้องรู้ก่อนว่าอะไรหนักอะไรเบา วิธีง่ายสุดคือประมาณจากขนาดไฟล์ เพราะนับ token แม่นยำ 100% ยาก แต่ rule of thumb คือประมาณ 4 ตัวอักษรต่อ 1 token (สำหรับข้อความผสมไทย-อังกฤษ)</p>
+<pre><code class="language-bash">#!/usr/bin/env bash
+# audit-skills.sh - list every skill and its description length so you
+# can spot the ones that are rarely used but always loaded.
+#
+# Heuristic: 1 token ~= 4 characters for mixed Thai/English text.
+
+set -euo pipefail
+
+SKILLS_DIR=&quot;.agents/skills&quot;
+
+printf &quot;%-30s %10s %10s\n&quot; &quot;SKILL&quot; &quot;DESC_BYTES&quot; &quot;EST_TOKENS&quot;
+printf &quot;%-30s %10s %10s\n&quot; &quot;-----&quot; &quot;----------&quot; &quot;----------&quot;
+
+total=0
+for skill in &quot;$SKILLS_DIR&quot;/*/SKILL.md; do
+  name=&quot;$(basename &quot;$(dirname &quot;$skill&quot;)&quot;)&quot;
+  # The description lives in the YAML front matter.
+  desc=&quot;$(sed -n &#39;s/^description: //p&#39; &quot;$skill&quot;)&quot;
+  bytes=&quot;${#desc}&quot;
+  tokens=$(( bytes / 4 ))
+  total=$(( total + tokens ))
+  printf &quot;%-30s %10d %10d\n&quot; &quot;$name&quot; &quot;$bytes&quot; &quot;$tokens&quot;
+done
+
+echo &quot;----------------------------------------&quot;
+echo &quot;Total skill description tokens loaded every prompt: ~$total&quot;
+</code></pre>
+<p>รันสคริปต์นี้แล้วเราจะเห็นเรียงจากใหญ่ไปเล็ก สิ่งที่เราทำคือหา skill ที่ description ใหญ่แต่ใช้หายาก แล้วเริ่มจากตรงนั้นก่อน</p>
+<hr>
+<h2>1. ตัด description ของ skill ให้กระชับ</h2>
+<p>หลักการคือ description ต้องสั้นพอที่ agent ตัดสินใจเร็วได้ แต่เฉพาะเจาะจงพอไม่สับสนกับ skill ตัวอื่น จุดที่ตัดได้บ่อยคือ list ของ keyword ที่ซ้ำกับชื่อ skill เอง</p>
+<h3>ก่อนตัด</h3>
+<pre><code class="language-yaml">---
+name: microsoft-foundry
+description: Deploy, evaluate, and manage Foundry agents end-to-end.
+  USE FOR: deploy agent to Foundry, hosted agent, create agent,
+  invoke agent, evaluate agent, run batch eval, optimize prompt,
+  improve prompt, prompt optimization, prompt optimizer,
+  dataset curation from traces, RBAC, role assignment,
+  permissions, quota, capacity, region, troubleshoot agent,
+  deployment failure, create dataset, knowledge index.
+---
+</code></pre>
+<h3>หลังตัด</h3>
+<pre><code class="language-yaml">---
+name: microsoft-foundry
+description: Deploy and evaluate Foundry agents.
+  USE FOR: deploy, batch eval, optimize prompt, RBAC, troubleshoot.
+---
+</code></pre>
+<p>keyword เดิม 25 ตัว เหลือ 6 ตัวแต่ยังครอบคลุม intent หลัก ได้ประโยชน์สองทาง ทั้ง token น้อยลง และ agent ไม่ต้องเสียสมาธิกับคำที่ซ้ำ</p>
+<hr>
+<h2>2. เปลี่ยน custom instruction แบบ global เป็น scoped</h2>
+<p>ถ้า instruction ใช้เฉพาะกับบางภาษาหรือบางโฟลเดอร์ อย่าทำให้มัน global ใช้ <code>applyTo</code> จำกัดขอบเขตแทน</p>
+<h3>ก่อนตัด (global, โหลดทุกไฟล์)</h3>
+<pre><code class="language-markdown"># Rust conventions
+
+- Use `thiserror` for library error types, not `std::error::Error`.
+- Prefer `?` propagation over manual error handling.
+- Run `cargo clippy -- -D warnings` before committing.
+</code></pre>
+<h3>หลังตัด (scoped เฉพาะไฟล์ Rust)</h3>
+<pre><code class="language-markdown">---
+applyTo: &quot;src/**/*.{rs}&quot;
+---
+
+# Rust conventions
+
+- Use `thiserror` for library error types, not `std::error::Error`.
+- Prefer `?` propagation over manual error handling.
+- Run `cargo clippy -- -D warnings` before committing.
+</code></pre>
+<p>ผลลัพธ์คือเวลาเราทำงานกับไฟล์ที่ไม่ใช่ Rust instruction นี้จะไม่ถูกโหลดเลย ประหยัด token ได้ทันทีโดยไม่เสียอะไร</p>
+<hr>
+<h2>3. ลบ skill และ instruction ที่ไม่ใช้จริง</h2>
+<p>การตัด description หรือ scoped ยังไม่พอ ถ้า skill ตัวนั้นไม่ได้ถูกเรียกใช้เลย สิ่งที่ดีที่สุดคือลบไปเลย วิธีประเมินคือดูว่าเราใช้มันครั้งสุดท้ายเมื่อไหร่ หรือลองสังเกตพฤติกรรมของ agent ว่าเป็นเพราะ skill ตัวนั้นทำให้ตอบเพี้ยนหรือเปล่า</p>
+<p>ถ้าหาไม่ได้ชัดเจน ให้ใช้หลัก &quot;ถ้า description ของมันไม่ช่วย agent ตัดสินใจเลือกงานที่เรากำลังทำ มันก็แค่ noise ให้ลบได้&quot;</p>
+<hr>
+<h2>สรุป</h2>
+<p>การตัดแต่ง skill และ custom instruction เป็นงานที่ &quot;ดูไม่สำคัญแต่เห็นผลชัดเจน&quot; เพราะทุกบรรทัดที่เราไม่ได้ใช้ก็ถูกส่งไปทุก prompt เหมือนกัน เราสามารถ optimization ได้ทันทีโดยไม่ต้องพึ่งเครื่องมือแพงหรือ model ใหญ่</p>
+<ul>
+<li>ทุก request โหลด skill list และ instruction ไปด้วยกัน แม้ไม่ได้ใช้</li>
+<li>Skill ที่ description ยาวแต่วันจริงใช้น้อย = กิน token ฟรีทุก prompt</li>
+<li>วัดก่อนตัดด้วย heuristic ~4 ตัวอักษรต่อ 1 token</li>
+<li>ตัด description ให้กระชับ เปลี่ยน global เป็น scoped ด้วย <code>applyTo</code> และลบสิ่งที่ไม่ใช้จริง</li>
+<li>เป้าหมายคือ context ที่ &quot;น้อยแต่ตรงเป้า&quot; ไม่ใช่ &quot;เยอะแต่ครบ&quot;</li>
+</ul>
+<p>ท้ายที่สุดแล้ว context ที่สั้นและตรงจุดไม่แค่ประหยัดเงิน แต่ยังช่วยให้ agent โฟกัสกับงานได้แม่นยำขึ้น เพราะมันไม่ต้องเสียสมาธิไปกับข้อมูลที่ไม่ได้เกี่ยวข้องเลย</p>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>

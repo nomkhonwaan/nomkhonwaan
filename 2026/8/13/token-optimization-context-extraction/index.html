@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Token Optimization: Context Extraction — Nomkhonwaan</title>
+  <meta name="description" content="Trust me I'm Petdo" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Maitree:wght@400;700&family=Prompt:wght@700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
+  <style>
+  .markdown-body {
+    font-family: 'Maitree', sans-serif;
+    line-height: 1.8;
+    color: var(--text, #333);
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.3;
+    color: var(--heading, #111);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.5rem; }
+  .markdown-body h3 { font-size: 1.25rem; }
+  .markdown-body p { margin-bottom: 1rem; }
+  .markdown-body a { color: var(--link, #2563eb); }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg, #f1f5f9);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  .markdown-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  .markdown-body ul, .markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .markdown-body li { margin-bottom: 0.25rem; }
+  .markdown-body blockquote {
+    border-left: 4px solid var(--blockquote-border, #2563eb);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--blockquote-text, #475569);
+    font-style: italic;
+  }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid var(--table-border, #e2e8f0);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-body th {
+    background: var(--table-header-bg, #f8fafc);
+    font-weight: 700;
+  }
+  .markdown-body img { max-width: 100%; }
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+</style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER347CPNY4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ER347CPNY4');
+  </script>
+</head>
+<body>
+    <main>
+    <a href="/" class="back-link">&larr; Back to home</a>
+
+    <article>
+      <header class="post-header">
+        <h1>Token Optimization: Context Extraction</h1>
+        <div class="post-meta">
+          <time>2026-08-13</time>
+          <div class="post-tags"><a class="post-tag" href="/tag/ai">ai</a></div>
+        </div>
+      </header>
+
+      <div class="post-content markdown-body"><p><img src="/posts/2026/8/13/4c5f9cb7-f9b4-434f-9866-c89e1830573b.png" alt="User sending large file directly to AI"></p>
+<p>เวลาทำงานกับ AI เรามักจะส่งไฟล์ทั้งก้อนให้ AI อ่าน ไม่ว่าจะเป็นล็อกไฟล์หลายพันบรรทัด โค้ดเบสขนาดใหญ่ หรือ documentation ยาว ๆ ยิ่ง context window ของ AI model ใหญ่ขึ้นเท่าไร เรายิ่งรู้สึกว่า &quot;ส่งเข้าไปเลยก็ได้&quot; แต่การทำแบบนั้นกิน token มหาศาลโดยไม่จำเป็น</p>
+<p>บล็อกนี้จะมาลองพูดถึงเทคนิคที่กลับวิธีคิดกัน: <strong>แทนที่จะส่งไฟล์ทั้งก้อนให้ AI อ่าน ให้ AI เขียนโปรแกรมหรือสคริปต์ที่ดึงเฉพาะส่วนที่เกี่ยวข้องออกมาให้เราก่อน</strong> แล้วค่อยส่งเฉพาะส่วนนั้นกลับไปให้ AI ประมวลผลต่อ</p>
+<hr>
+<p>แนวคิดนี้เลียนแบบวิธีที่มนุษย์เราทำเวลาอ่านโค้ดหรือล็อก เราไม่อ่านทุกบรรทัดตั้งแต่ต้นจนจบ แต่เราใช้ grep, awk, sed หรือ IDE features เพื่อค้นหาส่วนที่เกี่ยวข้องก่อน แล้วค่อยอ่านเฉพาะส่วนนั้น</p>
+<p>AI ก็เหมือนกัน ถ้าเราส่งข้อมูลทั้งก้อนไป มันต้องเสียสมาธิไปกับข้อมูลที่ไม่เกี่ยวข้อง เสีย token ฟรี และได้คำตอบช้าลง</p>
+<pre><code>แนวทางเดิม: ส่งไฟล์ทั้งก้อน → AI อ่านทุกบรรทัด → ตอบ
+→ ใช้ token เยอะ, เสียเวลากับข้อมูลไม่เกี่ยวข้อง
+
+แนวทางที่ดีกว่า: ให้ AI เขียนสคริปต์ → ผู้ใช้รัน → ได้เฉพาะส่วนที่เกี่ยวข้อง → ส่งให้ AI วิเคราะห์ต่อ
+→ ใช้ token น้อย, AI โฟกัสกับข้อมูลสำคัญ, ตอบเร็วขึ้น
+</code></pre>
+<hr>
+<p>สมมติว่าเรามีล็อกไฟล์ขนาด 50,000 บรรทัด อยากให้ AI ช่วยวิเคราะห์หาสาเหตุของ <code>connection timeout</code></p>
+<p>แนวทางเดิมคือส่งล็อก 50,000 บรรทัดไปให้ AI อ่านตรง ๆ</p>
+<pre><code>User: &quot;ช่วยวิเคราะห์หาสาเหตุของ &#39;connection timeout&#39; จากล็อกไฟล์นี้ให้หน่อย&quot;
+[แนบล็อก 50,000 บรรทัด]
+→ ใช้ ~100,000 tokens, ค่าใช้จ่ายสูง, ตอบช้า
+</code></pre>
+<p>แนวทางที่ดีกว่าคือให้ AI เขียนสคริปต์ grep หา error ที่น่าสนใจก่อน</p>
+<pre><code>User: &quot;ช่วยวิเคราะห์หาสาเหตุของ &#39;connection timeout&#39; จากล็อกไฟล์นี้ให้หน่อย
+  แต่ก่อนอื่นช่วยเขียนสคริปต์ grep ดึงเฉพาะบรรทัดที่เกี่ยวข้องกับ error หรือ exception ก่อน&quot;
+
+AI: &quot;ใช้คำสั่งนี้เพื่อดึงเฉพาะบรรทัดที่เกี่ยวข้อง&quot;
+</code></pre>
+<pre><code class="language-bash">grep -n -i &quot;connection timeout\|error\|exception\|fail\|timeout&quot; server.log | head -300
+</code></pre>
+<p>เมื่อรันสคริปต์แล้วจะเห็นว่าได้ผลลัพธ์ประมาณ 300 บรรทัด จากนั้นส่ง 300 บรรทัดนั้นให้ AI วิเคราะห์ต่อ ใช้ token แค่ ~3,000 tokens ประหยัดกว่า 30 เท่า</p>
+<p>ถ้าล็อกมี timestamp เราอาจให้ AI เขียนสคริปต์ที่ซับซ้อนขึ้น เช่น ดึงเฉพาะช่วงเวลาที่เกิด error บ่อย</p>
+<pre><code class="language-bash"># ดึงเฉพาะบรรทัดระหว่าง 14:00-15:00 น. ที่มีคำว่า error
+awk &#39;/2026-08-12 14:/,/2026-08-12 15:/&#39; server.log | grep -i &quot;error&quot; | head -200
+</code></pre>
+<hr>
+<p>อีกตัวอย่างคือการรีแฟกเตอร์โค้ด สมมติเราอยากให้ AI ช่วยรีแฟกเตอร์ฟังก์ชัน <code>ProcessOrder</code> ในไฟล์ <code>order.go</code> แต่ฟังก์ชันนี้ไปเรียกใช้บริการอื่น ๆ อีกหลายแห่ง</p>
+<p>แนวทางเดิมคือส่งทั้งไฟล์ order.go (500 บรรทัด) พร้อมกับไฟล์ที่เกี่ยวข้องอีก 10 ไฟล์</p>
+<pre><code>User: &quot;ช่วยรีแฟกเตอร์ฟังก์ชัน ProcessOrder ในไฟล์ order.go ให้หน่อย&quot;
+[แนบ order.go + services/*.go + models/*.go]
+→ ใช้ ~5,000 tokens ต่อรอบ, หลายรอบ = หลายหมื่น tokens
+</code></pre>
+<p>แนวทางที่ดีกว่าคือให้ AI เขียนสคริปต์ดึงเฉพาะฟังก์ชันที่เกี่ยวข้อง</p>
+<pre><code>User: &quot;ช่วยรีแฟกเตอร์ฟังก์ชัน ProcessOrder ในไฟล์ order.go ให้หน่อย
+  แต่ก่อนอื่นช่วยเขียนสคริปต์ดึงเฉพาะฟังก์ชัน ProcessOrder และ dependencies ที่มันเรียกใช้&quot;
+
+AI: &quot;รันสคริปต์นี้เพื่อดูเฉพาะฟังก์ชัน ProcessOrder และ dependencies&quot;
+</code></pre>
+<pre><code class="language-bash"># ดึงเฉพาะฟังก์ชัน ProcessOrder
+awk &#39;/^func.*ProcessOrder/,/^}/&#39; order.go
+
+# หาว่า ProcessOrder ไปเรียกใช้ฟังก์ชันอะไรบ้าง
+grep -oE &#39;\b[A-Z][a-zA-Z]+\(&#39; order.go | sort -u
+
+# ดึงฟังก์ชัน dependencies
+for fn in $(grep -oE &#39;\b[A-Z][a-zA-Z]+\(&#39; order.go | sort -u); do
+  grep -rn &quot;^func.*$fn&quot; ./services/ ./models/ 2&gt;/dev/null
+done
+</code></pre>
+<p>เมื่อรันสคริปต์แล้วจะพบว่าได้เฉพาะโค้ดที่เกี่ยวข้องประมาณ 80 บรรทัด ส่ง 80 บรรทัดนั้นให้ AI วิเคราะห์ต่อ ใช้ token แค่ ~800 tokens ประหยัดกว่า 6 เท่า</p>
+<hr>
+<p>อีกสถานการณ์ที่เจอบ่อยคือการอ่าน documentation ยาว ๆ สมมติเรามีคู่มือ API ยาว 200 หน้า อยากรู้วิธีเรียกใช้ endpoint ใด endpoint หนึ่ง</p>
+<p>แนวทางเดิมคือส่ง PDF หรือ Markdown ทั้งเล่มให้ AI อ่าน</p>
+<pre><code>User: &quot;ช่วยดูวิธีเรียกใช้ /v3/checkout endpoint จากคู่มือนี้ให้หน่อย&quot;
+[แนบ documentation 200 หน้า]
+→ ใช้ ~50,000 tokens, เสียเวลากับเนื้อหาที่ไม่เกี่ยวข้อง
+</code></pre>
+<p>แนวทางที่ดีกว่าคือให้ AI เขียนสคริปต์ดึงเฉพาะส่วนที่เกี่ยวข้อง</p>
+<pre><code>User: &quot;ช่วยดูวิธีเรียกใช้ /v3/checkout endpoint จากคู่มือนี้ให้หน่อย
+  แต่ก่อนอื่นช่วยเขียนสคริปต์ดึงเฉพาะส่วนที่พูดถึง /v3/checkout หรือ checkout&quot;
+
+AI: &quot;รันคำสั่งนี้เพื่อดึงเฉพาะส่วนที่เกี่ยวข้อง&quot;
+</code></pre>
+<pre><code class="language-bash"># ดึงเฉพาะบรรทัดที่มีคำว่า checkout
+grep -n -i &quot;checkout&quot; api-docs.md | head -100
+
+# หรือดึงทั้ง section ที่มีคำว่า checkout
+awk &#39;/^##.*[Cc]heckout/,/^## /&#39; api-docs.md
+</code></pre>
+<p>เมื่อรันสคริปต์แล้วจะเห็นว่าได้เฉพาะส่วนที่เกี่ยวข้องประมาณ 50 บรรทัด ส่ง 50 บรรทัดนั้นให้ AI อ่านและอธิบาย ใช้ token แค่ ~500 tokens ประหยัดกว่า 100 เท่า</p>
+<hr>
+<p><img src="/posts/2026/8/13/cfe3e977-905c-4295-b781-4d40be03f5eb.png" alt="User extracting relevant context with AI before sending to AI"></p>
+<p>ข้อดีของแนวทางนี้คือประหยัด token อย่างมาก จากตัวอย่างจะเห็นว่าประหยัดได้ตั้งแต่ 6 เท่า ถึง 100 เท่า แถม AI ยังได้คำตอบที่แม่นยำขึ้นเพราะไม่ต้องเสียสมาธิไปกับข้อมูลที่ไม่เกี่ยวข้อง และตอบได้เร็วขึ้นเพราะส่ง token น้อย ยิ่งกับ model ที่คิดช้าเมื่อ context ยาว ยิ่งเห็นความแตกต่างชัดขึ้น</p>
+<p>อีกข้อดีคือเราไม่จำเป็นต้องใช้ model ราคาแพงที่มี context window ใหญ่ แค่ model เล็ก ๆ ก็พอ แถมก่อนส่งให้ AI วิเคราะห์ เรายังได้เห็นข้อมูลที่ถูกดึงมาว่าครบถ้วนหรือไม่ ป้องกันการเข้าใจผิดกันไปก่อน</p>
+<p>ข้อควรระวังคือถึงแม้สคริปต์ที่ AI เขียนจะช่วยได้มาก แต่ก็อาจไม่ครอบคลุมทุกกรณี หรืออาจพลาดข้อมูลสำคัญที่ซ่อนอยู่ในส่วนที่ถูกตัดทิ้งไป เช่น สาเหตุของ error อาจไม่ได้อยู่ที่บรรทัดที่มีคำว่า &quot;error&quot; แต่อยู่ที่ค่าตัวแปรผิดปกติที่เกิดขึ้นก่อนหน้านั้นหลายร้อยบรรทัด ดังนั้นลองตรวจสอบผลลัพธ์ของสคริปต์คร่าว ๆ ก่อนส่งให้ AI วิเคราะห์ต่อ และถ้าผลลัพธ์ที่ได้ดูไม่ครอบคลุม ก็ขอให้ AI ปรับปรุงสคริปต์ให้ดีขึ้นก่อนได้</p>
+<hr>
+<p>จะเห็นว่าการให้ AI เขียนโปรแกรมดึง context แทนการส่งไฟล์ทั้งก้อนเป็นเทคนิคที่ช่วยประหยัด token ได้อย่างมาก พร้อมกับได้คำตอบที่แม่นยำและเร็วขึ้น แนวคิดคือเลียนแบบวิธีที่มนุษย์เราทำงานนั่นแหละ — ใช้เครื่องมือค้นหาส่วนที่เกี่ยวข้องก่อน แล้วค่อยอ่านเฉพาะส่วนนั้น</p>
+<p>เทคนิคนี้ใช้ได้กับหลากหลายสถานการณ์ ตั้งแต่การวิเคราะห์ล็อก การรีแฟกเตอร์โค้ด ไปจนถึงการอ่าน documentation ยาว ๆ และที่สำคัญคือใช้ได้กับ AI ทุกรุ่น ไม่จำเป็นต้องพึ่ง model ราคาแพงที่มี context window ใหญ่</p>
+</div>
+    </article>
+
+    <footer class="footer">
+      &copy; 2026 Natcha Luangaroonchai
+    </footer>
+  </main>
+</body>
+</html>
