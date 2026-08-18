@@ -1,5 +1,5 @@
 ---
-title: Context Extraction และ Token Optimization
+title: 'Token Optimization: Context Extraction'
 publish_date: 2026-08-13
 tags: ['ai']
 ---
