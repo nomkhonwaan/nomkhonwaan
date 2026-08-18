@@ -4,7 +4,7 @@ publish_date: 2026-08-13
 tags: ['ai']
 ---
 
-![Token Optimization Cover](/posts/2026/8/13/4c5f9cb7-f9b4-434f-9866-c89e1830573b.png)
+![User sending large file directly to AI](/posts/2026/8/13/4c5f9cb7-f9b4-434f-9866-c89e1830573b.png)
 
 เวลาทำงานกับ AI เรามักจะส่งไฟล์ทั้งก้อนให้ AI อ่าน ไม่ว่าจะเป็นล็อกไฟล์หลายพันบรรทัด โค้ดเบสขนาดใหญ่ หรือ documentation ยาว ๆ ยิ่ง context window ของ AI model ใหญ่ขึ้นเท่าไร เรายิ่งรู้สึกว่า "ส่งเข้าไปเลยก็ได้" แต่การทำแบบนั้นกิน token มหาศาลโดยไม่จำเป็น
 
@@ -127,7 +127,7 @@ awk '/^##.*[Cc]heckout/,/^## /' api-docs.md
 
 ---
 
-![Context Extraction Concept](/posts/2026/8/13/cfe3e977-905c-4295-b781-4d40be03f5eb.png)
+![User extracting relevant context with AI before sending to AI](/posts/2026/8/13/cfe3e977-905c-4295-b781-4d40be03f5eb.png)
 
 ข้อดีของแนวทางนี้คือประหยัด token อย่างมาก จากตัวอย่างจะเห็นว่าประหยัดได้ตั้งแต่ 6 เท่า ถึง 100 เท่า แถม AI ยังได้คำตอบที่แม่นยำขึ้นเพราะไม่ต้องเสียสมาธิไปกับข้อมูลที่ไม่เกี่ยวข้อง และตอบได้เร็วขึ้นเพราะส่ง token น้อย ยิ่งกับ model ที่คิดช้าเมื่อ context ยาว ยิ่งเห็นความแตกต่างชัดขึ้น
 
