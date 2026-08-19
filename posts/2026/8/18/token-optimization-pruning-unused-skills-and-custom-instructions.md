@@ -1,5 +1,5 @@
 ---
-title: 'Token Optimization: การตัดแต่ง Skill และ Custom Instruction ที่ไม่ได้ใช้'
+title: 'Token Optimization: Pruning Unused Skills and Custom Instructions'
 publish_date: 2026-08-18
 tags: ['ai']
 
