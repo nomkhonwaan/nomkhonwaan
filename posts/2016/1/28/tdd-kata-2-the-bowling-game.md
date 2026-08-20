@@ -11,6 +11,7 @@ tags: ['tdd', 'kata', 'go']
 
 - [TDD Kata 1 - String Calculator](/2015/6/1/tdd-kata-1-string-calculator)
 - [TDD Kata 2 - Bowling Game](/2016/1/28/tdd-kata-2-the-bowling-game)
+- [TDD Kata 3 - Advent of Code 2025 Day 7: Laboratories](/2026/8/20/tdd-data-3-aoc-2025-day-7)
 
 ---
 
