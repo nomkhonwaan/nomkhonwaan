@@ -818,7 +818,7 @@ test tests::test_second_part_two_splitters ... ok
 ...
 ```
 
-ผ่าน! ได้ 4 timelines ตามที่คิดไว้
+ผ่าน ได้ 4 timelines ตามที่คิดไว้
 
 ---
 
@@ -871,7 +871,7 @@ test tests::test_second_part_two_splitters ... ok
 ...
 ```
 
-ผ่านทั้ง 16 test แล้ว!
+ผ่านทั้ง 16 test แล้ว
 
 ## รันกับอินพุตจริง
 
@@ -882,8 +882,3 @@ cd advent-of-code/2025 && cargo run --bin day7 -- src/bin/day7/input.txt
 ```
 
 โปรแกรมจะอ่านแผนผังจากไฟล์ คำนวณจำนวนการแยกลำแสงและจำนวน timelines และพิมพ์ผลลัพธ์ออกมา
-
-```
-First part answer: 1592
-Second part answer: 17921968177009
-```
