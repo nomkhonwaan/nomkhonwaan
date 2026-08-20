@@ -14,6 +14,10 @@ tags: ['tdd', 'kata', 'rust', 'advent-of-code']
 - [TDD Kata 2 - Bowling Game](/2016/1/28/tdd-kata-2-the-bowling-game)
 - [TDD Kata 3 - Advent of Code 2025 Day 7: Laboratories](/2026/8/20/tdd-data-3-aoc-2025-day-7)
 
+## TL;DR
+
+[GitHub]((https://github.com/nomkhonwaan/nomkhonwaan/blob/main/advent-of-code/2025/src/bin/day7))
+
 ---
 
 ## กติกา
@@ -105,6 +109,7 @@ fn main() {
     let grid = parse_grid(&input);
 
     println!("First part answer: {}", cal_first_part_answer(&grid));
+    println!("Second part answer: {}", cal_second_part_answer(&grid));
 }
 
 fn parse_grid(input: &[String]) -> Vec<Vec<u8>> {
@@ -114,9 +119,13 @@ fn parse_grid(input: &[String]) -> Vec<Vec<u8>> {
 fn cal_first_part_answer(grid: &[Vec<u8>]) -> usize {
     0
 }
+
+fn cal_second_part_answer(grid: &[Vec<u8>]) -> usize {
+    0
+}
 ```
 
-เท่านี้เราก็มีโครงโปรแกรมที่พร้อมทำงานกับไฟล์อินพุตจริงแล้ว ต่อไปเราจะใช้ TDD เพื่อพัฒนา `parse_grid`, `find_start` และ `cal_first_part_answer` กัน
+เท่านี้เราก็มีโครงโปรแกรมที่พร้อมทำงานกับไฟล์อินพุตจริงแล้ว ต่อไปเราจะใช้ TDD เพื่อพัฒนา `parse_grid`, `find_start`, `cal_first_part_answer` และ `cal_second_part_answer` กัน
 
 ---
 
@@ -532,7 +541,7 @@ mod tests {
     // ...
 
     #[test]
-    fn test_full_example() {
+    fn test_first_part() {
         let input = vec![
             ".......S.......".to_string(),
             "...............".to_string(),
@@ -564,7 +573,7 @@ running 11 tests
 test tests::test_diamond_pattern ... ok
 test tests::test_find_start ... ok
 test tests::test_find_start_no_s ... ok
-test tests::test_full_example ... ok
+test tests::test_first_part ... ok
 test tests::test_no_splitters ... ok
 test tests::test_no_splitters_single_column ... ok
 test tests::test_one_splitter ... ok
@@ -574,34 +583,309 @@ test tests::test_three_splitters_in_line ... ok
 test tests::test_two_splitters_in_line ... ok
 ```
 
-ผ่าน! ครบ 21 ครั้งตามที่โจทย์กำหนด
+ผ่าน!
 
 ---
+
+## Part 2: Quantum Tachyon Manifold
+
+ปรากฏว่า manifold ที่แท้จริงนั้นเป็นแบบ quantum ซึ่งมีคุณสมบัติพิเศษคือเมื่ออนุภาคชน splitter อนุภาคจะแยกไปทั้งทางซ้ายและทางขวาพร้อมกัน โดยเวลาจะแตกออกเป็นสองเส้นทาง (timelines) ต่างกัน
+
+หน้าที่ของเราคือหาจำนวน timelines ทั้งหมดที่เกิดขึ้นหลังจากอนุภาคหนึ่งตัวเดินทางผ่าน manifold ครบทุกเส้นทางที่เป็นไปได้
+
+ก่อนอื่น implement stub สำหรับ `cal_second_part_answer`:
+
+```rust
+fn cal_second_part_answer(grid: &[Vec<u8>]) -> usize {
+    0
+}
+```
+
+จากนั้นเริ่มเขียนเทสทีละขั้น
+
+---
+
+### Step 8: Count Timelines - No Splitters
+
+กรณีที่ง่ายที่สุดคือไม่มี splitter เลย ลำแสงจะเคลื่อนที่ลงมาตรง ๆ จนออกจากกริด โดยมีแค่ 1 timeline
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ...
+
+    #[test]
+    fn test_second_part_no_splitters() {
+        let input = vec![
+            "S..".to_string(),
+            "...".to_string(),
+            "...".to_string(),
+        ];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 1);
+    }
+}
+```
+
+รันเทสแล้วพัง! เพราะฟังก์ชันยัง return 0:
+
+```
+running 12 tests
+test tests::test_second_part_no_splitters ... FAILED
+...
+```
+
+จากนั้นแก้ไข `cal_second_part_answer` ให้ return 1 สำหรับกรณีที่ไม่มี splitter แต่ยังไม่ต้อง implement จริง:
+
+```rust
+fn cal_second_part_answer(grid: &[Vec<u8>]) -> usize {
+    1
+}
+```
+
+รันเทสอีกครั้ง:
+
+```
+running 12 tests
+test tests::test_second_part_no_splitters ... ok
+...
+```
+
+ผ่าน!
+
+---
+
+### Step 9: Count Timelines - One Splitter
+
+ถ้ามี splitter ตัวเดียว จะเกิด 2 timelines (แยกซ้าย-ขวา)
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ...
+
+    #[test]
+    fn test_second_part_one_splitter() {
+        let input = vec![
+            "S".to_string(),
+            "^".to_string(),
+            ".".to_string(),
+        ];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 2);
+    }
+}
+```
+
+รันเทส:
+
+```
+running 13 tests
+test tests::test_second_part_one_splitter ... FAILED
+...
+```
+
+เทสพังตามที่คาดไว้ จากนั้น implement ฟังก์ชัน `cal_second_part_answer` จริง โดยใช้ recursion และ memoization:
+
+```rust
+fn cal_second_part_answer(grid: &[Vec<u8>]) -> usize {
+    let start = find_start(grid).expect("grid must have a start position");
+    let mut memo = vec![vec![None; grid[0].len()]; grid.len()];
+    count_timelines(grid, start.0 + 1, start.1, &mut memo)
+}
+
+fn count_timelines(
+    grid: &[Vec<u8>],
+    r: usize,
+    c: usize,
+    memo: &mut Vec<Vec<Option<usize>>>,
+) -> usize {
+    if r >= grid.len() {
+        return 1;
+    }
+    if let Some(val) = memo[r][c] {
+        return val;
+    }
+    let result = match grid[r][c] {
+        b'^' => {
+            let left = if c > 0 {
+                count_timelines(grid, r, c - 1, memo)
+            } else {
+                1
+            };
+            let right = if c + 1 < grid[0].len() {
+                count_timelines(grid, r, c + 1, memo)
+            } else {
+                1
+            };
+            left + right
+        }
+        _ => count_timelines(grid, r + 1, c, memo),
+    };
+    memo[r][c] = Some(result);
+    result
+}
+```
+
+รันเทส:
+
+```
+running 13 tests
+test tests::test_second_part_one_splitter ... ok
+test tests::test_second_part_no_splitters ... ok
+...
+```
+
+ผ่าน!
+
+---
+
+### Step 10: Count Timelines - Multiple Splitters
+
+เพิ่มเทสที่มี splitter หลายตัวในแนวเดียวกัน ควรจะได้ 2 timelines เช่นกันเพราะลำแสงที่แยกไปซ้าย-ขวาจะออกนอกกริด
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ...
+
+    #[test]
+    fn test_second_part_two_splitters() {
+        let input = vec![
+            "S".to_string(),
+            "^".to_string(),
+            "^".to_string(),
+            ".".to_string(),
+        ];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 2);
+    }
+}
+```
+
+รันเทส:
+
+```
+running 14 tests
+test tests::test_second_part_no_splitters ... ok
+test tests::test_second_part_one_splitter ... ok
+test tests::test_second_part_two_splitters ... ok
+...
+```
+
+ผ่าน!
+
+---
+
+### Step 11: Count Timelines - Diamond Pattern
+
+เคสที่ splitter วางตัวเป็นรูปเพชร ควรจะได้ 4 timelines
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ...
+
+    #[test]
+    fn test_second_part_diamond_pattern() {
+        let input = vec![
+            "..S..".to_string(),
+            ".....".to_string(),
+            "..^..".to_string(),
+            ".....".to_string(),
+            ".^.^.".to_string(),
+        ];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 4);
+    }
+}
+```
+
+รันเทส:
+
+```
+running 15 tests
+test tests::test_second_part_diamond_pattern ... ok
+test tests::test_second_part_no_splitters ... ok
+test tests::test_second_part_one_splitter ... ok
+test tests::test_second_part_two_splitters ... ok
+...
+```
+
+ผ่าน!
+
+---
+
+### Step 12: Count Timelines - Full Example
+
+ถึงเวลาทดสอบกับตัวอย่างเต็ม ซึ่งควรจะได้ 40 timelines
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ...
+
+    #[test]
+    fn test_second_part() {
+        let input = vec![
+            ".......S.......".to_string(),
+            "...............".to_string(),
+            ".......^.......".to_string(),
+            "...............".to_string(),
+            "......^.^......".to_string(),
+            "...............".to_string(),
+            ".....^.^.^.....".to_string(),
+            "...............".to_string(),
+            "....^.^...^....".to_string(),
+            "...............".to_string(),
+            "...^.^...^.^...".to_string(),
+            "...............".to_string(),
+            "..^...^.....^..".to_string(),
+            "...............".to_string(),
+            ".^.^.^.^.^...^.".to_string(),
+            "...............".to_string(),
+        ];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 40);
+    }
+}
+```
+
+รันเทส:
+
+```
+running 16 tests
+test tests::test_second_part ... ok
+test tests::test_second_part_diamond_pattern ... ok
+test tests::test_second_part_no_splitters ... ok
+test tests::test_second_part_one_splitter ... ok
+test tests::test_second_part_two_splitters ... ok
+...
+```
+
+ผ่าน!
 
 ## รันกับอินพุตจริง
 
 เมื่อเทสผ่านทั้งหมดแล้ว เราสามารถรันโปรแกรมกับไฟล์อินพุตจริงได้เลย:
 
 ```bash
-cd advent-of-code/2025 && cargo run --bin day7 -- path/to/input.txt
+cd advent-of-code/2025 && cargo run --bin day7 -- src/bin/day7/input.txt
 ```
 
-โปรแกรมจะอ่านแผนผังจากไฟล์ คำนวณจำนวนการแยกลำแสง และพิมพ์ผลลัพธ์ออกมา
+โปรแกรมจะอ่านแผนผังจากไฟล์ คำนวณจำนวนการแยกลำแสงและจำนวน timelines และพิมพ์ผลลัพธ์ออกมา
 
----
-
-## สรุป
-
-เราใช้ TDD เพื่อแก้โจทย์ Advent of Code 2025 Day 7 ด้วยภาษา Rust โดยเริ่มจากขั้นตอนง่าย ๆ ไปจนถึงตัวอย่างเต็ม:
-
-- **Step 1:** สร้างฟังก์ชัน `parse_grid` สำหรับแปลงอินพุตเป็นกริด
-- **Step 2:** สร้างฟังก์ชัน `find_start` สำหรับหาตำแหน่งเริ่มต้นของลำแสง
-- **Step 3:** เริ่มต้น `cal_first_part_answer` สำหรับกรณีที่ไม่มี splitter
-- **Step 4-6:** เพิ่มความซับซ้อนทีละน้อยด้วย splitter หนึ่งตัว หลายตัว และรูปแบบต่าง ๆ
-- **Step 7:** ทดสอบกับตัวอย่างเต็มที่ได้ 21 ครั้ง
-
-แนวคิดสำคัญที่ได้จาก kata นี้คือการจำลองลำแสง (beam simulation) ด้วยการเก็บตำแหน่งของลำแสงทั้งหมดใน `Vec` และประมวลผลทีละตัว เมื่อเจอ splitter ก็เพิ่มลำแสงใหม่เข้าไปในลิสต์ ทำแบบนี้ไปเรื่อย ๆ จนกระทั่งลำแสงทั้งหมดออกจากกริด
-
----
-
-ตัวอย่างโค้ดฉบับเต็มสามารถดูได้ที่ [GitHub](https://github.com/nomkhonwaan/advent-of-code-2025/tree/main/src/bin/day7)
+```
+First part answer: 1592
+Second part answer: 17921968177009
+```

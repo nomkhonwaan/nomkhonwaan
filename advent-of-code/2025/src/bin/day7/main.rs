@@ -7,6 +7,7 @@ fn main() {
     let grid = parse_grid(&input);
 
     println!("First part answer: {}", cal_first_part_answer(&grid));
+    println!("Second part answer: {}", cal_second_part_answer(&grid));
 }
 
 fn parse_grid(input: &[String]) -> Vec<Vec<u8>> {
@@ -56,6 +57,44 @@ fn find_start(grid: &[Vec<u8>]) -> Option<(usize, usize)> {
         }
     }
     None
+}
+
+fn cal_second_part_answer(grid: &[Vec<u8>]) -> usize {
+    let start = find_start(grid).expect("grid must have a start position");
+    let mut memo = vec![vec![None; grid[0].len()]; grid.len()];
+    count_timelines(grid, start.0 + 1, start.1, &mut memo)
+}
+
+fn count_timelines(
+    grid: &[Vec<u8>],
+    r: usize,
+    c: usize,
+    memo: &mut Vec<Vec<Option<usize>>>,
+) -> usize {
+    if r >= grid.len() {
+        return 1;
+    }
+    if let Some(val) = memo[r][c] {
+        return val;
+    }
+    let result = match grid[r][c] {
+        b'^' => {
+            let left = if c > 0 {
+                count_timelines(grid, r, c - 1, memo)
+            } else {
+                1
+            };
+            let right = if c + 1 < grid[0].len() {
+                count_timelines(grid, r, c + 1, memo)
+            } else {
+                1
+            };
+            left + right
+        }
+        _ => count_timelines(grid, r + 1, c, memo),
+    };
+    memo[r][c] = Some(result);
+    result
 }
 
 #[cfg(test)]
@@ -192,5 +231,68 @@ mod tests {
         ];
         let grid = parse_grid(&input);
         assert_eq!(cal_first_part_answer(&grid), 21);
+    }
+
+    #[test]
+    fn test_second_part_no_splitters() {
+        let input = vec!["S..".to_string(), "...".to_string(), "...".to_string()];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 1);
+    }
+
+    #[test]
+    fn test_second_part_one_splitter() {
+        let input = vec!["S".to_string(), "^".to_string(), ".".to_string()];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 2);
+    }
+
+    #[test]
+    fn test_second_part_two_splitters() {
+        let input = vec![
+            "S".to_string(),
+            "^".to_string(),
+            "^".to_string(),
+            ".".to_string(),
+        ];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 2);
+    }
+
+    #[test]
+    fn test_second_part_diamond_pattern() {
+        let input = vec![
+            "..S..".to_string(),
+            ".....".to_string(),
+            "..^..".to_string(),
+            ".....".to_string(),
+            ".^.^.".to_string(),
+        ];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 4);
+    }
+
+    #[test]
+    fn test_second_part() {
+        let input = vec![
+            ".......S.......".to_string(),
+            "...............".to_string(),
+            ".......^.......".to_string(),
+            "...............".to_string(),
+            "......^.^......".to_string(),
+            "...............".to_string(),
+            ".....^.^.^.....".to_string(),
+            "...............".to_string(),
+            "....^.^...^....".to_string(),
+            "...............".to_string(),
+            "...^.^...^.^...".to_string(),
+            "...............".to_string(),
+            "..^...^.....^..".to_string(),
+            "...............".to_string(),
+            ".^.^.^.^.^...^.".to_string(),
+            "...............".to_string(),
+        ];
+        let grid = parse_grid(&input);
+        assert_eq!(cal_second_part_answer(&grid), 40);
     }
 }
