@@ -171,7 +171,7 @@ mod tests {
     }
 
     #[test]
-    fn test_full_example() {
+    fn test_first_part() {
         let input = vec![
             ".......S.......".to_string(),
             "...............".to_string(),
