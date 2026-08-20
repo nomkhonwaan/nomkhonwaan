@@ -16,7 +16,7 @@ tags: ['tdd', 'kata', 'rust', 'advent-of-code']
 
 ## TL;DR
 
-[GitHub]((https://github.com/nomkhonwaan/nomkhonwaan/blob/main/advent-of-code/2025/src/bin/day7))
+[GitHub](https://github.com/nomkhonwaan/nomkhonwaan/blob/main/advent-of-code/2025/src/bin/day7/main.rs)
 
 ---
 
@@ -173,7 +173,7 @@ running 1 test
 test tests::test_parse_grid ... ok
 ```
 
-เทสผ่าน! เพราะเราได้เขียน `parse_grid` ไว้ในโครงหลักแล้ว
+เทสผ่าน เพราะเราได้เขียน `parse_grid` ไว้ในโครงหลักแล้ว
 
 ---
 
@@ -214,7 +214,7 @@ mod tests {
 }
 ```
 
-รันเทสแล้วพังตามที่คาดไว้ จากนั้นเขียนฟังก์ชัน `find_start`:
+รันเทสแล้วพัง เพราะยังไม่มี `find_start` อยู่เลย จากนั้นเขียนฟังก์ชันนี้:
 
 ```rust
 fn find_start(grid: &[Vec<u8>]) -> Option<(usize, usize)> {
@@ -238,7 +238,7 @@ test tests::test_find_start_no_s ... ok
 test tests::test_parse_grid ... ok
 ```
 
-ผ่าน!
+ได้ `(0, 7)` ตามที่คาดหวัง และเคสที่ไม่มี `S` ก็ return `None` ตามที่ตั้งใจไว้
 
 ---
 
@@ -280,7 +280,7 @@ mod tests {
 }
 ```
 
-รันเทสแล้วผ่าน! เพราะฟังก์ชัน `cal_first_part_answer` ที่ return 0 อยู่แล้วตรงกับเคสที่ไม่มี splitter
+รันเทสแล้วผ่าน เพราะฟังก์ชัน `cal_first_part_answer` ที่ return 0 อยู่แล้วตรงกับเคสที่ไม่มี splitter
 
 ---
 
@@ -331,9 +331,9 @@ assertion `left == right` failed
  right: 1
 ```
 
-เทสพังตามที่คาดไว้ เพราะฟังก์ชันยัง return 0 เสมอ
+พังตามคาด เพราะ `cal_first_part_answer` ยัง return 0 อยู่เลย
 
-จากนั้นเขียนฟังก์ชัน `cal_first_part_answer` จริง โดยแทนที่ฟังก์ชันเดิมที่ return 0:
+จากนั้นเขียน `cal_first_part_answer` จริง โดยแทนที่ฟังก์ชันเดิมที่ return 0:
 
 ```rust
 fn cal_first_part_answer(grid: &[Vec<u8>]) -> usize {
@@ -383,9 +383,7 @@ test tests::test_find_start_no_s ... ok
 test tests::test_parse_grid ... ok
 ```
 
-ผ่าน!
-
-เพิ่มเทสอีกเคสสำหรับ splitter ที่ไม่อยู่ตรงแนวเดียวกับ `S`:
+ผ่าน เคสที่มี splitter ตัวเดียวผ่านแล้ว มาเพิ่มเคสอีกที่ splitter ไม่ได้อยู่ตรงแนวกับ `S`:
 
 ```rust
 #[cfg(test)]
@@ -420,7 +418,7 @@ test tests::test_one_splitter ... ok
 test tests::test_parse_grid ... ok
 ```
 
-ผ่าน! เพราะ `^` อยู่ที่ตำแหน่ง (2,2) แต่ลำแสงเคลื่อนที่ลงมาตรง ๆ จาก `S` ที่ (0,0) ในแนวคอลัมน์ 0 จึงไม่เจอ splitter นี้
+เทส เพราะ `^` อยู่ที่ตำแหน่ง (2,2) แต่ลำแสงเคลื่อนที่ลงมาตรง ๆ จาก `S` ที่ (0,0) ในแนวคอลัมน์ 0 จึงไม่เจอ splitter นี้
 
 ---
 
@@ -479,13 +477,13 @@ test tests::test_three_splitters_in_line ... ok
 test tests::test_two_splitters_in_line ... ok
 ```
 
-ผ่าน! แต่ละเคสได้แค่ 1 split เพราะหลังจาก splitter ตัวแรกที่ (1,0) ลำแสงใหม่ที่แยกไปทางซ้ายและขวาจะออกนอกกริด (เนื่องจากกริดกว้างแค่ 1 คอลัมน์) ทำให้ splitter ตัวถัดไปในแนวเดียวกันไม่ถูกเจอ
+ทั้ง 9 test ผ่าน แต่ละเคสได้แค่ 1 split เพราะหลังจาก splitter ตัวแรกที่ (1,0) ลำแสงใหม่ที่แยกไปทางซ้ายและขวาจะออกนอกกริด (เนื่องจากกริดกว้างแค่ 1 คอลัมน์) ทำให้ splitter ตัวถัดไปในแนวเดียวกันไม่ถูกเจอ
 
 ---
 
 ## Step 6: Count Splits - Diamond Pattern
 
-ลองเคสที่ splitter วางตัวเป็นรูปสามเหลี่ยมหรือเพชร ซึ่งจะทำให้เกิดการแยกที่ซับซ้อนขึ้น
+ลองเคสที่ splitter วางตัวเป็นรูปเพชร ซึ่งจะทำให้เกิดการแยกที่ซับซ้อนขึ้น
 
 ```rust
 #[cfg(test)]
@@ -525,7 +523,7 @@ test tests::test_parse_grid ... ok
 test tests::test_two_splitters_in_line ... ok
 ```
 
-ผ่าน!
+ผ่าน 10 test ได้ 3 ครั้งตามที่เราตั้งใจ
 
 ---
 
@@ -583,7 +581,7 @@ test tests::test_three_splitters_in_line ... ok
 test tests::test_two_splitters_in_line ... ok
 ```
 
-ผ่าน!
+ผ่าน ได้ 21 ตามโจทย์
 
 ---
 
@@ -653,7 +651,7 @@ test tests::test_second_part_no_splitters ... ok
 ...
 ```
 
-ผ่าน!
+ผ่านเคสพื้นฐานได้แล้ว ต่อไปลองเคสที่มี splitter
 
 ---
 
@@ -689,7 +687,7 @@ test tests::test_second_part_one_splitter ... FAILED
 ...
 ```
 
-เทสพังตามที่คาดไว้ จากนั้น implement ฟังก์ชัน `cal_second_part_answer` จริง โดยใช้ recursion และ memoization:
+พังเพราะตอนนี้ยัง return 1 อยู่ มา implement `cal_second_part_answer` จริง โดยใช้ recursion พร้อม memoization:
 
 ```rust
 fn cal_second_part_answer(grid: &[Vec<u8>]) -> usize {
@@ -740,7 +738,7 @@ test tests::test_second_part_no_splitters ... ok
 ...
 ```
 
-ผ่าน!
+ได้ 2 timelines ตามที่คาดหวัง มาลองเคสที่ซับซ้อนขึ้นอีกหน่อย
 
 ---
 
@@ -779,13 +777,13 @@ test tests::test_second_part_two_splitters ... ok
 ...
 ```
 
-ผ่าน!
+ผ่านทั้ง 3 เคส ลองเคสรูปเพชรกัน
 
 ---
 
 ### Step 11: Count Timelines - Diamond Pattern
 
-เคสที่ splitter วางตัวเป็นรูปเพชร ควรจะได้ 4 timelines
+เอาเคสรูปเพชรมาลองกับ Part 2 ดูบ้าง คราวนี้ควรจะได้ 4 timelines เพราะแต่ละสาขาแยกเป็น timeline ของตัวเอง
 
 ```rust
 #[cfg(test)]
@@ -820,7 +818,7 @@ test tests::test_second_part_two_splitters ... ok
 ...
 ```
 
-ผ่าน!
+ผ่าน! ได้ 4 timelines ตามที่คิดไว้
 
 ---
 
@@ -873,7 +871,7 @@ test tests::test_second_part_two_splitters ... ok
 ...
 ```
 
-ผ่าน!
+ผ่านทั้ง 16 test แล้ว!
 
 ## รันกับอินพุตจริง
 
