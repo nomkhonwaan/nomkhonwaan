@@ -331,18 +331,25 @@ fn cal_first_part_answer(grid: &[Vec<u8>]) -> usize {
     let start = find_start(grid).expect("grid must have a start position");
     let mut split_count = 0;
     let mut beams = vec![start];
+    let mut visited = vec![vec![false; grid[0].len()]; grid.len()];
 
     while let Some((row, col)) = beams.pop() {
+        if visited[row][col] {
+            continue;
+        }
+        visited[row][col] = true;
+
         let mut r = row + 1;
 
         while r < grid.len() {
+            visited[r][col] = true;
             match grid[r][col] {
                 b'^' => {
                     split_count += 1;
-                    if col > 0 {
+                    if col > 0 && !visited[r][col - 1] {
                         beams.push((r, col - 1));
                     }
-                    if col + 1 < grid[0].len() {
+                    if col + 1 < grid[0].len() && !visited[r][col + 1] {
                         beams.push((r, col + 1));
                     }
                     break;
