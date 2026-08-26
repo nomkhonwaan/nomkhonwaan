@@ -76,8 +76,8 @@ fn cal_second_part_answer(vertices: &[(i64, i64)]) -> i64 {
     0
 }
 
-fn is_rectangle_valid(xmin: i64, xmax: i64, ymin: i64, ymax: i64, vertices: &[(i64, i64)]) -> bool {
-    if has_vertex_inside(xmin, xmax, ymin, ymax, vertices) {
+fn is_rectangle_valid(x_min: i64, x_max: i64, y_min: i64, y_max: i64, vertices: &[(i64, i64)]) -> bool {
+    if has_vertex_inside(x_min, x_max, y_min, y_max, vertices) {
         return false;
     }
 
@@ -86,7 +86,7 @@ fn is_rectangle_valid(xmin: i64, xmax: i64, ymin: i64, ymax: i64, vertices: &[(i
         let p1 = vertices[i];
         let p2 = vertices[(i + 1) % n];
 
-        if edge_cuts_rectangle(xmin, xmax, ymin, ymax, p1, p2) {
+        if edge_cuts_rectangle(x_min, x_max, y_min, y_max, p1, p2) {
             return false;
         }
     }
@@ -94,17 +94,17 @@ fn is_rectangle_valid(xmin: i64, xmax: i64, ymin: i64, ymax: i64, vertices: &[(i
     true
 }
 
-fn has_vertex_inside(xmin: i64, xmax: i64, ymin: i64, ymax: i64, vertices: &[(i64, i64)]) -> bool {
+fn has_vertex_inside(x_min: i64, x_max: i64, y_min: i64, y_max: i64, vertices: &[(i64, i64)]) -> bool {
     vertices
         .iter()
-        .any(|&(x, y)| x > xmin && x < xmax && y > ymin && y < ymax)
+        .any(|&(x, y)| x > x_min && x < x_max && y > y_min && y < y_max)
 }
 
 fn edge_cuts_rectangle(
-    xmin: i64,
-    xmax: i64,
-    ymin: i64,
-    ymax: i64,
+    x_min: i64,
+    x_max: i64,
+    y_min: i64,
+    y_max: i64,
     p1: (i64, i64),
     p2: (i64, i64),
 ) -> bool {
@@ -112,13 +112,13 @@ fn edge_cuts_rectangle(
     let (x2, y2) = p2;
 
     if x1 == x2 {
-        let edge_ymin = std::cmp::min(y1, y2);
-        let edge_ymax = std::cmp::max(y1, y2);
-        x1 > xmin && x1 < xmax && !(edge_ymax <= ymin || edge_ymin >= ymax)
+        let edge_y_min = std::cmp::min(y1, y2);
+        let edge_y_max = std::cmp::max(y1, y2);
+        x1 > x_min && x1 < x_max && !(edge_y_max <= y_min || edge_y_min >= y_max)
     } else {
-        let edge_xmin = std::cmp::min(x1, x2);
-        let edge_xmax = std::cmp::max(x1, x2);
-        y1 > ymin && y1 < ymax && !(edge_xmax <= xmin || edge_xmin >= xmax)
+        let edge_x_min = std::cmp::min(x1, x2);
+        let edge_x_max = std::cmp::max(x1, x2);
+        y1 > y_min && y1 < y_max && !(edge_x_max <= x_min || edge_x_min >= x_max)
     }
 }
 
