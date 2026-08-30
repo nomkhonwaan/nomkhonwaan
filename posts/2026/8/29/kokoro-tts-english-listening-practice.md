@@ -1,5 +1,5 @@
 ---
-title: Set up English listening practice with Kokoro TTS in Python
+title: ช่วยลูกฝึกฟังภาษาอังกฤษเพื่อสอบเขียนคำศัพท์ด้วย Kokoro TTS
 publish_date: 2026-08-29
 tags: ['python', 'tts', 'kokoro', 'ai', 'side-project']
 ---
