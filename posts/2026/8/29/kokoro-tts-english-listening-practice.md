@@ -1,7 +1,7 @@
 ---
 title: ช่วยลูกฝึกฟังภาษาอังกฤษเพื่อสอบเขียนคำศัพท์ด้วย Kokoro TTS
 publish_date: 2026-08-29
-tags: ['python', 'tts', 'kokoro', 'ai', 'side-project']
+tags: ['python', 'tts', 'kokoro', 'ai']
 ---
 
 ![Father and child practicing English listening with a word buttons web page](/posts/2026/8/29/af0aa1bd-052c-41f2-8750-64bae26142b5.png)
