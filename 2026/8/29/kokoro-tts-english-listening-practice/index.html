@@ -107,15 +107,17 @@
         </div>
       </header>
 
-      <div class="post-content markdown-body"><p>ช่วงนี้ผมกำลังช่วยลูกฝึกภาษาอังกฤษด้วยการทำแบบฝึกหัดฟัง มีคำศัพท์ 21 คำที่ต้องจำให้ได้เพื่อสอบเขียนในชั้นเรียน</p>
-<p>เงื่อนไขการสอบคือคุณครูจะบอกคำศัพท์ทีละคำ แล้วให้เด็ก ๆ เขียนตาม ด้วยสำเนียงของผมเอง คงออกเสียงได้ไม่เหมือนคุณครูที่เป็นเจ้าของภาษาแน่ ๆ</p>
-<p>เลยลองหาตัวเลือกเป็นโมเดล TTS ที่มีขนาดเล็กพอและให้เสียงสำเนียงอังกฤษได้ ก็เลยมาเจอกับ <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro-82M</a> ซึ่งเป็นโมเดลขนาด 82 ล้านพารามิเตอร์ ใช้ได้ฟรี (Apache-2.0) และรันแบบ offline บนเครื่องได้เลย ผมเลยลองเอามาทำเป็นโปรแกรมออกเสียงเพื่อให้ลูกได้ใช้ทดสอบการฟัง</p>
+      <div class="post-content markdown-body"><p><img src="/posts/2026/8/29/af0aa1bd-052c-41f2-8750-64bae26142b5.png" alt="Father and child practicing English listening with a word buttons web page"></p>
+<p>ช่วงนี้ผมกำลังช่วยลูกฝึกภาษาอังกฤษอยู่ โจทย์คือต้องทำแบบฝึกหัดฟัง มีคำศัพท์ 21 คำที่ต้องจำให้ได้เพื่อเตรียมสอบเขียนในชั้นเรียน</p>
+<p>เงื่อนไขการสอบคือคุณครูจะออกเสียงคำศัพท์ทีละคำ แล้วให้เด็ก ๆ เขียนตาม ปัญหาคือถ้าให้ผมออกเสียงเอง ด้วยสำเนียงไทย ๆ ของผม คงไม่เหมือนที่คุณครูซึ่งเป็นเจ้าของภาษาออกเสียงแน่นอน เด็กฝึกฟังผิดเสียงก็เขียนผิดคำ</p>
+<p>เลยลองหาตัวเลือกอื่นดู ก็เจอโมเดล TTS ตัวหนึ่งที่ขนาดเล็กพอรันบนเครื่องตัวเองได้ แถมออกเสียงภาษาอังกฤษได้เนียน นั่นคือ <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro-82M</a> โมเดลขนาด 82 ล้านพารามิเตอร์ ใช้ได้ฟรีภายใต้สัญญาอนุญาต Apache-2.0 และรันแบบ offline ได้เลย ผมเลยเอามาต่อยอดเป็นโปรแกรมออกเสียงคำศัพท์เล็ก ๆ ให้ลูกใช้ฝึกฟัง</p>
 <h2>TL;DR</h2>
 <p><a href="https://github.com/nomkhonwaan/nomkhonwaan/blob/main/python/kokoro/main.py">GitHub</a></p>
+<hr>
 <h2>Kokoro คืออะไร</h2>
-<p>Kokoro เป็นโมเดล text-to-speech ที่เล็กพอจะรันบน CPU หรือ Apple Silicon ได้ ติดตั้งคู่กับ <code>espeak-ng</code> สำหรับแปลงข้อความเป็นเสียง (grapheme-to-phoneme)</p>
+<p>Kokoro เป็นโมเดล text-to-speech ที่เล็กพอจะรันบน CPU หรือ Apple Silicon ได้สบาย ไม่ต้องพึ่ง GPU ตัวมันจะแปลงข้อความเป็นเสียงโดยอาศัย <code>espeak-ng</code> ในการแปลงตัวหนังสือเป็นหน่วยเสียง (grapheme-to-phoneme) ดังนั้นก่อนใช้งานต้องติดตั้ง <code>espeak-ng</code> ด้วย</p>
 <h2>จัดการคำศัพท์</h2>
-<p>หลักการคือฟังก์ชันสร้างเสียงแล้วส่ง WAV กลับในรูปแบบบิตสตรีมผ่าน HTTP:</p>
+<p>หัวใจของโปรแกรมนี้คือฟังก์ชันที่รับคำศัพท์เข้ามา แล้วคืนค่าเสียง WAV กลับออกไปเป็นบิตสตรีมผ่าน HTTP:</p>
 <pre><code class="language-python">from io import BytesIO
 import soundfile as sf
 from kokoro import KPipeline
@@ -128,13 +130,14 @@ def synthesize_wav(word: str) -&gt; bytes:
         sf.write(buf, audio.detach().cpu().numpy(), 24000, format=&quot;WAV&quot;, subtype=&quot;PCM_16&quot;)
     return buf.getvalue()
 </code></pre>
-<p>ฟังก์ชันนี้ output เป็น <code>bytes</code> ของไฟล์ WAV ในหน่วยความจำ เมื่อเบราว์เซอร์ส่ง <code>GET /audio?word=garden</code> เซิร์ฟเวอร์ก็เรียกฟังก์ชันนี้ แล้วตอบกลับเป็น <code>audio/wav</code> ให้เบราว์เซอร์เล่นได้ทันที มี <code>voice=&quot;bm_lewis&quot;</code> เป็นเสียงผู้ชายสำเนียง British English</p>
+<p>ฟังก์ชันนี้คืนค่าเป็น <code>bytes</code> ของไฟล์ WAV ที่สร้างในหน่วยความจำ เมื่อเบราว์เซอร์ส่ง <code>GET /audio?word=garden</code> มา เซิร์ฟเวอร์ก็เรียกฟังก์ชันนี้ แล้วตอบกลับเป็น <code>audio/wav</code> ให้เบราว์เซอร์เล่นได้ทันที ตรง <code>voice=&quot;bm_lewis&quot;</code> เป็นเสียงผู้ชายสำเนียง British English ซึ่งตรงกับที่คุณครูใช้พอดี</p>
 <h3>โค้ดเต็มทำงานยังไง</h3>
-<p>แยกอธิบายเป็นส่วน ๆ เพื่อให้เห็นภาพรวมชัดขึ้น โปรแกรมแบ่งเป็นสี่ส่วนหลัก</p>
+<p>ขอแยกอธิบายเป็นส่วน ๆ เพื่อให้เห็นภาพรวมชัดขึ้น โปรแกรมแบ่งเป็นสี่ส่วนหลัก</p>
 <h4>1. โหลดโมเดลไว้ล่วงหน้า</h4>
 <pre><code class="language-python">pipeline = KPipeline(lang_code=&quot;b&quot;, repo_id=&quot;hexgrad/Kokoro-82M&quot;)
 </code></pre>
-<p>บรรทัดเดียวนี้คือจุดเริ่มต้นของทุกอย่าง ตรง <code>repo_id</code> บอกให้ดาวน์โหลดโมเดล Kokoro จาก Hugging Face ครั้งแรก แล้วเก็บ (cache) ไว้ในเครื่อง ส่วน <code>lang_code=&quot;b&quot;</code> คือย่อมาจาก British English เพื่อกำหนดสำเนียง ขั้นนี้เป็นส่วนที่ช้าที่สุดของโปรแกรม เพราะต้องโหลดโมเดลทั้งหมดเข้าหน่วยความจำ แต่พอโหลดเสร็จหนึ่งครั้งแล้ว ตัวแปร <code>pipeline</code> ถูก reuse ไปตลอด เราไม่ต้องโหลดซ้ำทุกครั้งที่พูดคำใหม่</p>
+<p>บรรทัดเดียวนี้คือจุดเริ่มต้นของทุกอย่าง ตรง <code>repo_id</code> บอกให้ดาวน์โหลดโมเดล Kokoro จาก Hugging Face ครั้งแรก แล้วเก็บ (cache) ไว้ในเครื่อง ส่วน <code>lang_code=&quot;b&quot;</code> ย่อมาจาก British English ใช้กำหนดสำเนียงของเสียง</p>
+<p>ขั้นนี้เป็นส่วนที่ช้าที่สุดของโปรแกรม เพราะต้องโหลดโมเดลทั้งหมดเข้าหน่วยความจำ แต่พอโหลดเสร็จหนึ่งครั้งแล้ว ตัวแปร <code>pipeline</code> ถูก reuse ไปตลอด เราไม่ต้องโหลดซ้ำทุกครั้งที่จะให้ออกเสียงคำใหม่</p>
 <h4>2. สังเคราะห์เสียงในหน่วยความจำ</h4>
 <pre><code class="language-python">def synthesize_wav(word: str) -&gt; bytes:
     buf = BytesIO()
@@ -142,8 +145,8 @@ def synthesize_wav(word: str) -&gt; bytes:
         sf.write(buf, audio.detach().cpu().numpy(), 24000, format=&quot;WAV&quot;, subtype=&quot;PCM_16&quot;)
     return buf.getvalue()
 </code></pre>
-<p>นี่คือฟังก์ชันหลัก รับคำหนึ่งคำ (<code>word</code>) เข้ามา แล้วให้ <code>pipeline</code> พูดคำนั้นออกมาเป็นข้อมูลเสียง ตรง <code>voice=&quot;bm_lewis&quot;</code> เป็นเสียงผู้ชายสำเนียง British English</p>
-<p>ผมเขียนผลลัพธ์ลง <code>BytesIO</code> ซึ่งเป็นบัฟเฟอร์ในหน่วยความจำ แล้ว <code>sf.write</code> ก็จัดรูปแบบข้อมูลเป็น WAV (PCM 16-bit ที่ความถี่ 24kHz) ก่อนส่งกลับ ฟังก์ชันจึงคืนค่าเป็น <code>bytes</code> ของไฟล์ WAV</p>
+<p>นี่คือฟังก์ชันหลัก รับคำหนึ่งคำ (<code>word</code>) เข้ามา แล้วให้ <code>pipeline</code> ออกเสียงคำนั้นออกมา ตรง <code>voice=&quot;bm_lewis&quot;</code> เป็นเสียงผู้ชายสำเนียง British English</p>
+<p>ผมเขียนผลลัพธ์ลง <code>BytesIO</code> ซึ่งเป็นบัฟเฟอร์ในหน่วยความจำ แล้ว <code>sf.write</code> จัดรูปแบบข้อมูลเป็น WAV (PCM 16-bit ที่ความถี่ 24kHz) ก่อนส่งกลับ ฟังก์ชันจึงคืนค่าเป็น <code>bytes</code> ของไฟล์ WAV โดยที่ไม่ต้องเขียนไฟล์ลงดิสก์เลย</p>
 <h4>3. รับคำขอจาก HTTP</h4>
 <pre><code class="language-python"># GET /                  -&gt; returns the HTML page
 # GET /audio?word=garden -&gt; synthesizes &quot;garden&quot; and responds with audio/wav
@@ -161,7 +164,7 @@ def synthesize_wav(word: str) -&gt; bytes:
 pip install kokoro torch soundfile
 python python/kokoro/main.py
 </code></pre>
-<p>แล้วเปิด <code>http://127.0.0.1:8765</code> ในเบราว์เซอร์ คลิกคำไหนก็ได้ยินเสียงคำนั้นทันที โมเดลจะโหลดครั้งแรกตอนเปิดเว็บ แล้วค่อย ๆ โหลดถัดไปเรื่อย ๆ ครับ</p>
+<p>แล้วเปิด <code>http://127.0.0.1:8765</code> ในเบราว์เซอร์ คลิกคำไหนก็ได้ยินเสียงคำนั้นทันที ครั้งแรกจะช้าหน่อยเพราะโมเดลกำลังโหลด หลังจากนั้นก็เร็วใช้ได้ครับ</p>
 </div>
     </article>
 
